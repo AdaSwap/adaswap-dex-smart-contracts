@@ -2,6 +2,20 @@
 # yarn lockfile v1
 
 
+"@adaswap/core@npm:@dungvan/adaswap-core@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@dungvan/adaswap-core/-/adaswap-core-1.0.0.tgz#3903d827a1252569a491e36ba922e921ade4e15f"
+  integrity sha512-0PKDmDn4AwaUwbSTSBjXuBdyBkQUQe3AabSO9kXCJW3ojOepB5kTlNyHE/uC0kYLVpQtNidWjGiWU80k7nuvcw==
+  dependencies:
+    "@openzeppelin/contracts" "^4.5.0"
+
+"@adaswap/lib@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@adaswap/lib/-/lib-1.0.0.tgz#4987c2ff91061a9d4fe3fb2b26a666e4728db173"
+  integrity sha512-zpUjSlXlmwkq8g8YN1OATFFgHHUb0fppH7ZOMVxJJas3S4PVvG5nPwmuSgyrek4WPKosbytwHDr3R27gBg2nvg==
+  dependencies:
+    core-js "^3.21.1"
+
 "@apollo/protobufjs@1.2.2":
   version "1.2.2"
   resolved "https://registry.yarnpkg.com/@apollo/protobufjs/-/protobufjs-1.2.2.tgz#4bd92cd7701ccaef6d517cdb75af2755f049f87c"
@@ -47,20 +61,6 @@
   dependencies:
     buffer "^5.4.3"
     seedrandom "^3.0.5"
-
-"@dungvan/adaswap-core@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@dungvan/adaswap-core/-/adaswap-core-1.0.0.tgz#3903d827a1252569a491e36ba922e921ade4e15f"
-  integrity sha512-0PKDmDn4AwaUwbSTSBjXuBdyBkQUQe3AabSO9kXCJW3ojOepB5kTlNyHE/uC0kYLVpQtNidWjGiWU80k7nuvcw==
-  dependencies:
-    "@openzeppelin/contracts" "^4.5.0"
-
-"@dungvan/adaswap-libraries@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@dungvan/adaswap-libraries/-/adaswap-libraries-1.0.0.tgz#ec427094ba033b7fbb2a17eebefc275d9f1ceafd"
-  integrity sha512-2CJilLVJzmRqEfmX63V2xrIyxeZ1UCbXeWqj8t64FOmahdx/F+3m8khxZFUYKKJD7QN5VR4dYe0eKbaBr4VhWQ==
-  dependencies:
-    core-js "^3.21.1"
 
 "@ethereumjs/common@^2.3.0", "@ethereumjs/common@^2.4.0", "@ethereumjs/common@^2.6.3":
   version "2.6.3"
