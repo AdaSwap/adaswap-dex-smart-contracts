@@ -1,7 +1,7 @@
 pragma solidity >=0.8.13;
 
-import '../../../adaswap-core/contracts/interfaces/IUniswapV2Pair.sol';
-import '../../../lib/contracts/libraries/FixedPoint.sol';
+import '@dungvan/adaswap-core/contracts/interfaces/IUniswapV2Pair.sol';
+import '@dungvan/adaswap-libraries/contracts/libraries/FixedPoint.sol';
 
 // library with helper methods for oracles that are concerned with computing average prices
 library UniswapV2OracleLibrary {

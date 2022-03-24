@@ -1,9 +1,9 @@
 pragma solidity >=0.8.13;
 
-import '../../../adaswap-core/contracts/interfaces/IUniswapV2Pair.sol';
-import '../../../adaswap-core/contracts/interfaces/IUniswapV2Factory.sol';
-import '../../../lib/contracts/libraries/Babylonian.sol';
-import '../../../lib/contracts/libraries/FullMath.sol';
+import '@dungvan/adaswap-core/contracts/interfaces/IUniswapV2Pair.sol';
+import '@dungvan/adaswap-core/contracts/interfaces/IUniswapV2Factory.sol';
+import '@dungvan/adaswap-libraries/contracts/libraries/Babylonian.sol';
+import '@dungvan/adaswap-libraries/contracts/libraries/FullMath.sol';
 
 import './SafeMath.sol';
 import './UniswapV2Library.sol';
