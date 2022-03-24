@@ -1,7 +1,7 @@
 {
   "contractName": "BitMath",
   "abi": [],
-  "metadata": "{\"compiler\":{\"version\":\"0.8.13+commit.abaa5c0e\"},\"language\":\"Solidity\",\"output\":{\"abi\":[],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"@uniswap/lib/contracts/libraries/BitMath.sol\":\"BitMath\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"@uniswap/lib/contracts/libraries/BitMath.sol\":{\"keccak256\":\"0x6da2d94a147cb47401763adac782ae7f622aa97ecfd6bfddd80a5949c66a46ad\",\"license\":\"GPL-3.0-or-later\",\"urls\":[\"bzz-raw://a71a31bba6306f41a1de1a8bc2cf48d53bcffb2384bb719568bf12eb2613631e\",\"dweb:/ipfs/QmTnkGpyed8rks7LxWG6FARz5MBKr91HpUauJ1mW9pf4jX\"]}},\"version\":1}",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.13+commit.abaa5c0e\"},\"language\":\"Solidity\",\"output\":{\"abi\":[],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"../../../../lib/contracts/libraries/BitMath.sol\":\"BitMath\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"../../../../lib/contracts/libraries/BitMath.sol\":{\"keccak256\":\"0x6da2d94a147cb47401763adac782ae7f622aa97ecfd6bfddd80a5949c66a46ad\",\"license\":\"GPL-3.0-or-later\",\"urls\":[\"bzz-raw://a71a31bba6306f41a1de1a8bc2cf48d53bcffb2384bb719568bf12eb2613631e\",\"dweb:/ipfs/QmTnkGpyed8rks7LxWG6FARz5MBKr91HpUauJ1mW9pf4jX\"]}},\"version\":1}",
   "bytecode": "0x60566050600b82828239805160001a6073146043577f4e487b7100000000000000000000000000000000000000000000000000000000600052600060045260246000fd5b30600052607381538281f3fe73000000000000000000000000000000000000000030146080604052600080fdfea2646970667358221220099c4dcfc6c292a1f2eb9165c311e4071e74c66dfe452e2cb3f4c6543dda137064736f6c634300080d0033",
   "deployedBytecode": "0x73000000000000000000000000000000000000000030146080604052600080fdfea2646970667358221220099c4dcfc6c292a1f2eb9165c311e4071e74c66dfe452e2cb3f4c6543dda137064736f6c634300080d0033",
   "immutableReferences": {},
@@ -10,9 +10,9 @@
   "sourceMap": "71:2073:1:-:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;",
   "deployedSourceMap": "71:2073:1:-:0;;;;;;;;",
   "source": "// SPDX-License-Identifier: GPL-3.0-or-later\npragma solidity >=0.5.0;\n\nlibrary BitMath {\n    // returns the 0 indexed position of the most significant bit of the input x\n    // s.t. x >= 2**msb and x < 2**(msb+1)\n    function mostSignificantBit(uint256 x) internal pure returns (uint8 r) {\n        require(x > 0, 'BitMath::mostSignificantBit: zero');\n\n        if (x >= 0x100000000000000000000000000000000) {\n            x >>= 128;\n            r += 128;\n        }\n        if (x >= 0x10000000000000000) {\n            x >>= 64;\n            r += 64;\n        }\n        if (x >= 0x100000000) {\n            x >>= 32;\n            r += 32;\n        }\n        if (x >= 0x10000) {\n            x >>= 16;\n            r += 16;\n        }\n        if (x >= 0x100) {\n            x >>= 8;\n            r += 8;\n        }\n        if (x >= 0x10) {\n            x >>= 4;\n            r += 4;\n        }\n        if (x >= 0x4) {\n            x >>= 2;\n            r += 2;\n        }\n        if (x >= 0x2) r += 1;\n    }\n\n    // returns the 0 indexed position of the least significant bit of the input x\n    // s.t. (x & 2**lsb) != 0 and (x & (2**(lsb) - 1)) == 0)\n    // i.e. the bit at the index is set and the mask of all lower bits is 0\n    function leastSignificantBit(uint256 x) internal pure returns (uint8 r) {\n        require(x > 0, 'BitMath::leastSignificantBit: zero');\n\n        r = 255;\n        if (x & type(uint128).max > 0) {\n            r -= 128;\n        } else {\n            x >>= 128;\n        }\n        if (x & type(uint64).max > 0) {\n            r -= 64;\n        } else {\n            x >>= 64;\n        }\n        if (x & type(uint32).max > 0) {\n            r -= 32;\n        } else {\n            x >>= 32;\n        }\n        if (x & type(uint16).max > 0) {\n            r -= 16;\n        } else {\n            x >>= 16;\n        }\n        if (x & type(uint8).max > 0) {\n            r -= 8;\n        } else {\n            x >>= 8;\n        }\n        if (x & 0xf > 0) {\n            r -= 4;\n        } else {\n            x >>= 4;\n        }\n        if (x & 0x3 > 0) {\n            r -= 2;\n        } else {\n            x >>= 2;\n        }\n        if (x & 0x1 > 0) r -= 1;\n    }\n}\n",
-  "sourcePath": "@uniswap/lib/contracts/libraries/BitMath.sol",
+  "sourcePath": "../../../../lib/contracts/libraries/BitMath.sol",
   "ast": {
-    "absolutePath": "@uniswap/lib/contracts/libraries/BitMath.sol",
+    "absolutePath": "../../../../lib/contracts/libraries/BitMath.sol",
     "exportedSymbols": {
       "BitMath": [
         480
@@ -3417,7 +3417,7 @@
     "src": "45:2100:1"
   },
   "legacyAST": {
-    "absolutePath": "@uniswap/lib/contracts/libraries/BitMath.sol",
+    "absolutePath": "../../../../lib/contracts/libraries/BitMath.sol",
     "exportedSymbols": {
       "BitMath": [
         480

@@ -28,7 +28,7 @@
       "type": "function"
     }
   ],
-  "metadata": "{\"compiler\":{\"version\":\"0.8.13+commit.abaa5c0e\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"name\":\"Q112\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"RESOLUTION\",\"outputs\":[{\"internalType\":\"uint8\",\"name\":\"\",\"type\":\"uint8\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"@uniswap/lib/contracts/libraries/FixedPoint.sol\":\"FixedPoint\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"@uniswap/lib/contracts/libraries/Babylonian.sol\":{\"keccak256\":\"0xeb1c2a281a00f4660775f75ccfa1e51fbe1d75f86aeb9d0d297151ecdb900177\",\"license\":\"GPL-3.0-or-later\",\"urls\":[\"bzz-raw://68515f0265381bddfb1d1356ea10ce4e5784276fc09f197fcdcedfa5c75cc069\",\"dweb:/ipfs/QmXWVVPnuJwRUAu3Qpu1s7Fyc5WPQxmZPczVEe5cJ5wVHZ\"]},\"@uniswap/lib/contracts/libraries/BitMath.sol\":{\"keccak256\":\"0x6da2d94a147cb47401763adac782ae7f622aa97ecfd6bfddd80a5949c66a46ad\",\"license\":\"GPL-3.0-or-later\",\"urls\":[\"bzz-raw://a71a31bba6306f41a1de1a8bc2cf48d53bcffb2384bb719568bf12eb2613631e\",\"dweb:/ipfs/QmTnkGpyed8rks7LxWG6FARz5MBKr91HpUauJ1mW9pf4jX\"]},\"@uniswap/lib/contracts/libraries/FixedPoint.sol\":{\"keccak256\":\"0x23943e0d4c12bf77cb2db26bde3c29dea9bc697768af58ec6e4ebb13db1936ae\",\"license\":\"GPL-3.0-or-later\",\"urls\":[\"bzz-raw://a56c83a6f4bb4e3647cede27c6401e9971aa6dd6b8e878be60c1cdd021bb2dc6\",\"dweb:/ipfs/QmZcCFnJ87FT8meq7AN6wHbHZqcNe5NrxAsWAECJJr7Chb\"]},\"@uniswap/lib/contracts/libraries/FullMath.sol\":{\"keccak256\":\"0x1994e72f7775284e46b1bf45b0421807084834cd351787a3d57daf5bfd8ca298\",\"license\":\"CC-BY-4.0\",\"urls\":[\"bzz-raw://d8365c6d7fd4d1d1413367e78cbb36a769da6dcc0491f5508ae2d14cf5b38495\",\"dweb:/ipfs/QmWBQbNaa35GqD9nSmToMvQUjfc4iRzP6WFbSAgw3j2Vhv\"]}},\"version\":1}",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.13+commit.abaa5c0e\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"name\":\"Q112\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"RESOLUTION\",\"outputs\":[{\"internalType\":\"uint8\",\"name\":\"\",\"type\":\"uint8\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"../../../../lib/contracts/libraries/FixedPoint.sol\":\"FixedPoint\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"../../../../lib/contracts/libraries/Babylonian.sol\":{\"keccak256\":\"0xeb1c2a281a00f4660775f75ccfa1e51fbe1d75f86aeb9d0d297151ecdb900177\",\"license\":\"GPL-3.0-or-later\",\"urls\":[\"bzz-raw://68515f0265381bddfb1d1356ea10ce4e5784276fc09f197fcdcedfa5c75cc069\",\"dweb:/ipfs/QmXWVVPnuJwRUAu3Qpu1s7Fyc5WPQxmZPczVEe5cJ5wVHZ\"]},\"../../../../lib/contracts/libraries/BitMath.sol\":{\"keccak256\":\"0x6da2d94a147cb47401763adac782ae7f622aa97ecfd6bfddd80a5949c66a46ad\",\"license\":\"GPL-3.0-or-later\",\"urls\":[\"bzz-raw://a71a31bba6306f41a1de1a8bc2cf48d53bcffb2384bb719568bf12eb2613631e\",\"dweb:/ipfs/QmTnkGpyed8rks7LxWG6FARz5MBKr91HpUauJ1mW9pf4jX\"]},\"../../../../lib/contracts/libraries/FixedPoint.sol\":{\"keccak256\":\"0x23943e0d4c12bf77cb2db26bde3c29dea9bc697768af58ec6e4ebb13db1936ae\",\"license\":\"GPL-3.0-or-later\",\"urls\":[\"bzz-raw://a56c83a6f4bb4e3647cede27c6401e9971aa6dd6b8e878be60c1cdd021bb2dc6\",\"dweb:/ipfs/QmZcCFnJ87FT8meq7AN6wHbHZqcNe5NrxAsWAECJJr7Chb\"]},\"../../../../lib/contracts/libraries/FullMath.sol\":{\"keccak256\":\"0x1994e72f7775284e46b1bf45b0421807084834cd351787a3d57daf5bfd8ca298\",\"license\":\"CC-BY-4.0\",\"urls\":[\"bzz-raw://d8365c6d7fd4d1d1413367e78cbb36a769da6dcc0491f5508ae2d14cf5b38495\",\"dweb:/ipfs/QmWBQbNaa35GqD9nSmToMvQUjfc4iRzP6WFbSAgw3j2Vhv\"]}},\"version\":1}",
   "bytecode": "0x610127610053600b82828239805160001a607314610046577f4e487b7100000000000000000000000000000000000000000000000000000000600052600060045260246000fd5b30600052607381538281f3fe7300000000000000000000000000000000000000003014608060405260043610603d5760003560e01c80633bf7a83e146042578063552f888a14605c575b600080fd5b60486076565b6040516053919060a5565b60405180910390f35b60626089565b604051606d919060d8565b60405180910390f35b6e01000000000000000000000000000081565b607081565b6000819050919050565b609f81608e565b82525050565b600060208201905060b860008301846098565b92915050565b600060ff82169050919050565b60d28160be565b82525050565b600060208201905060eb600083018460cb565b9291505056fea2646970667358221220e713f113c81e5ce19785c269734d697c977685e6da88616585eeb60ae22d0e1764736f6c634300080d0033",
   "deployedBytecode": "0x7300000000000000000000000000000000000000003014608060405260043610603d5760003560e01c80633bf7a83e146042578063552f888a14605c575b600080fd5b60486076565b6040516053919060a5565b60405180910390f35b60626089565b604051606d919060d8565b60405180910390f35b6e01000000000000000000000000000081565b607081565b6000819050919050565b609f81608e565b82525050565b600060208201905060b860008301846098565b92915050565b600060ff82169050919050565b60d28160be565b82525050565b600060208201905060eb600083018460cb565b9291505056fea2646970667358221220e713f113c81e5ce19785c269734d697c977685e6da88616585eeb60ae22d0e1764736f6c634300080d0033",
   "immutableReferences": {},
@@ -496,9 +496,9 @@
   "sourceMap": "251:5938:2:-:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;",
   "deployedSourceMap": "251:5938:2:-:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;540:62;;;:::i;:::-;;;;;;;:::i;:::-;;;;;;;;496:38;;;:::i;:::-;;;;;;;:::i;:::-;;;;;;;;540:62;571:31;540:62;:::o;496:38::-;531:3;496:38;:::o;7:77:33:-;44:7;73:5;62:16;;7:77;;;:::o;90:126::-;185:24;203:5;185:24;:::i;:::-;180:3;173:37;90:126;;:::o;222:238::-;323:4;361:2;350:9;346:18;338:26;;374:79;450:1;439:9;435:17;426:6;374:79;:::i;:::-;222:238;;;;:::o;466:86::-;501:7;541:4;534:5;530:16;519:27;;466:86;;;:::o;558:120::-;649:22;665:5;649:22;:::i;:::-;644:3;637:35;558:120;;:::o;684:230::-;781:4;819:2;808:9;804:18;796:26;;832:75;904:1;893:9;889:17;880:6;832:75;:::i;:::-;684:230;;;;:::o",
   "source": "// SPDX-License-Identifier: GPL-3.0-or-later\npragma solidity >=0.4.0;\n\nimport './FullMath.sol';\nimport './Babylonian.sol';\nimport './BitMath.sol';\n\n// a library for handling binary fixed point numbers (https://en.wikipedia.org/wiki/Q_(number_format))\nlibrary FixedPoint {\n    // range: [0, 2**112 - 1]\n    // resolution: 1 / 2**112\n    struct uq112x112 {\n        uint224 _x;\n    }\n\n    // range: [0, 2**144 - 1]\n    // resolution: 1 / 2**112\n    struct uq144x112 {\n        uint256 _x;\n    }\n\n    uint8 public constant RESOLUTION = 112;\n    uint256 public constant Q112 = 0x10000000000000000000000000000; // 2**112\n    uint256 private constant Q224 = 0x100000000000000000000000000000000000000000000000000000000; // 2**224\n    uint256 private constant LOWER_MASK = 0xffffffffffffffffffffffffffff; // decimal of UQ*x112 (lower 112 bits)\n\n    // encode a uint112 as a UQ112x112\n    function encode(uint112 x) internal pure returns (uq112x112 memory) {\n        return uq112x112(uint224(x) << RESOLUTION);\n    }\n\n    // encodes a uint144 as a UQ144x112\n    function encode144(uint144 x) internal pure returns (uq144x112 memory) {\n        return uq144x112(uint256(x) << RESOLUTION);\n    }\n\n    // decode a UQ112x112 into a uint112 by truncating after the radix point\n    function decode(uq112x112 memory self) internal pure returns (uint112) {\n        return uint112(self._x >> RESOLUTION);\n    }\n\n    // decode a UQ144x112 into a uint144 by truncating after the radix point\n    function decode144(uq144x112 memory self) internal pure returns (uint144) {\n        return uint144(self._x >> RESOLUTION);\n    }\n\n    // multiply a UQ112x112 by a uint, returning a UQ144x112\n    // reverts on overflow\n    function mul(uq112x112 memory self, uint256 y) internal pure returns (uq144x112 memory) {\n        uint256 z = 0;\n        require(y == 0 || (z = self._x * y) / y == self._x, 'FixedPoint::mul: overflow');\n        return uq144x112(z);\n    }\n\n    // multiply a UQ112x112 by an int and decode, returning an int\n    // reverts on overflow\n    function muli(uq112x112 memory self, int256 y) internal pure returns (int256) {\n        uint256 z = FullMath.mulDiv(self._x, uint256(y < 0 ? -y : y), Q112);\n        require(z < 2**255, 'FixedPoint::muli: overflow');\n        return y < 0 ? -int256(z) : int256(z);\n    }\n\n    // multiply a UQ112x112 by a UQ112x112, returning a UQ112x112\n    // lossy\n    function muluq(uq112x112 memory self, uq112x112 memory other) internal pure returns (uq112x112 memory) {\n        if (self._x == 0 || other._x == 0) {\n            return uq112x112(0);\n        }\n        uint112 upper_self = uint112(self._x >> RESOLUTION); // * 2^0\n        uint112 lower_self = uint112(self._x & LOWER_MASK); // * 2^-112\n        uint112 upper_other = uint112(other._x >> RESOLUTION); // * 2^0\n        uint112 lower_other = uint112(other._x & LOWER_MASK); // * 2^-112\n\n        // partial products\n        uint224 upper = uint224(upper_self) * upper_other; // * 2^0\n        uint224 lower = uint224(lower_self) * lower_other; // * 2^-224\n        uint224 uppers_lowero = uint224(upper_self) * lower_other; // * 2^-112\n        uint224 uppero_lowers = uint224(upper_other) * lower_self; // * 2^-112\n\n        // so the bit shift does not overflow\n        require(upper <= type(uint112).max, 'FixedPoint::muluq: upper overflow');\n\n        // this cannot exceed 256 bits, all values are 224 bits\n        uint256 sum = uint256(upper << RESOLUTION) + uppers_lowero + uppero_lowers + (lower >> RESOLUTION);\n\n        // so the cast does not overflow\n        require(sum <= type(uint224).max, 'FixedPoint::muluq: sum overflow');\n\n        return uq112x112(uint224(sum));\n    }\n\n    // divide a UQ112x112 by a UQ112x112, returning a UQ112x112\n    function divuq(uq112x112 memory self, uq112x112 memory other) internal pure returns (uq112x112 memory) {\n        require(other._x > 0, 'FixedPoint::divuq: division by zero');\n        if (self._x == other._x) {\n            return uq112x112(uint224(Q112));\n        }\n        if (self._x <= type(uint144).max) {\n            uint256 value = (uint256(self._x) << RESOLUTION) / other._x;\n            require(value <= type(uint224).max, 'FixedPoint::divuq: overflow');\n            return uq112x112(uint224(value));\n        }\n\n        uint256 result = FullMath.mulDiv(Q112, self._x, other._x);\n        require(result <= type(uint224).max, 'FixedPoint::divuq: overflow');\n        return uq112x112(uint224(result));\n    }\n\n    // returns a UQ112x112 which represents the ratio of the numerator to the denominator\n    // can be lossy\n    function fraction(uint256 numerator, uint256 denominator) internal pure returns (uq112x112 memory) {\n        require(denominator > 0, 'FixedPoint::fraction: division by zero');\n        if (numerator == 0) return FixedPoint.uq112x112(0);\n\n        if (numerator <= type(uint144).max) {\n            uint256 result = (numerator << RESOLUTION) / denominator;\n            require(result <= type(uint224).max, 'FixedPoint::fraction: overflow');\n            return uq112x112(uint224(result));\n        } else {\n            uint256 result = FullMath.mulDiv(numerator, Q112, denominator);\n            require(result <= type(uint224).max, 'FixedPoint::fraction: overflow');\n            return uq112x112(uint224(result));\n        }\n    }\n\n    // take the reciprocal of a UQ112x112\n    // reverts on overflow\n    // lossy\n    function reciprocal(uq112x112 memory self) internal pure returns (uq112x112 memory) {\n        require(self._x != 0, 'FixedPoint::reciprocal: reciprocal of zero');\n        require(self._x != 1, 'FixedPoint::reciprocal: overflow');\n        return uq112x112(uint224(Q224 / self._x));\n    }\n\n    // square root of a UQ112x112\n    // lossy between 0/1 and 40 bits\n    function sqrt(uq112x112 memory self) internal pure returns (uq112x112 memory) {\n        if (self._x <= type(uint144).max) {\n            return uq112x112(uint224(Babylonian.sqrt(uint256(self._x) << 112)));\n        }\n\n        uint8 safeShiftBits = 255 - BitMath.mostSignificantBit(self._x);\n        safeShiftBits -= safeShiftBits % 2;\n        return uq112x112(uint224(Babylonian.sqrt(uint256(self._x) << safeShiftBits) << ((112 - safeShiftBits) / 2)));\n    }\n}\n",
-  "sourcePath": "@uniswap/lib/contracts/libraries/FixedPoint.sol",
+  "sourcePath": "../../../../lib/contracts/libraries/FixedPoint.sol",
   "ast": {
-    "absolutePath": "@uniswap/lib/contracts/libraries/FixedPoint.sol",
+    "absolutePath": "../../../../lib/contracts/libraries/FixedPoint.sol",
     "exportedSymbols": {
       "Babylonian": [
         202
@@ -529,7 +529,7 @@
         "src": "45:24:2"
       },
       {
-        "absolutePath": "@uniswap/lib/contracts/libraries/FullMath.sol",
+        "absolutePath": "../../../../lib/contracts/libraries/FullMath.sol",
         "file": "./FullMath.sol",
         "id": 483,
         "nameLocation": "-1:-1:-1",
@@ -541,7 +541,7 @@
         "unitAlias": ""
       },
       {
-        "absolutePath": "@uniswap/lib/contracts/libraries/Babylonian.sol",
+        "absolutePath": "../../../../lib/contracts/libraries/Babylonian.sol",
         "file": "./Babylonian.sol",
         "id": 484,
         "nameLocation": "-1:-1:-1",
@@ -553,7 +553,7 @@
         "unitAlias": ""
       },
       {
-        "absolutePath": "@uniswap/lib/contracts/libraries/BitMath.sol",
+        "absolutePath": "../../../../lib/contracts/libraries/BitMath.sol",
         "file": "./BitMath.sol",
         "id": 485,
         "nameLocation": "-1:-1:-1",
@@ -9320,7 +9320,7 @@
     "src": "45:6145:2"
   },
   "legacyAST": {
-    "absolutePath": "@uniswap/lib/contracts/libraries/FixedPoint.sol",
+    "absolutePath": "../../../../lib/contracts/libraries/FixedPoint.sol",
     "exportedSymbols": {
       "Babylonian": [
         202
@@ -9351,7 +9351,7 @@
         "src": "45:24:2"
       },
       {
-        "absolutePath": "@uniswap/lib/contracts/libraries/FullMath.sol",
+        "absolutePath": "../../../../lib/contracts/libraries/FullMath.sol",
         "file": "./FullMath.sol",
         "id": 483,
         "nameLocation": "-1:-1:-1",
@@ -9363,7 +9363,7 @@
         "unitAlias": ""
       },
       {
-        "absolutePath": "@uniswap/lib/contracts/libraries/Babylonian.sol",
+        "absolutePath": "../../../../lib/contracts/libraries/Babylonian.sol",
         "file": "./Babylonian.sol",
         "id": 484,
         "nameLocation": "-1:-1:-1",
@@ -9375,7 +9375,7 @@
         "unitAlias": ""
       },
       {
-        "absolutePath": "@uniswap/lib/contracts/libraries/BitMath.sol",
+        "absolutePath": "../../../../lib/contracts/libraries/BitMath.sol",
         "file": "./BitMath.sol",
         "id": 485,
         "nameLocation": "-1:-1:-1",
