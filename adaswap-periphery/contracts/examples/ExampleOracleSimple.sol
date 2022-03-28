@@ -1,8 +1,8 @@
 pragma solidity >=0.8.13;
 
-import '@dungvan/adaswap-core/contracts/interfaces/IUniswapV2Factory.sol';
-import '@dungvan/adaswap-core/contracts/interfaces/IUniswapV2Pair.sol';
-import '@dungvan/adaswap-libraries/contracts/libraries/FixedPoint.sol';
+import '@adaswap/core/contracts/interfaces/IUniswapV2Factory.sol';
+import '@adaswap/core/contracts/interfaces/IUniswapV2Pair.sol';
+import '@adaswap/lib/contracts/libraries/FixedPoint.sol';
 
 import '../libraries/UniswapV2OracleLibrary.sol';
 import '../libraries/UniswapV2Library.sol';

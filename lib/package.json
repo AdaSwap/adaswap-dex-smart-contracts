@@ -1,5 +1,5 @@
 {
-  "name": "@dungvan/adaswap-libraries",
+  "name": "@adaswap/lib",
   "version": "1.0.0",
   "description": "📖 Solidity libraries that are shared across Uniswap contracts",
   "files": [

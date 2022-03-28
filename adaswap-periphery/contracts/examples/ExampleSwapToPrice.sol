@@ -1,8 +1,8 @@
 pragma solidity >=0.8.13;
 
-import '@dungvan/adaswap-core/contracts/interfaces/IUniswapV2Pair.sol';
-import '@dungvan/adaswap-libraries/contracts/libraries/Babylonian.sol';
-import '@dungvan/adaswap-libraries/contracts/libraries/TransferHelper.sol';
+import '@adaswap/core/contracts/interfaces/IUniswapV2Pair.sol';
+import '@adaswap/lib/contracts/libraries/Babylonian.sol';
+import '@adaswap/lib/contracts/libraries/TransferHelper.sol';
 
 import '../libraries/UniswapV2LiquidityMathLibrary.sol';
 import '../interfaces/IUniswapV2Router01.sol';

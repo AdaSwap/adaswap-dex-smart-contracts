@@ -23,6 +23,6 @@ Install this in another project via `yarn add @uniswap/lib`
 Then import the contracts via:
 
 ```solidity
-import '../@dungvan/adaswap-libraries/contracts/libraries/Babylonian.sol';
+import '../@adaswap/lib/contracts/libraries/Babylonian.sol';
 
 ```

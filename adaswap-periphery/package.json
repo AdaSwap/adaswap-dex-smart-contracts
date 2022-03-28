@@ -1,5 +1,5 @@
 {
-  "name": "@dungvan/adaswap-periphery",
+  "name": "@adaswap/periphery",
   "version": "1.0.0",
   "description": "📖 Solidity libraries that are shared across Uniswap contracts",
   "files": [
@@ -22,8 +22,9 @@
   "license": "ISC",
   "keywords": [],
   "dependencies": {
+    "@adaswap/core": "npm:@dungvan/adaswap-core@^1.0.0",
+    "@adaswap/lib": "^1.0.0",
     "@openzeppelin/contracts": "^4.5.0",
-    "@dungvan/adaswap-core": "^1.0.0",
-    "@dungvan/adaswap-libraries": "^1.0.0"
+    "@truffle/hdwallet-provider": "^2.0.4"
   }
 }
