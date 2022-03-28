@@ -48,3 +48,8 @@ Thumbs.db
 *.mov
 *.wmv
 
+# Secret files
+.secret
+
+# temporary contract address deployment
+.contract.address

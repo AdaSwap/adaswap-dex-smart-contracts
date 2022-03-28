@@ -5,7 +5,6 @@ import '@adaswap/lib/contracts/libraries/TransferHelper.sol';
 
 import './libraries/UniswapV2Library.sol';
 import './interfaces/IUniswapV2Router01.sol';
-import './interfaces/IERC20.sol';
 import './interfaces/IWETH.sol';
 
 contract UniswapV2Router01 is IUniswapV2Router01 {
