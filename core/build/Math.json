@@ -1,0 +1,15 @@
+{
+  "abi": [],
+  "evm": {
+    "bytecode": {
+      "object": "60566037600b82828239805160001a607314602a57634e487b7160e01b600052600060045260246000fd5b30600052607381538281f3fe73000000000000000000000000000000000000000030146080604052600080fdfea26469706673582212208ed3b00442a0cff27ff39c9183f18cc3cadf9b45bd41af6847c2337aecfb03de64736f6c634300080d0033",
+      "sourceMap": "80:522:14:-:0;;;;;;;;;;;;;;;-1:-1:-1;;;80:522:14;;;;;;;;;;;;;;;;;"
+    },
+    "deployedBytecode": {
+      "object": "73000000000000000000000000000000000000000030146080604052600080fdfea26469706673582212208ed3b00442a0cff27ff39c9183f18cc3cadf9b45bd41af6847c2337aecfb03de64736f6c634300080d0033",
+      "sourceMap": "80:522:14:-:0;;;;;;;;"
+    }
+  },
+  "metadata": "{\"compiler\":{\"version\":\"0.8.13+commit.abaa5c0e\"},\"language\":\"Solidity\",\"output\":{\"abi\":[],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"contracts/libraries/Math.sol\":\"Math\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":999999},\"remappings\":[]},\"sources\":{\"contracts/libraries/Math.sol\":{\"keccak256\":\"0x7af1b5c7458b3acd5a1f92788e691a3c6ebd837c209d8d3b7434748773d6f51f\",\"urls\":[\"bzz-raw://4002ca81d037f9c1fcbb71f503eb8e1f047490ee36f07671bd03813aac66b671\",\"dweb:/ipfs/QmPgcapubbAZasSX9gwHxrsD39a9KP45mvD3L1UwvEmWsR\"]}},\"version\":1}",
+  "bytecode": "60566037600b82828239805160001a607314602a57634e487b7160e01b600052600060045260246000fd5b30600052607381538281f3fe73000000000000000000000000000000000000000030146080604052600080fdfea26469706673582212208ed3b00442a0cff27ff39c9183f18cc3cadf9b45bd41af6847c2337aecfb03de64736f6c634300080d0033"
+}
