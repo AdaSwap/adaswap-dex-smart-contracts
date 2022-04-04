@@ -1,11 +1,11 @@
 pragma solidity >=0.8.13;
 
-import '@adaswap/core/contracts/interfaces/IUniswapV2Factory.sol';
-import '@adaswap/core/contracts/interfaces/IUniswapV2Pair.sol';
-import '@adaswap/lib/contracts/libraries/FixedPoint.sol';
+import '@adaswap-dev/core/contracts/interfaces/IAdaswapFactory.sol';
+import '@adaswap-dev/core/contracts/interfaces/IAdaswapPair.sol';
+import '@adaswap-dev/lib/contracts/libraries/FixedPoint.sol';
 
-import '../libraries/UniswapV2OracleLibrary.sol';
-import '../libraries/UniswapV2Library.sol';
+import '../libraries/AdaswapOracleLibrary.sol';
+import '../libraries/AdaswapLibrary.sol';
 
 // fixed window oracle that recomputes the average price for the entire period once every period
 // note that the price average is only guaranteed to be over at least 1 period, but may be over a longer period
@@ -14,7 +14,7 @@ contract ExampleOracleSimple {
 
     uint public constant PERIOD = 24 hours;
 
-    IUniswapV2Pair immutable pair;
+    IAdaswapPair immutable pair;
     address public immutable token0;
     address public immutable token1;
 
@@ -25,7 +25,7 @@ contract ExampleOracleSimple {
     FixedPoint.uq112x112 public price1Average;
 
     constructor(address factory, address tokenA, address tokenB) {
-        IUniswapV2Pair _pair = IUniswapV2Pair(UniswapV2Library.pairFor(factory, tokenA, tokenB));
+        IAdaswapPair _pair = IAdaswapPair(AdaswapLibrary.pairFor(factory, tokenA, tokenB));
         pair = _pair;
         token0 = _pair.token0();
         token1 = _pair.token1();
@@ -39,7 +39,7 @@ contract ExampleOracleSimple {
 
     function update() external {
         (uint price0Cumulative, uint price1Cumulative, uint32 blockTimestamp) =
-            UniswapV2OracleLibrary.currentCumulativePrices(address(pair));
+            AdaswapOracleLibrary.currentCumulativePrices(address(pair));
         uint32 timeElapsed = blockTimestamp - blockTimestampLast; // overflow is desired
 
         // ensure that at least one full period has passed since the last update

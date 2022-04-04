@@ -1,6 +1,6 @@
 {
-  "name": "@adaswap/lib",
-  "version": "1.0.1",
+  "name": "@adaswap-dev/lib",
+  "version": "0.0.1",
   "description": "📖 Solidity libraries that are shared across Uniswap contracts",
   "files": [
     "build",

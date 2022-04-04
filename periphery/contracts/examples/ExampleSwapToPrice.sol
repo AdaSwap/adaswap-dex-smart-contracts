@@ -1,21 +1,21 @@
 pragma solidity >=0.8.13;
 
-import '@adaswap/core/contracts/interfaces/IUniswapV2Pair.sol';
-import '@adaswap/lib/contracts/libraries/Babylonian.sol';
-import '@adaswap/lib/contracts/libraries/TransferHelper.sol';
+import '@adaswap-dev/core/contracts/interfaces/IAdaswapPair.sol';
+import '@adaswap-dev/lib/contracts/libraries/Babylonian.sol';
+import '@adaswap-dev/lib/contracts/libraries/TransferHelper.sol';
 
-import '../libraries/UniswapV2LiquidityMathLibrary.sol';
-import '../interfaces/IUniswapV2Router01.sol';
+import '../libraries/AdaswapLiquidityMathLibrary.sol';
+import '../interfaces/IAdaswapRouter01.sol';
 import '../libraries/SafeMath.sol';
-import '../libraries/UniswapV2Library.sol';
+import '../libraries/AdaswapLibrary.sol';
 
 contract ExampleSwapToPrice {
     using SafeMath for uint256;
 
-    IUniswapV2Router01 public immutable router;
+    IAdaswapRouter01 public immutable router;
     address public immutable factory;
 
-    constructor(address factory_, IUniswapV2Router01 router_) {
+    constructor(address factory_, IAdaswapRouter01 router_) {
         factory = factory_;
         router = router_;
     }
@@ -41,8 +41,8 @@ contract ExampleSwapToPrice {
         bool aToB;
         uint256 amountIn;
         {
-            (uint256 reserveA, uint256 reserveB) = UniswapV2Library.getReserves(factory, tokenA, tokenB);
-            (aToB, amountIn) = UniswapV2LiquidityMathLibrary.computeProfitMaximizingTrade(
+            (uint256 reserveA, uint256 reserveB) = AdaswapLibrary.getReserves(factory, tokenA, tokenB);
+            (aToB, amountIn) = AdaswapLiquidityMathLibrary.computeProfitMaximizingTrade(
                 truePriceTokenA, truePriceTokenB,
                 reserveA, reserveB
             );

@@ -1,6 +1,6 @@
 pragma solidity >=0.8.13;
 
-import '../libraries/UniswapV2LiquidityMathLibrary.sol';
+import '../libraries/AdaswapLiquidityMathLibrary.sol';
 
 contract ExampleComputeLiquidityValue {
     using SafeMath for uint256;
@@ -11,14 +11,14 @@ contract ExampleComputeLiquidityValue {
         factory = factory_;
     }
 
-    // see UniswapV2LiquidityMathLibrary#getReservesAfterArbitrage
+    // see AdaswapLiquidityMathLibrary#getReservesAfterArbitrage
     function getReservesAfterArbitrage(
         address tokenA,
         address tokenB,
         uint256 truePriceTokenA,
         uint256 truePriceTokenB
     ) external view returns (uint256 reserveA, uint256 reserveB) {
-        return UniswapV2LiquidityMathLibrary.getReservesAfterArbitrage(
+        return AdaswapLiquidityMathLibrary.getReservesAfterArbitrage(
             factory,
             tokenA,
             tokenB,
@@ -27,7 +27,7 @@ contract ExampleComputeLiquidityValue {
         );
     }
 
-    // see UniswapV2LiquidityMathLibrary#getLiquidityValue
+    // see AdaswapLiquidityMathLibrary#getLiquidityValue
     function getLiquidityValue(
         address tokenA,
         address tokenB,
@@ -36,7 +36,7 @@ contract ExampleComputeLiquidityValue {
         uint256 tokenAAmount,
         uint256 tokenBAmount
     ) {
-        return UniswapV2LiquidityMathLibrary.getLiquidityValue(
+        return AdaswapLiquidityMathLibrary.getLiquidityValue(
             factory,
             tokenA,
             tokenB,
@@ -44,7 +44,7 @@ contract ExampleComputeLiquidityValue {
         );
     }
 
-    // see UniswapV2LiquidityMathLibrary#getLiquidityValueAfterArbitrageToPrice
+    // see AdaswapLiquidityMathLibrary#getLiquidityValueAfterArbitrageToPrice
     function getLiquidityValueAfterArbitrageToPrice(
         address tokenA,
         address tokenB,
@@ -55,7 +55,7 @@ contract ExampleComputeLiquidityValue {
         uint256 tokenAAmount,
         uint256 tokenBAmount
     ) {
-        return UniswapV2LiquidityMathLibrary.getLiquidityValueAfterArbitrageToPrice(
+        return AdaswapLiquidityMathLibrary.getLiquidityValueAfterArbitrageToPrice(
             factory,
             tokenA,
             tokenB,
@@ -76,7 +76,7 @@ contract ExampleComputeLiquidityValue {
         uint256
     ) {
         uint gasBefore = gasleft();
-        UniswapV2LiquidityMathLibrary.getLiquidityValueAfterArbitrageToPrice(
+        AdaswapLiquidityMathLibrary.getLiquidityValueAfterArbitrageToPrice(
             factory,
             tokenA,
             tokenB,
