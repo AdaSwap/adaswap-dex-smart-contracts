@@ -18,6 +18,10 @@ contract AdaswapFactory is IAdaswapFactory {
         return allPairs.length;
     }
 
+    function pairCodeHash() external pure returns (bytes32) {
+        return keccak256(type(AdaswapPair).creationCode);
+    }
+
     function createPair(address tokenA, address tokenB) external returns (address pair) {
         require(tokenA != tokenB, 'Adaswap: IDENTICAL_ADDRESSES');
         (address token0, address token1) = tokenA < tokenB ? (tokenA, tokenB) : (tokenB, tokenA);

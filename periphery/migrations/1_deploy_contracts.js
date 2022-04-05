@@ -3,7 +3,7 @@ const WETH = artifacts.require('WETH.sol');
 
 module.exports = async function (deployer, network) {
   let weth;
-  const FACTORY_CONTRACT_ADDRESS = '0x09Ced14F7CBf72eEa46cD9c48c368F952410AB87';
+  const FACTORY_CONTRACT_ADDRESS = '0xa0d2D39e4e150722Cb7E24Bd3f16CA5c3BA12f49';
 
   if (network === 'milkomedaTestnet') {
     weth = await WETH.at('0xd034bc3C84837Cfa08c8ECdD3F8d9EBB0D67e3B0');

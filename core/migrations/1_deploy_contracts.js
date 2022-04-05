@@ -8,10 +8,10 @@ module.exports = async function (deployer, network, addresses) {
   const factory = await Factory.deployed()
 
   let token1Address, token2Address;
-  if (network === 'mainnet') {
+  if (network === 'milkomedaTestnet') {
 
-    token1Address = '';
-    token2Address = '';
+    token1Address = '0x0466aA819634FB39C9349d9Ab8DB5e0bA89E6948';
+    token2Address = '0x32A82E9A172C434c1Bb5Dac6C1C3367634f93170';
 
   } else {
 
