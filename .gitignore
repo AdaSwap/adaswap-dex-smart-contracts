@@ -51,5 +51,8 @@ Thumbs.db
 # Secret files
 .secret
 
+# build files
+build
+
 # temporary contract address deployment
 .contract.address
