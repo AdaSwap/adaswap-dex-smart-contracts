@@ -1,0 +1,15 @@
+{
+  "abi": [],
+  "evm": {
+    "bytecode": {
+      "object": "60566037600b82828239805160001a607314602a57634e487b7160e01b600052600060045260246000fd5b30600052607381538281f3fe73000000000000000000000000000000000000000030146080604052600080fdfea2646970667358221220f43853778b9d396131182a3bd0465d47c4dd00daf7d61b269996611b2603443064736f6c634300080d0033",
+      "sourceMap": "211:1371:4:-:0;;;;;;;;;;;;;;;-1:-1:-1;;;211:1371:4;;;;;;;;;;;;;;;;;"
+    },
+    "deployedBytecode": {
+      "object": "73000000000000000000000000000000000000000030146080604052600080fdfea2646970667358221220f43853778b9d396131182a3bd0465d47c4dd00daf7d61b269996611b2603443064736f6c634300080d0033",
+      "sourceMap": "211:1371:4:-:0;;;;;;;;"
+    }
+  },
+  "metadata": "{\"compiler\":{\"version\":\"0.8.13+commit.abaa5c0e\"},\"language\":\"Solidity\",\"output\":{\"abi\":[],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"@adaswap-dev/lib/contracts/libraries/Babylonian.sol\":\"Babylonian\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":999999},\"remappings\":[]},\"sources\":{\"@adaswap-dev/lib/contracts/libraries/Babylonian.sol\":{\"keccak256\":\"0x1297700d70913b11fb8a0d43a2ff6981cc104e2670d52cb5b81f1299989d2bc1\",\"license\":\"GPL-3.0-or-later\",\"urls\":[\"bzz-raw://18a3ea2b27a81f9da94ded00aeb9a3de9e77d3206878ab902963f3a2585f15fe\",\"dweb:/ipfs/QmXZharQkDzPEXAT6EpiXYFwir6XwiZuBzSkSomd6DURxt\"]}},\"version\":1}",
+  "bytecode": "60566037600b82828239805160001a607314602a57634e487b7160e01b600052600060045260246000fd5b30600052607381538281f3fe73000000000000000000000000000000000000000030146080604052600080fdfea2646970667358221220f43853778b9d396131182a3bd0465d47c4dd00daf7d61b269996611b2603443064736f6c634300080d0033"
+}
