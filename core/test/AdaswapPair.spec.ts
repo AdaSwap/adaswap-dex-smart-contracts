@@ -1,0 +1,1 @@
+const MINIMUM_LIQUIDITY = web3.utils.toBN(10).pow(web3.utils.toBN(3))

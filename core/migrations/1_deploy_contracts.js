@@ -10,10 +10,17 @@ module.exports = async function (deployer, network, addresses) {
   let token1Address, token2Address;
   if (network === 'milkomedaTestnet') {
 
-    token1Address = '0x0466aA819634FB39C9349d9Ab8DB5e0bA89E6948';
-    token2Address = '0x32A82E9A172C434c1Bb5Dac6C1C3367634f93170';
+    token1Address = '0x6bD7B9EaD7c74A7eB960E8076f917A420a516FCD';
+    token2Address = '0x0B1D2C821e20dF17dCDe1009ab0794C73b2E8Bb1';
 
-  } else {
+  }
+  if (network === 'polygonTestnet') {
+
+    token1Address = '0x8ED991926567b989666e20e8E738D5428731E035';
+    token2Address = '0x62AF935678ca43591410e400515f9B9dd8dED34e';
+
+  }
+  if (network === 'development') {
 
     await deployer.deploy(Token1);
     await deployer.deploy(Token2);

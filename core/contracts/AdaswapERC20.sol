@@ -6,8 +6,8 @@ import './libraries/SafeMath.sol';
 contract AdaswapERC20 is IAdaswapERC20 {
     using SafeMath for uint;
 
-    string public constant name = 'Adaswap';
-    string public constant symbol = 'ASW';
+    string public constant name = 'Adaswap LP Token';
+    string public constant symbol = 'ALP';
     uint8 public constant decimals = 18;
     uint  public totalSupply;
     mapping(address => uint) public balanceOf;
