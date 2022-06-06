@@ -1,71 +1,30 @@
-const ERC20 = artifacts.require('test/ERC20')
-const { ecsign } = require('ethereumjs-util')
-const { use, expect } = require('chai')
-const { utils, eth } = web3
+const AdaswapERC20 = artifacts.require('test/TestAdaswapERC20')
 const solidity = require('./shared/solidity')
+const {
+  ecsign
+} = require('ethereumjs-util')
+const {
+  use,
+  expect
+} = require('chai')
+const {
+  expandTo18Decimals,
+  maxUint256,
+  getDomainSeparator,
+  getApprovalDigest,
+  PERMIT_TYPEHASH
+} = require('./shared/utils')
 
+const { utils, eth } = web3
 use(solidity)
 
-const TOTAL_SUPPLY = utils.toBN(1000).mul(utils.toBN(10).pow(utils.toBN(18)))
-const TEST_AMOUNT = utils.toBN(10).mul(utils.toBN(10).pow(utils.toBN(18)))
-const MAX_UINT256 = (utils.toBN(2).pow(utils.toBN(256))).sub(utils.toBN(1))
-const PERMIT_TYPEHASH = utils.keccak256(
-  utils.stringToHex('Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)')
-)
-
-function getDomainSeparator(
-  name,
-  tokenAddress
-) {
-  return utils.keccak256(
-    eth.abi.encodeParameters(
-      ['bytes32', 'bytes32', 'bytes32', 'uint256', 'address'],
-      [
-        utils.keccak256(
-          utils.stringToHex('EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)')
-        ),
-        utils.keccak256(utils.stringToHex(name)),
-        utils.keccak256(utils.stringToHex('1')),
-        1,
-        tokenAddress
-      ]
-    )
-  )
-}
-
-function getApprovalDigest(
-  tokenName,
-  tokenAddress,
-  approve,
-  nonce,
-  deadline
-) {
-  const DOMAIN_SEPARATOR = getDomainSeparator(tokenName, tokenAddress)
-  return utils.soliditySha3(
-    {
-      type: 'bytes1', value: '0x19'
-    },
-    {
-      type: 'bytes1', value: '0x01'
-    },
-    {
-      type: 'bytes32', value: DOMAIN_SEPARATOR
-    },
-    {
-      type: 'bytes32', value: utils.keccak256(
-        eth.abi.encodeParameters(
-          ['bytes32', 'address', 'address', 'uint256', 'uint256', 'uint256'],
-          [PERMIT_TYPEHASH, approve.owner, approve.spender, approve.value, nonce, deadline]
-        )
-      )
-    }
-  )
-}
+const TOTAL_SUPPLY = expandTo18Decimals(1000)
+const TEST_AMOUNT = expandTo18Decimals(10)
 
 contract('AdaswapERC20', async accounts => {
   let instance
   beforeEach(async () => {
-    instance = await ERC20.new(TOTAL_SUPPLY)
+    instance = await AdaswapERC20.new(TOTAL_SUPPLY)
   })
   it('name, symbol, decimals, totalSupply, balanceOf, DOMAIN_SEPARATOR, PERMIT_TYPEHASH', async () => {
     expect(await instance.name()).to.eq('Adaswap LP Token', 'token name')
@@ -150,11 +109,11 @@ contract('AdaswapERC20', async accounts => {
   })
 
   it('transferFrom:max', async () => {
-    let tx = await instance.approve(accounts[1], MAX_UINT256)
-    expect(tx).to.emit('Approval', {owner: accounts[0], spender: accounts[1], value: MAX_UINT256})
+    let tx = await instance.approve(accounts[1], maxUint256)
+    expect(tx).to.emit('Approval', {owner: accounts[0], spender: accounts[1], value: maxUint256})
 
     let allowance = await instance.allowance(accounts[0], accounts[1])
-    expect(allowance.toString()).to.eq(MAX_UINT256.toString(), 'allowance')
+    expect(allowance.toString()).to.eq(maxUint256.toString(), 'allowance')
 
     // transfer from
     tx = await instance.transferFrom(accounts[0], accounts[2], TEST_AMOUNT, { from: accounts[1] })
@@ -171,7 +130,7 @@ contract('AdaswapERC20', async accounts => {
     const wallets = await eth.accounts.wallet.create(1)
 
     let nonce = await instance.nonces(wallets[0].address)
-    const deadline = MAX_UINT256
+    const deadline = maxUint256
     const name = await instance.name()
     const digest = await getApprovalDigest(
       name,
