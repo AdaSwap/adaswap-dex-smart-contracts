@@ -15,7 +15,7 @@
 
 pragma solidity >=0.8.13;
 
-contract WETH9 {
+contract TestWETH {
     string public name     = "Wrapped Ether";
     string public symbol   = "WETH";
     uint8  public decimals = 18;
