@@ -1,4 +1,4 @@
-pragma solidity >=0.8.13;
+pragma solidity =0.8.13;
 
 import './interfaces/IAdaswapERC20.sol';
 import './libraries/SafeMath.sol';

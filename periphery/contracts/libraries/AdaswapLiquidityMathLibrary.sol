@@ -1,4 +1,4 @@
-pragma solidity >=0.8.13;
+pragma solidity =0.8.13;
 
 import '@adaswap-dev/core/contracts/interfaces/IAdaswapPair.sol';
 import '@adaswap-dev/core/contracts/interfaces/IAdaswapFactory.sol';
