@@ -54,3 +54,4 @@ Thumbs.db
 # temporary contract address deployment
 .contract.address
 
+.env

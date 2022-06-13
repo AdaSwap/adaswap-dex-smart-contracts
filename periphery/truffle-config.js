@@ -20,8 +20,7 @@
 
 const HDWalletProvider = require('@truffle/hdwallet-provider');
 
-const fs = require('fs');
-const mnemonic = fs.readFileSync(".secret").toString().trim();
+require('dotenv').config({path:'../.env'});
 
 module.exports = {
   /**
@@ -59,11 +58,34 @@ module.exports = {
     // Useful for deploying to a public network.
     // NB: It's important to wrap the provider as a function.
     milkomedaTestnet: {
-      provider: () => new HDWalletProvider(mnemonic, `https://rpc-devnet-cardano-evm.c1.milkomeda.com`),
+      provider: () => new HDWalletProvider(
+        `${process.env.MILKOMEDA_TESTNET_DEPLOYER_PRIV_KEY}`, 
+        `${process.env.MILKOMEDA_TESTNET_PROVIDER}`
+      ),
       network_id: 200101,  // Milkomeda's id
       confirmations: 2,    // # of confs to wait between deployments. (default: 0)
       timeoutBlocks: 200,  // # of blocks before a deployment times out  (minimum/default: 50)
       skipDryRun: true     // Skip dry run before migrations? (default: false for public nets )
+    },
+    polygonTestnet: {
+      provider: () => new HDWalletProvider(
+        `${process.env.POLYGON_TESTNET_DEPLOYER_PRIV_KEY}`, 
+        `${process.env.POLYGON_TESTNET_PROVIDER}`
+      ),
+      network_id: 80001,
+      confirmations: 2,
+      timeoutBlocks: 200,
+      skipDryRun: true
+    },
+    milkomedaMainnet: {
+      provider: () => new HDWalletProvider(
+        `${process.env.MILKOMEDA_MAINNET_DEPLOYER_PRIV_KEY}`, 
+        `${process.env.MILKOMEDA_MAINNET_PROVIDER}`
+      ),
+      network_id: 2001,
+      confirmations: 2,
+      timeoutBlocks: 200,
+      skipDryRun: true
     },
     // Useful for private networks
     // private: {
