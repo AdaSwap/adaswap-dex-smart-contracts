@@ -1,6 +1,6 @@
 {
-  "name": "@adaswap-dev/core",
-  "version": "0.0.5",
+  "name": "@adaswap-testnet/core",
+  "version": "0.0.3",
   "description": "📖 Solidity libraries that are shared across Uniswap contracts",
   "files": [
     "contracts",
@@ -16,6 +16,7 @@
     "@types/mocha": "^9.1.1",
     "@types/web3": "^1.2.2",
     "chai": "^4.3.6",
+    "dotenv": "^16.0.1",
     "lodash": "^4.17.21",
     "mocha": "^10.0.0",
     "solc": "^0.8.13",
@@ -32,7 +33,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@openzeppelin/contracts": "^4.5.0",
-    "@truffle/hdwallet-provider": "^2.0.4"
+    "@openzeppelin/contracts": "4.6.0",
+    "@truffle/hdwallet-provider": "2.0.4"
   }
 }

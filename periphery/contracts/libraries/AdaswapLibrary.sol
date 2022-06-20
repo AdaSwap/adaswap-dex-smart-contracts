@@ -1,6 +1,6 @@
 pragma solidity =0.8.13;
 
-import'@adaswap-dev/core/contracts/interfaces/IAdaswapPair.sol';
+import'@adaswap-testnet/core/contracts/interfaces/IAdaswapPair.sol';
 
 import './SafeMath.sol';
 
@@ -21,7 +21,7 @@ library AdaswapLibrary {
                 hex'ff',
                 factory,
                 keccak256(abi.encodePacked(token0, token1)),
-                hex'6582cb976959f37676f927ada60cce63e2a0269623981a28b6466eae7e77f544' // init code hash
+                hex'2a3a9e0090eb58d4478aa215093c7ded7ee372eac924c25d729ad0f74cd31bf5' // init code hash
             )))));
     }
 

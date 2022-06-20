@@ -1,8 +1,8 @@
 pragma solidity =0.8.13;
 
-import '@adaswap-dev/core/contracts/interfaces/IAdaswapPair.sol';
-import '@adaswap-dev/lib/contracts/libraries/Babylonian.sol';
-import '@adaswap-dev/lib/contracts/libraries/TransferHelper.sol';
+import '@adaswap-testnet/core/contracts/interfaces/IAdaswapPair.sol';
+import '@adaswap-testnet/lib/contracts/libraries/Babylonian.sol';
+import '@adaswap-testnet/lib/contracts/libraries/TransferHelper.sol';
 
 import '../libraries/AdaswapLiquidityMathLibrary.sol';
 import '../interfaces/IAdaswapRouter01.sol';
@@ -34,9 +34,9 @@ contract ExampleSwapToPrice {
         uint256 deadline
     ) public {
         // true price is expressed as a ratio, so both values must be non-zero
-        require(truePriceTokenA != 0 && truePriceTokenB != 0, "ExampleSwapToPrice: ZERO_PRICE");
+        require(truePriceTokenA != 0 && truePriceTokenB != 0, 'ExampleSwapToPrice: ZERO_PRICE');
         // caller can specify 0 for either if they wish to swap in only one direction, but not both
-        require(maxSpendTokenA != 0 || maxSpendTokenB != 0, "ExampleSwapToPrice: ZERO_SPEND");
+        require(maxSpendTokenA != 0 || maxSpendTokenB != 0, 'ExampleSwapToPrice: ZERO_SPEND');
 
         bool aToB;
         uint256 amountIn;

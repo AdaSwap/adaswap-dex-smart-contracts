@@ -1,7 +1,7 @@
 pragma solidity =0.8.13;
 
-import '@adaswap-dev/core/contracts/interfaces/IAdaswapFactory.sol';
-import '@adaswap-dev/lib/contracts/libraries/TransferHelper.sol';
+import '@adaswap-testnet/core/contracts/interfaces/IAdaswapFactory.sol';
+import '@adaswap-testnet/lib/contracts/libraries/TransferHelper.sol';
 
 import './interfaces/IAdaswapRouter02.sol';
 import './libraries/AdaswapLibrary.sol';
@@ -15,7 +15,7 @@ contract AdaswapRouter02 is IAdaswapRouter02 {
     address public immutable override WETH;
 
     modifier ensure(uint256 deadline) {
-        require(deadline >= block.timestamp, "AdaswapRouter: EXPIRED");
+        require(deadline >= block.timestamp, 'AdaswapRouter: EXPIRED');
         _;
     }
 
@@ -57,7 +57,7 @@ contract AdaswapRouter02 is IAdaswapRouter02 {
             if (amountBOptimal <= amountBDesired) {
                 require(
                     amountBOptimal >= amountBMin,
-                    "AdaswapRouter: INSUFFICIENT_B_AMOUNT"
+                    'AdaswapRouter: INSUFFICIENT_B_AMOUNT'
                 );
                 (amountA, amountB) = (amountADesired, amountBOptimal);
             } else {
@@ -69,7 +69,7 @@ contract AdaswapRouter02 is IAdaswapRouter02 {
                 assert(amountAOptimal <= amountADesired);
                 require(
                     amountAOptimal >= amountAMin,
-                    "AdaswapRouter: INSUFFICIENT_A_AMOUNT"
+                    'AdaswapRouter: INSUFFICIENT_A_AMOUNT'
                 );
                 (amountA, amountB) = (amountAOptimal, amountBDesired);
             }
@@ -172,11 +172,11 @@ contract AdaswapRouter02 is IAdaswapRouter02 {
             : (amount1, amount0);
         require(
             amountA >= amountAMin,
-            "AdaswapRouter: INSUFFICIENT_A_AMOUNT"
+            'AdaswapRouter: INSUFFICIENT_A_AMOUNT'
         );
         require(
             amountB >= amountBMin,
-            "AdaswapRouter: INSUFFICIENT_B_AMOUNT"
+            'AdaswapRouter: INSUFFICIENT_B_AMOUNT'
         );
     }
 
@@ -379,7 +379,7 @@ contract AdaswapRouter02 is IAdaswapRouter02 {
         amounts = AdaswapLibrary.getAmountsOut(factory, amountIn, path);
         require(
             amounts[amounts.length - 1] >= amountOutMin,
-            "AdaswapRouter: INSUFFICIENT_OUTPUT_AMOUNT"
+            'AdaswapRouter: INSUFFICIENT_OUTPUT_AMOUNT'
         );
         TransferHelper.safeTransferFrom(
             path[0],
@@ -406,7 +406,7 @@ contract AdaswapRouter02 is IAdaswapRouter02 {
         amounts = AdaswapLibrary.getAmountsIn(factory, amountOut, path);
         require(
             amounts[0] <= amountInMax,
-            "AdaswapRouter: EXCESSIVE_INPUT_AMOUNT"
+            'AdaswapRouter: EXCESSIVE_INPUT_AMOUNT'
         );
         TransferHelper.safeTransferFrom(
             path[0],
@@ -430,11 +430,11 @@ contract AdaswapRouter02 is IAdaswapRouter02 {
         ensure(deadline)
         returns (uint256[] memory amounts)
     {
-        require(path[0] == WETH, "AdaswapRouter: INVALID_PATH");
+        require(path[0] == WETH, 'AdaswapRouter: INVALID_PATH');
         amounts = AdaswapLibrary.getAmountsOut(factory, msg.value, path);
         require(
             amounts[amounts.length - 1] >= amountOutMin,
-            "AdaswapRouter: INSUFFICIENT_OUTPUT_AMOUNT"
+            'AdaswapRouter: INSUFFICIENT_OUTPUT_AMOUNT'
         );
         IWETH(WETH).deposit{value: amounts[0]}();
         assert(
@@ -459,11 +459,11 @@ contract AdaswapRouter02 is IAdaswapRouter02 {
         ensure(deadline)
         returns (uint256[] memory amounts)
     {
-        require(path[path.length - 1] == WETH, "AdaswapRouter: INVALID_PATH");
+        require(path[path.length - 1] == WETH, 'AdaswapRouter: INVALID_PATH');
         amounts = AdaswapLibrary.getAmountsIn(factory, amountOut, path);
         require(
             amounts[0] <= amountInMax,
-            "AdaswapRouter: EXCESSIVE_INPUT_AMOUNT"
+            'AdaswapRouter: EXCESSIVE_INPUT_AMOUNT'
         );
         TransferHelper.safeTransferFrom(
             path[0],
@@ -489,11 +489,11 @@ contract AdaswapRouter02 is IAdaswapRouter02 {
         ensure(deadline)
         returns (uint256[] memory amounts)
     {
-        require(path[path.length - 1] == WETH, "AdaswapRouter: INVALID_PATH");
+        require(path[path.length - 1] == WETH, 'AdaswapRouter: INVALID_PATH');
         amounts = AdaswapLibrary.getAmountsOut(factory, amountIn, path);
         require(
             amounts[amounts.length - 1] >= amountOutMin,
-            "AdaswapRouter: INSUFFICIENT_OUTPUT_AMOUNT"
+            'AdaswapRouter: INSUFFICIENT_OUTPUT_AMOUNT'
         );
         TransferHelper.safeTransferFrom(
             path[0],
@@ -519,11 +519,11 @@ contract AdaswapRouter02 is IAdaswapRouter02 {
         ensure(deadline)
         returns (uint256[] memory amounts)
     {
-        require(path[0] == WETH, "AdaswapRouter: INVALID_PATH");
+        require(path[0] == WETH, 'AdaswapRouter: INVALID_PATH');
         amounts = AdaswapLibrary.getAmountsIn(factory, amountOut, path);
         require(
             amounts[0] <= msg.value,
-            "AdaswapRouter: EXCESSIVE_INPUT_AMOUNT"
+            'AdaswapRouter: EXCESSIVE_INPUT_AMOUNT'
         );
         IWETH(WETH).deposit{value: amounts[0]}();
         assert(
@@ -595,7 +595,7 @@ contract AdaswapRouter02 is IAdaswapRouter02 {
         require(
             IERC20(path[path.length - 1]).balanceOf(to).sub(balanceBefore) >=
                 amountOutMin,
-            "AdaswapRouter: INSUFFICIENT_OUTPUT_AMOUNT"
+            'AdaswapRouter: INSUFFICIENT_OUTPUT_AMOUNT'
         );
     }
 
@@ -605,7 +605,7 @@ contract AdaswapRouter02 is IAdaswapRouter02 {
         address to,
         uint256 deadline
     ) external payable virtual override ensure(deadline) {
-        require(path[0] == WETH, "AdaswapRouter: INVALID_PATH");
+        require(path[0] == WETH, 'AdaswapRouter: INVALID_PATH');
         uint256 amountIn = msg.value;
         IWETH(WETH).deposit{value: amountIn}();
         assert(
@@ -619,7 +619,7 @@ contract AdaswapRouter02 is IAdaswapRouter02 {
         require(
             IERC20(path[path.length - 1]).balanceOf(to).sub(balanceBefore) >=
                 amountOutMin,
-            "AdaswapRouter: INSUFFICIENT_OUTPUT_AMOUNT"
+            'AdaswapRouter: INSUFFICIENT_OUTPUT_AMOUNT'
         );
     }
 
@@ -630,7 +630,7 @@ contract AdaswapRouter02 is IAdaswapRouter02 {
         address to,
         uint256 deadline
     ) external virtual override ensure(deadline) {
-        require(path[path.length - 1] == WETH, "AdaswapRouter: INVALID_PATH");
+        require(path[path.length - 1] == WETH, 'AdaswapRouter: INVALID_PATH');
         TransferHelper.safeTransferFrom(
             path[0],
             msg.sender,
@@ -641,7 +641,7 @@ contract AdaswapRouter02 is IAdaswapRouter02 {
         uint256 amountOut = IERC20(WETH).balanceOf(address(this));
         require(
             amountOut >= amountOutMin,
-            "AdaswapRouter: INSUFFICIENT_OUTPUT_AMOUNT"
+            'AdaswapRouter: INSUFFICIENT_OUTPUT_AMOUNT'
         );
         IWETH(WETH).withdraw(amountOut);
         TransferHelper.safeTransferETH(to, amountOut);

@@ -1,9 +1,9 @@
 pragma solidity =0.8.13;
 
-import '@adaswap-dev/core/contracts/interfaces/IAdaswapPair.sol';
-import '@adaswap-dev/core/contracts/interfaces/IAdaswapFactory.sol';
-import '@adaswap-dev/lib/contracts/libraries/Babylonian.sol';
-import '@adaswap-dev/lib/contracts/libraries/FullMath.sol';
+import '@adaswap-testnet/core/contracts/interfaces/IAdaswapPair.sol';
+import '@adaswap-testnet/core/contracts/interfaces/IAdaswapFactory.sol';
+import '@adaswap-testnet/lib/contracts/libraries/Babylonian.sol';
+import '@adaswap-testnet/lib/contracts/libraries/FullMath.sol';
 
 import './SafeMath.sol';
 import './AdaswapLibrary.sol';
@@ -111,7 +111,7 @@ library AdaswapLiquidityMathLibrary {
         return computeLiquidityValue(reservesA, reservesB, totalSupply, liquidityAmount, feeOn, kLast);
     }
 
-    // given two tokens, tokenA and tokenB, and their "true price", i.e. the observed ratio of value of token A to token B,
+    // given two tokens, tokenA and tokenB, and their 'true price', i.e. the observed ratio of value of token A to token B,
     // and a liquidity amount, returns the value of the liquidity in terms of tokenA and tokenB
     function getLiquidityValueAfterArbitrageToPrice(
         address factory,
