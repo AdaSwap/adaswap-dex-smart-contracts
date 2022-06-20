@@ -1,5 +1,5 @@
 {
-  "name": "@adaswap-dev/lib",
+  "name": "@adaswap-testnet/lib",
   "version": "0.0.2",
   "description": "📖 Solidity libraries that are shared across Uniswap contracts",
   "files": [
@@ -28,7 +28,7 @@
   "scripts": {
     "lint": "prettier ./test/*.ts --check",
     "precompile": "rimraf ./build/",
-    "compile": "waffle",
+    "compile": "truffle compile",
     "pretest": "yarn compile",
     "test": "mocha",
     "prepublishOnly": "yarn test"
