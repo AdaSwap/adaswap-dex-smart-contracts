@@ -52,6 +52,7 @@ contract('AdaswapERC20', async accounts => {
       ),
       'domain seperator'
     )
+    
     expect(await instance.PERMIT_TYPEHASH()).to.eq(
       utils.keccak256(
         utils.stringToHex('Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)')
