@@ -106,4 +106,9 @@ contract('AdaswapFactory', accounts => {
     }
     expect(err1).to.revertedWith('Adaswap: FORBIDDEN')
   })
+
+  it('pairCodeHash', async () => {
+    const pairInitialCodeHash = await factory.pairCodeHash()
+    expect(pairInitialCodeHash).to.eq('0x2a3a9e0090eb58d4478aa215093c7ded7ee372eac924c25d729ad0f74cd31bf5')
+  })
 })

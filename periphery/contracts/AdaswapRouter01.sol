@@ -1,7 +1,7 @@
 pragma solidity =0.8.13;
 
-import '@adaswap-dev/core/contracts/interfaces/IAdaswapFactory.sol';
-import '@adaswap-dev/lib/contracts/libraries/TransferHelper.sol';
+import '@adaswap-testnet/core/contracts/interfaces/IAdaswapFactory.sol';
+import '@adaswap-testnet/lib/contracts/libraries/TransferHelper.sol';
 
 import './libraries/AdaswapLibrary.sol';
 import './interfaces/IAdaswapRouter01.sol';
