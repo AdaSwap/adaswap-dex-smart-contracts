@@ -10,5 +10,8 @@ module.exports = {
     },
     milkomedaMainnet: {
         FEE_ADDRESS: ''
-    }
+    },
+    development: {
+        FEE_ADDRESS: '0x6C12887a13A4f88D8da142f588C1285FfdABC7e5'
+    },
 };
