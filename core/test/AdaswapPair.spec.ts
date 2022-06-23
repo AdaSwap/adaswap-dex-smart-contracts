@@ -204,7 +204,7 @@ contract('AdaswapPair', accounts => {
     expect(balance1.toString()).to.eq(totalSupplyToken1.sub(utils.toBN(1000)).toString())
   })
 
-  // @todo fix ganache issue
+  // TODO: fix ganache issue
   // it('price{0,1}CumulativeLast', async () => {
     // const token0Amount = expandTo18Decimals(3)
     // const token1Amount = expandTo18Decimals(3)

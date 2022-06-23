@@ -62,7 +62,7 @@ const PERMIT_TYPEHASH = web3.utils.keccak256(
 const mineBlock = async function (timestamp) {
   await new Promise(async (resolve, reject) => {
     web3.currentProvider.send(
-      { jsonrpc: '2.0', method: 'evm_mine', params: [timestamp] },
+      { id: 1, jsonrpc: '2.0', method: 'evm_mine', params: [timestamp] },
       (error, result) => {
         if (error) {
           reject(error)
