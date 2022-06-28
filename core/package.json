@@ -30,7 +30,8 @@
     "ganache": "npx ganache --chain.networkId=200101 --chain.chainId=1 --chain.vmErrorsOnRPCResponse --chain.hardfork=istanbul --miner.defaultGasPrice=20000000000 --miner.blockGasLimit=6721975 --server.port=7545 --wallet.mnemonic='height school space unique renew cable one stumble ring cube artefact plunge'",
     "test-headless": "npm run ganache > /dev/null & npm run test && kill $(lsof -t -i:7545) || kill $(lsof -t -i:8545)",
     "compile": "npx truffle compile --all",
-    "truffle": "npx truffle console --network development"
+    "truffle": "npx truffle console --network development",
+    "deploy": "npx truffle migrate --network $NETWORK"
   },
   "keywords": [],
   "author": "",
