@@ -1,7 +1,7 @@
 # Adaswap DEX
-## Project dependencies
+## Project requirements
 
-- Node v>=10
+- Node v>=16
 
 ## First steps
 
