@@ -1,6 +1,6 @@
 {
   "name": "@adaswap-testnet/periphery",
-  "version": "0.0.2",
+  "version": "0.0.1",
   "description": "📖 Solidity libraries that are shared across Uniswap contracts",
   "files": [
     "contracts",
