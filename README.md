@@ -56,3 +56,12 @@
 - First setup deployment parameters in `constants.js`
 
 - `npm run deploy --network NETWORK_NAME`
+
+
+## Publishing NPM packages for each core/lib/periphery
+
+- Rebuild Whole Contracts by run: `truffle compile`
+
+- Update version of package in `package.json`
+
+- Publish package: `npm publish --access public`
