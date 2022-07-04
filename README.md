@@ -58,6 +58,19 @@
 - `npm run deploy --network NETWORK_NAME`
 
 
+## Lib
+
+`cd lib`
+
+### Install dependencies
+
+`npm i`
+
+### Compile contracts
+
+`npm run compile`
+
+
 ## Publishing NPM packages for each core/lib/periphery
 
 - Rebuild Whole Contracts by run: `truffle compile`
