@@ -7,41 +7,13 @@
     "build",
     "!contracts/test"
   ],
-  "homepage": "https://adaswap.app",
-  "engines": {
-    "node": ">=10"
-  },
+  "license": "MIT",
   "devDependencies": {
-    "@truffle/contract": "^4.5.14",
-    "@types/chai": "^4.3.1",
-    "@types/mocha": "^9.1.1",
-    "@types/node": "^17.0.42",
-    "@types/web3": "^1.2.2",
+    "@nomiclabs/hardhat-ethers": "^2.0.6",
+    "@nomiclabs/hardhat-waffle": "^2.0.3",
     "chai": "^4.3.6",
-    "dotenv": "^16.0.1",
-    "lodash": "^4.17.21",
-    "mocha": "^10.0.0",
-    "solc": "^0.8.13",
-    "truffle": "^5.5.5",
-    "ts-node": "^10.8.1",
-    "typescript": "^4.7.2",
-    "web3": "^1.7.3"
-  },
-  "scripts": {
-    "test": "npx truffle test --network development",
-    "ganache": "npx ganache --chain.networkId=200101 --chain.chainId=1 --chain.vmErrorsOnRPCResponse --chain.hardfork=istanbul --miner.defaultGasPrice=20000000000 --miner.blockGasLimit=6721975 --server.port=7545 --wallet.mnemonic='height school space unique renew cable one stumble ring cube artefact plunge' --wallet.defaultBalance=10000",
-    "test-headless": "npm run ganache > /dev/null & npm run test && kill $(lsof -t -i:7545) || kill $(lsof -t -i:8545)",
-    "compile": "npx truffle compile --all",
-    "truffle": "npx truffle console --network development",
-    "deploy": "npx truffle migrate --network $NETWORK"
-  },
-  "author": "",
-  "license": "ISC",
-  "keywords": [],
-  "dependencies": {
-    "@adaswap-testnet/core": "0.0.3",
-    "@openzeppelin/contracts": "4.5.0",
-    "@truffle/hdwallet-provider": "2.0.4",
-    "@adaswap-testnet/lib": "0.0.2"
+    "ethereum-waffle": "^3.4.4",
+    "ethers": "^5.6.9",
+    "hardhat": "^2.9.9"
   }
 }
