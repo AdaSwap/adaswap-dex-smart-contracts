@@ -1,19 +1,18 @@
 {
   "name": "@adaswap-testnet/periphery",
-  "version": "0.0.1",
-  "description": "📖 Solidity libraries that are shared across Uniswap contracts",
+  "version": "0.0.2",
+  "description": "📖 Periphery contracts for AdaSwap DEX",
   "files": [
     "contracts",
-    "build",
+    "artifacts/contracts",
     "!contracts/test"
   ],
   "scripts": {
-    "test": "yarn hardhat test --network development",
-    "ganache": "npx ganache --chain.networkId=200101 --chain.chainId=1 --chain.vmErrorsOnRPCResponse --chain.hardfork=istanbul --miner.defaultGasPrice=20000000000 --miner.blockGasLimit=6721975 --server.port=7545 --wallet.mnemonic='height school space unique renew cable one stumble ring cube artefact plunge' --wallet.defaultBalance=10000",
-    "test-headless": "npm run ganache > /dev/null & npm run test && kill $(lsof -t -i:7545) || kill $(lsof -t -i:8545)",
+    "test": "yarn hardhat test --network hardhat",
     "compile": "yarn hardhat compile",
-    "truffle": "npx truffle console --network development",
-    "deploy": "yarn hardhat run --network milkomedaTestnet scripts/deploy.js"
+    "chain": "hardhat node --network hardhat",
+    "deploy-testnet": "yarn hardhat run --network milkomedaTestnet scripts/deploy.js",
+    "deploy-mainnet": "yarn hardhat run --network milkomedaMainnet scripts/deploy.js"
   },
   "license": "MIT",
   "devDependencies": {
