@@ -4,15 +4,15 @@
   "description": "📖 Periphery contracts for AdaSwap DEX",
   "files": [
     "contracts",
-    "artifacts/contracts",
-    "!contracts/test"
+    "artifacts"
   ],
   "scripts": {
     "test": "yarn hardhat test --network hardhat",
     "compile": "yarn hardhat compile",
     "chain": "hardhat node --network hardhat",
     "deploy-testnet": "yarn hardhat run --network milkomedaTestnet scripts/deploy.js",
-    "deploy-mainnet": "yarn hardhat run --network milkomedaMainnet scripts/deploy.js"
+    "deploy-mainnet": "yarn hardhat run --network milkomedaMainnet scripts/deploy.js",
+    "deploy-dev": "yarn hardhat run --network hardhat scripts/deploy.js"
   },
   "license": "MIT",
   "devDependencies": {

@@ -9,6 +9,8 @@
 2. Run `npm i` to install common environment package `dotenv`
 3. Create a `.env` file, copy all fields from `.env.example` to created file and paste your private keys
 
+### Before any contract deployment please configure `constants.js`
+
 ---
 
 ## Core 
@@ -17,21 +19,27 @@
 
 ### Install dependencies
 
-`npm i`
+`yarn`
 
 ### Compile contracts
 
-`npm run compile`
+`yarn compile`
 
 ### Run tests 
 
-`npm run test-headless`
+`yarn test`
+
+### Run your local blockchain 
+
+`yarn chain`
 
 ### Deploy contracts
 
-- First setup deployment parameters in `constants.js`
+- Milkomeda Testnet deployment: `yarn deploy-testnet`
 
-- `npm run deploy --network NETWORK_NAME`
+- Milkomeda Mainnet deployment: `yarn deploy-mainnet`
+
+- Local blockchain deployment: `yarn deploy-dev`
 
 ---
 
@@ -41,22 +49,29 @@
 
 ### Install dependencies
 
-`npm i`
+`yarn`
 
 ### Compile contracts
 
-`npm run compile`
+`yarn compile`
 
 ### Run tests 
 
-`npm run test-headless`
+`yarn test`
+
+### Run your local blockchain 
+
+`yarn chain`
 
 ### Deploy contracts
 
-- First setup deployment parameters in `constants.js`
+- Milkomeda Testnet deployment: `yarn deploy-testnet`
 
-- `npm run deploy --network NETWORK_NAME`
+- Milkomeda Mainnet deployment: `yarn deploy-mainnet`
 
+- Local blockchain deployment: `yarn deploy-dev`
+
+---
 
 ## Lib
 
@@ -64,17 +79,17 @@
 
 ### Install dependencies
 
-`npm i`
+`yarn`
 
 ### Compile contracts
 
-`npm run compile`
+`yarn compile`
 
 
 ## Publishing NPM packages for each core/lib/periphery
 
-- Rebuild Whole Contracts by run: `truffle compile`
+- Rebuild Whole Contracts by run: `yarn compile`
 
-- Update version of package in `package.json`
+- Npm account login: `yarn login`
 
-- Publish package: `npm publish --access public`
+- Publish package: `yarn publish --access public`
