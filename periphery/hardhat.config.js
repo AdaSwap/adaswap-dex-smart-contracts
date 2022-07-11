@@ -2,6 +2,7 @@ require("@nomiclabs/hardhat-waffle");
 require("@nomiclabs/hardhat-waffle");
 const fs = require("fs");
 require('dotenv').config({path:'../.env'});
+require('hardhat-contract-sizer');
 
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
@@ -44,13 +45,14 @@ module.exports = {
 
   networks: {
     hardhat: {
-      // forking: {
-      //   url: process.env.KOVAN_PROVIDER,
-      //   blockNumber: 30282748
-      // }
+      forking: {
+        url: process.env.MILKOMEDA_MAINNET_PROVIDER,
+        blockNumber: 4000000
+      }
       // accounts: {
       //   mnemonic: 'height school space unique renew cable one stumble ring cube artefact plunge'
       // }
+
     },
     localhost: {
       url: "http://localhost:8545",
@@ -95,10 +97,16 @@ module.exports = {
     version: "0.8.13",
     settings: {          // See the solidity docs for advice about optimization and evmVersion
       optimizer: {
-        enabled: false,
+        enabled: true,
         runs: 999999
       },
       evmVersion: "istanbul",
     }
+  },
+  contractSizer: {
+    alphaSort: true,
+    disambiguatePaths: false,
+    runOnCompile: true,
+    strict: false
   }
 }

@@ -8,7 +8,6 @@ import './libraries/AdaswapLibrary.sol';
 import './interfaces/IWETH.sol';
 
 contract AdaswapRouter02 is IAdaswapRouter02 {
-    using SafeMath for uint256;
 
     address public immutable override factory;
     address public immutable override WETH;
@@ -557,9 +556,7 @@ contract AdaswapRouter02 is IAdaswapRouter02 {
                 (uint256 reserveInput, uint256 reserveOutput) = input == token0
                     ? (reserve0, reserve1)
                     : (reserve1, reserve0);
-                amountInput = IERC20(input).balanceOf(address(pair)).sub(
-                    reserveInput
-                );
+                amountInput = IERC20(input).balanceOf(address(pair)) - reserveInput;
                 amountOutput = AdaswapLibrary.getAmountOut(
                     amountInput,
                     reserveInput,
@@ -592,7 +589,7 @@ contract AdaswapRouter02 is IAdaswapRouter02 {
         uint256 balanceBefore = IERC20(path[path.length - 1]).balanceOf(to);
         _swapSupportingFeeOnTransferTokens(path, to);
         require(
-            IERC20(path[path.length - 1]).balanceOf(to).sub(balanceBefore) >=
+            IERC20(path[path.length - 1]).balanceOf(to) - balanceBefore >=
                 amountOutMin,
             'AdaswapRouter: INSUFFICIENT_OUTPUT_AMOUNT'
         );
@@ -616,8 +613,7 @@ contract AdaswapRouter02 is IAdaswapRouter02 {
         uint256 balanceBefore = IERC20(path[path.length - 1]).balanceOf(to);
         _swapSupportingFeeOnTransferTokens(path, to);
         require(
-            IERC20(path[path.length - 1]).balanceOf(to).sub(balanceBefore) >=
-                amountOutMin,
+            IERC20(path[path.length - 1]).balanceOf(to) - balanceBefore >= amountOutMin,
             'AdaswapRouter: INSUFFICIENT_OUTPUT_AMOUNT'
         );
     }

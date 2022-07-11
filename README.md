@@ -92,4 +92,4 @@
 
 - Npm account login: `yarn login`
 
-- Publish package: `yarn publish --access public`
+- Publish package: `yarn publish --access restricted`
