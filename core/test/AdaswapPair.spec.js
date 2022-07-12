@@ -8,7 +8,7 @@ const {
   expandTo18Decimals,
   mineBlock,
   encodePrice
-} = require('../../lib/shared/utils')
+} = require('./shared/utils')
 
 const { ethers } = require("hardhat");
 const { BigNumber, utils } = require("ethers");

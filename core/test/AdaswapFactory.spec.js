@@ -6,7 +6,7 @@ const {
 const {
   addressZero,
   getCreate2Address
-} = require('../../lib/shared/utils')
+} = require('./shared/utils')
 
 const { ethers, provider } = require("hardhat");
 const { BigNumber, Wallet, utils, Contract } = require("ethers");

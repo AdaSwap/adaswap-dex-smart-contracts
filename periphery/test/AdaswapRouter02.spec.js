@@ -10,7 +10,7 @@ const {
   getApprovalDigest,
   MINIMUM_LIQUIDITY,
   maxUint256
-} = require('../../lib/shared/utils')
+} = require('./shared/utils')
 
 const { Wallet, utils, Contract, ContractFactory, BigNumber, HDNode } = require("ethers");
 const { ethers } = require("hardhat");

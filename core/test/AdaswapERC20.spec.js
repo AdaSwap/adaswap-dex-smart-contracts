@@ -12,7 +12,7 @@ const {
   getApprovalDigest,
   getDomainSeparator,
   PERMIT_TYPEHASH
-} = require('../../lib/shared/utils')
+} = require('./shared/utils')
 
 const { Wallet } = require("ethers");
 const { ethers } = require("hardhat");

@@ -72,10 +72,10 @@ module.exports = {
       accounts: [`${process.env.MILKOMEDA_MAINNET_DEPLOYER_PRIV_KEY}`],
     },
 
-    polygonTestnet: {
-      url: `${process.env.POLYGON_TESTNET_PROVIDER}`,
-      accounts: [`${process.env.POLYGON_TESTNET_DEPLOYER_PRIV_KEY}`],
-    },
+    // polygonTestnet: {
+    //   url: `${process.env.POLYGON_TESTNET_PROVIDER}`,
+    //   accounts: [`${process.env.POLYGON_TESTNET_DEPLOYER_PRIV_KEY}`],
+    // },
 
     // rinkeby: {
     //   url: `https://rinkeby.infura.io/v3/${process.env.RINKEBY_INFURA_KEY}`,
