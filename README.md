@@ -3,6 +3,8 @@
 
 - Node v>=16
 
+- Yarn
+
 ## First steps
 
 1. Clone repository git clone `git@bitbucket.org:adaswap/adaswap-dex-smart-contracts.git`

@@ -44,10 +44,10 @@ module.exports = {
 
   networks: {
     hardhat: {
-      // forking: {
-      //   url: process.env.KOVAN_PROVIDER,
-      //   blockNumber: 30282748
-      // }
+      forking: {
+        url: process.env.MILKOMEDA_MAINNET_PROVIDER,
+        blockNumber: 4000000
+      }
       // accounts: {
       //   mnemonic: 'height school space unique renew cable one stumble ring cube artefact plunge'
       // }
