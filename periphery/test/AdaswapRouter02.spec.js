@@ -12,7 +12,7 @@ const {
   maxUint256
 } = require('../../lib/shared/utils')
 
-const { Wallet, utils, Contract, ContractFactory, BigNumber } = require("ethers");
+const { Wallet, utils, Contract, ContractFactory, BigNumber, HDNode } = require("ethers");
 const { ethers } = require("hardhat");
 use(solidity)
 
@@ -32,7 +32,6 @@ describe('AdaswapRouter02', () => {
     token1 = await TokenFactory.deploy('Token 1', 'TK1', TOKEN1_TOTAL_SUPPLY)
 
     let interface = new utils.Interface(AdaswapFactoryJson.abi)
-    // console.log(interface)
     let factory = new ContractFactory(interface, AdaswapFactoryByteCode, accounts[0])
     factory = await factory.deploy(accounts[0].address)
     await factory.createPair(token0.address, token1.address)
@@ -180,250 +179,231 @@ describe('AdaswapRouter02', () => {
 
 describe('fee-on-transfer tokens', () => {
 
-  let dtt, weth, router, pair
+  let dtt, weth, router, pair, dtt2, factory
   let accounts = []
   beforeEach(async function () {
-    
-    weth = await TestWETH.new()
-    dtt = await DeflatingERC20.new(expandTo18Decimals('10000'))
-    const factory = await new eth.Contract(AdaswapFactoryInterface).deploy({ data: AdaswapFactoryByteCode, arguments: [accounts[0].address] }).send({ from: accounts[0].address, gas: 4710000 })
-    await factory.methods.createPair(dtt.address, weth.address).send({ from: accounts[0].address, gas: 4710000 })
-    let ich = await factory.methods.pairCodeHash().call()
-    expect(ich).to.eq('0x2a3a9e0090eb58d4478aa215093c7ded7ee372eac924c25d729ad0f74cd31bf5')
-    const pairAddress = await factory.methods.allPairs(0).call()
-    pair = await IAdaswapPair.at(pairAddress)
+    accounts = await ethers.getSigners();
 
-    router = await AdaswapRouter02.new(factory._address, weth.address)
+    weth = await ethers.getContractFactory("TestWETH")
+    weth = await weth.deploy()
+
+    dtt = await ethers.getContractFactory("DeflatingERC20")
+    dtt = await dtt.deploy(expandTo18Decimals('10000'))
+
+    let interface = new utils.Interface(AdaswapFactoryJson.abi)
+    factory = new ContractFactory(interface, AdaswapFactoryByteCode, accounts[0])
+    factory = await factory.deploy(accounts[0].address)
+    await factory.createPair(dtt.address, weth.address)
+    let ich = await factory.pairCodeHash()
+    let codeHash = utils.keccak256(AdaswapPairJson.bytecode)
+    expect(ich).to.eq(codeHash)
+
+    const pairAddress = await factory.allPairs(0)
+    pair = new Contract(pairAddress, AdaswapPairJson.abi, accounts[0])
+
+    router = await ethers.getContractFactory("AdaswapRouter02")
+    router = await router.deploy(factory.address, weth.address)
   })
 
   afterEach(async function () {
-    const routerBalance = await eth.getBalance(router.address)
+    const routerBalance = await ethers.provider.getBalance(router.address)
     expect(routerBalance.toString()).to.eq('0')
   })
 
   async function addLiquidity(DTTAmount, WETHAmount) {
     await dtt.approve(router.address, maxUint256)
-    await router.addLiquidityETH(dtt.address, DTTAmount, DTTAmount, WETHAmount, accounts[0].address, maxUint256, {
-      ...,
-      value: WETHAmount
-    })
+    await router.addLiquidityETH(
+      dtt.address, 
+      DTTAmount, 
+      DTTAmount, 
+      WETHAmount, 
+      accounts[0].address, 
+      maxUint256, 
+      {
+        value: WETHAmount
+      }
+    )
   }
 
   it('removeLiquidityETHSupportingFeeOnTransferTokens', async () => {
-//     const DTTAmount = expandTo18Decimals('1')
-//     const ETHAmount = expandTo18Decimals('4')
-//     await addLiquidity(DTTAmount, ETHAmount)
+    const DTTAmount = expandTo18Decimals('1')
+    const ETHAmount = expandTo18Decimals('4')
+    await addLiquidity(DTTAmount, ETHAmount)
 
-//     const DTTInPair = await dtt.balanceOf(pair.address)
-//     const WETHInPair = await weth.balanceOf(pair.address)
-//     const liquidity = await pair.balanceOf(accounts[0].address)
-//     const totalSupply = await pair.totalSupply()
-//     const NaiveDTTExpected = DTTInPair.mul(liquidity).div(totalSupply)
-//     const WETHExpected = WETHInPair.mul(liquidity).div(totalSupply)
+    const DTTInPair = await dtt.balanceOf(pair.address)
+    const WETHInPair = await weth.balanceOf(pair.address)
+    const liquidity = await pair.balanceOf(accounts[0].address)
+    const totalSupply = await pair.totalSupply()
+    const NaiveDTTExpected = DTTInPair.mul(liquidity).div(totalSupply)
+    const WETHExpected = WETHInPair.mul(liquidity).div(totalSupply)
 
-//     await pair.approve(router.address, maxUint256)
-//     await router.removeLiquidityETHSupportingFeeOnTransferTokens(
-//       dtt.address,
-//       liquidity,
-//       NaiveDTTExpected,
-//       WETHExpected,
-//       accounts[0].address,
-//       maxUint256,
+    await pair.approve(router.address, maxUint256)
+    await router.removeLiquidityETHSupportingFeeOnTransferTokens(
+      dtt.address,
+      liquidity,
+      NaiveDTTExpected,
+      WETHExpected,
+      accounts[0].address,
+      maxUint256,
       
-//     )
-//   })
+    )
+  })
 
-//   it('removeLiquidityETHWithPermitSupportingFeeOnTransferTokens', async () => {
+  it('removeLiquidityETHWithPermitSupportingFeeOnTransferTokens', async () => {
 
-//     const DTTAmount = expandTo18Decimals('1')
-//       .mul(BigNumber.from(100))
-//       .div(BigNumber.from(99))
-//     const ETHAmount = expandTo18Decimals('4')
-//     addLiquidity
-//     await addLiquidity(DTTAmount, ETHAmount)
-//     const expectedLiquidity = expandTo18Decimals('2')
+    const DTTAmount = expandTo18Decimals('1')
+      .mul(BigNumber.from(100))
+      .div(BigNumber.from(99))
+    const ETHAmount = expandTo18Decimals('4')
+    await addLiquidity(DTTAmount, ETHAmount)
+    const expectedLiquidity = expandTo18Decimals('2')
 
-//     const deadline = maxUint256
-//     const nonce = await pair.nonces(accounts[0].address)
-//     const digest = await getApprovalDigest(
-//       'Adaswap LP Token',
-//       pair.address,
-//       { owner: accounts[0].address, spender: router.address, value: expectedLiquidity.sub(MINIMUM_LIQUIDITY) },
-//       nonce,
-//       deadline
-//     )
-//     const { v, r, s } = ecsign(Buffer.from(digest.slice(2), 'hex'), Buffer.from('0x2bac0f8e27296e81289099a0229a0c2fa6d2da03501fd09c9937b10c464209e6'.slice(2), 'hex'))
+    const deadline = maxUint256
+    const nonce = await pair.nonces(accounts[0].address)
+    const digest = getApprovalDigest(
+      'Adaswap LP Token',
+      pair.address,
+      { owner: accounts[0].address, spender: router.address, value: expectedLiquidity.sub(MINIMUM_LIQUIDITY) },
+      nonce,
+      deadline
+    )
+    
+    const { v, r, s } = ecsign(
+      Buffer.from(digest.slice(2), 'hex'), 
+      Buffer.from('0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80'.slice(2), 'hex')
+    )
 
-//     const DTTInPair = await dtt.balanceOf(pair.address)
-//     const WETHInPair = await weth.balanceOf(pair.address)
-//     const liquidity = await pair.balanceOf(accounts[0].address)
-//     const totalSupply = await pair.totalSupply()
-//     const NaiveDTTExpected = DTTInPair.mul(liquidity).div(totalSupply)
-//     const WETHExpected = WETHInPair.mul(liquidity).div(totalSupply)
+    const DTTInPair = await dtt.balanceOf(pair.address)
+    const WETHInPair = await weth.balanceOf(pair.address)
+    const liquidity = await pair.balanceOf(accounts[0].address)
+    const totalSupply = await pair.totalSupply()
+    const NaiveDTTExpected = DTTInPair.mul(liquidity).div(totalSupply)
+    const WETHExpected = WETHInPair.mul(liquidity).div(totalSupply)
 
-//     await pair.approve(router.address, maxUint256)
-//     await router.removeLiquidityETHWithPermitSupportingFeeOnTransferTokens(
-//       dtt.address,
-//       liquidity,
-//       NaiveDTTExpected,
-//       WETHExpected,
-//       accounts[0].address,
-//       maxUint256,
-//       false,
-//       v,
-//       r,
-//       s,
-      
-//     )
-//   })
+    await pair.approve(router.address, maxUint256)
+    await router.removeLiquidityETHWithPermitSupportingFeeOnTransferTokens(
+      dtt.address,
+      liquidity,
+      NaiveDTTExpected,
+      WETHExpected,
+      accounts[0].address,
+      maxUint256,
+      false,
+      v,
+      r,
+      s
+    )
+  })
 
-//   describe('swapExactTokensForTokensSupportingFeeOnTransferTokens', () => {
-//     const DTTAmount = expandTo18Decimals('5')
-//       .mul(BigNumber.from(100))
-//       .div(BigNumber.from(99))
-//     const ETHAmount = expandTo18Decimals('10')
-//     const amountIn = expandTo18Decimals('1')
+  const DTTAmount = expandTo18Decimals('5')
+    .mul(BigNumber.from(100))
+    .div(BigNumber.from(99))
+  const ETHAmount = expandTo18Decimals('10')
+  const amountIn = expandTo18Decimals('1')
 
-//     beforeEach(async () => {
-//       await addLiquidity(DTTAmount, ETHAmount)
-//     })
+  it('DTT -> WETH', async () => {
+    await addLiquidity(DTTAmount, ETHAmount)
+    await dtt.approve(router.address, maxUint256)
 
-//     it('DTT -> WETH', async () => {
-//       await dtt.approve(router.address, maxUint256)
+    await router.swapExactTokensForTokensSupportingFeeOnTransferTokens(
+      amountIn,
+      0,
+      [dtt.address, weth.address],
+      accounts[0].address,
+      maxUint256
+    )
+  })
 
-//       await router.swapExactTokensForTokensSupportingFeeOnTransferTokens(
-//         amountIn,
-//         0,
-//         [dtt.address, weth.address],
-//         accounts[0].address,
-//         maxUint256,
-        
-//       )
-//     })
 
-//     // WETH -> DTT
-//     it('WETH -> DTT', async () => {
-//       await weth.deposit({ value: amountIn }) // mint WETH
-//       await weth.approve(router.address, maxUint256)
+  // WETH -> DTT
+  it('WETH -> DTT', async () => {
+    await addLiquidity(DTTAmount, ETHAmount)
+    await weth.deposit({ value: amountIn }) // mint WETH
+    await weth.approve(router.address, maxUint256)
 
-//       await router.swapExactTokensForTokensSupportingFeeOnTransferTokens(
-//         amountIn,
-//         0,
-//         [weth.address, dtt.address],
-//         accounts[0].address,
-//         maxUint256,
-        
-//       )
-//     })
-//   })
+    await router.swapExactTokensForTokensSupportingFeeOnTransferTokens(
+      amountIn,
+      0,
+      [weth.address, dtt.address],
+      accounts[0].address,
+      maxUint256
+    )
+  })
 
-//   // ETH -> DTT
-//   it('swapExactETHForTokensSupportingFeeOnTransferTokens', async () => {
-//     const DTTAmount = expandTo18Decimals('10')
-//       .mul(BigNumber.from(100))
-//       .div(BigNumber.from(99))
-//     const ETHAmount = expandTo18Decimals('5')
-//     const swapAmount = expandTo18Decimals('1')
-//     await addLiquidity(DTTAmount, ETHAmount)
+  // ETH -> DTT
+  it('swapExactETHForTokensSupportingFeeOnTransferTokens', async () => {
+    let DTTAmount1 = expandTo18Decimals('10')
+      .mul(BigNumber.from(100))
+      .div(BigNumber.from(99))
+    const ETHAmount1 = expandTo18Decimals('5')
+    const swapAmount = expandTo18Decimals('1')
+    await addLiquidity(DTTAmount1, ETHAmount1)
 
-//     await router.swapExactETHForTokensSupportingFeeOnTransferTokens(
-//       0,
-//       [weth.address, dtt.address],
-//       accounts[0].address,
-//       maxUint256,
-//       {
-//         ...,
-//         value: swapAmount
-//       }
-//     )
-//   })
+    await router.swapExactETHForTokensSupportingFeeOnTransferTokens(
+      0,
+      [weth.address, dtt.address],
+      accounts[0].address,
+      maxUint256,
+      {
+        value: swapAmount
+      }
+    )
+  })
 
-//   // DTT -> ETH
-//   it('swapExactTokensForETHSupportingFeeOnTransferTokens', async () => {
-//     const DTTAmount = expandTo18Decimals('5')
-//       .mul(BigNumber.from(100))
-//       .div(BigNumber.from(99))
-//     const ETHAmount = expandTo18Decimals('10')
-//     const swapAmount = expandTo18Decimals('1')
+  // DTT -> ETH
+  it('swapExactTokensForETHSupportingFeeOnTransferTokens', async () => {
+    const DTTAmount1 = expandTo18Decimals('5')
+      .mul(BigNumber.from(100))
+      .div(BigNumber.from(99))
+    const ETHAmount1 = expandTo18Decimals('10')
+    const swapAmount = expandTo18Decimals('1')
 
-//     await addLiquidity(DTTAmount, ETHAmount)
-//     await dtt.approve(router.address, maxUint256)
+    await addLiquidity(DTTAmount1, ETHAmount1)
+    await dtt.approve(router.address, maxUint256)
 
-//     await router.swapExactTokensForETHSupportingFeeOnTransferTokens(
-//       swapAmount,
-//       0,
-//       [dtt.address, weth.address],
-//       accounts[0].address,
-//       maxUint256,
-      
-//     )
-//   })
-// })
+    await router.swapExactTokensForETHSupportingFeeOnTransferTokens(
+      swapAmount,
+      0,
+      [dtt.address, weth.address],
+      accounts[0].address,
+      maxUint256
+    )
+  })
 
-// contract('fee-on-transfer tokens: reloaded', accounts => {
-//   const  = {
-//     gasLimit: 9999999,
-//     from: accounts[0].address
-//   }
+  it('fee-on-transfer tokens: reloaded: DTT -> DTT2', async () => {
+    const DTTAmount = expandTo18Decimals('5')
+      .mul(BigNumber.from(100))
+      .div(BigNumber.from(99))
+    const DTT2Amount = expandTo18Decimals('5')
+    const amountIn = expandTo18Decimals('1')
+    dtt2 = await ethers.getContractFactory("DeflatingERC20")
+    dtt2 = await dtt2.deploy(expandTo18Decimals('10000'))
 
-//   let dtt, weth, dtt2, router, pair
-//   beforeEach(async function () {
-//     weth = await TestWETH.new()
-//     dtt = await DeflatingERC20.new(expandTo18Decimals('10000'))
-//     dtt2 = await DeflatingERC20.new(expandTo18Decimals('10000'))
-//     const factory = await new eth.Contract(AdaswapFactoryInterface).deploy({ data: AdaswapFactoryByteCode, arguments: [accounts[0].address] }).send({ from: accounts[0].address, gas: 4710000 })
-//     await factory.methods.createPair(dtt.address, dtt2.address).send({ from: accounts[0].address, gas: 4710000 })
-//     let ich = await factory.methods.pairCodeHash().call()
-//     expect(ich).to.eq('0x2a3a9e0090eb58d4478aa215093c7ded7ee372eac924c25d729ad0f74cd31bf5')
-//     const pairAddress = await factory.methods.allPairs(0).call()
-//     pair = await IAdaswapPair.at(pairAddress)
+    await factory.createPair(dtt.address, dtt2.address)
+    const pairAddress = await factory.allPairs(1)
+    pair = new Contract(pairAddress, AdaswapPairJson.abi, accounts[0])
+    
+    await dtt.approve(router.address, maxUint256)
+    await dtt2.approve(router.address, maxUint256)
+    await router.addLiquidity(
+      dtt.address,
+      dtt2.address,
+      DTTAmount,
+      DTT2Amount,
+      DTTAmount,
+      DTT2Amount,
+      accounts[0].address,
+      maxUint256
+    )
+    await addLiquidity(DTTAmount, DTT2Amount)
 
-//     router = await AdaswapRouter02.new(factory._address, weth.address)
-//   })
 
-//   afterEach(async function () {
-//     const routerBalance = await eth.getBalance(router.address)
-//     expect(routerBalance.toString()).to.eq('0')
-//   })
-
-//   async function addLiquidity(DTTAmount, DTT2Amount) {
-//     await dtt.approve(router.address, maxUint256)
-//     await dtt2.approve(router.address, maxUint256)
-//     await router.addLiquidity(
-//       dtt.address,
-//       dtt2.address,
-//       DTTAmount,
-//       DTT2Amount,
-//       DTTAmount,
-//       DTT2Amount,
-//       accounts[0].address,
-//       maxUint256,
-      
-//     )
-//   }
-
-//   describe('swapExactTokensForTokensSupportingFeeOnTransferTokens', () => {
-//     const DTTAmount = expandTo18Decimals('5')
-//       .mul(BigNumber.from(100))
-//       .div(BigNumber.from(99))
-//     const DTT2Amount = expandTo18Decimals('5')
-//     const amountIn = expandTo18Decimals('1')
-
-//     beforeEach(async () => {
-//       await addLiquidity(DTTAmount, DTT2Amount)
-//     })
-
-//     it('DTT -> DTT2', async () => {
-//       await dtt.approve(router.address, maxUint256)
-
-//       await router.swapExactTokensForTokensSupportingFeeOnTransferTokens(
-//         amountIn,
-//         0,
-//         [dtt.address, dtt2.address],
-//         accounts[0].address,
-//         maxUint256,
-        
-//       )
-//     })
+    await router.swapExactTokensForTokensSupportingFeeOnTransferTokens(
+      amountIn,
+      0,
+      [dtt.address, dtt2.address],
+      accounts[0].address,
+      maxUint256
+    )
   })
 })

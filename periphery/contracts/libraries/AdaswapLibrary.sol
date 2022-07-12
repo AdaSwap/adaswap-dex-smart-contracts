@@ -19,7 +19,7 @@ library AdaswapLibrary {
                 hex'ff',
                 factory,
                 keccak256(abi.encodePacked(token0, token1)),
-                hex'b4e74923937e505e14a74dc96b6f316512293ed5bcf7f76a7ea0209cff35b480' // init code hash
+                hex'd27b57c5cec4f69c31b257335a89e83543b6aaf2f85c3c4b1946fe5d3f9558dc' // init code hash
             )))));
     }
 

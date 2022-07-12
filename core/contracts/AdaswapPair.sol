@@ -5,7 +5,6 @@ import './interfaces/IAdaswapPair.sol';
 import './AdaswapERC20.sol';
 import './libraries/Math.sol';
 import './libraries/UQ112x112.sol';
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import './interfaces/IAdaswapFactory.sol';
 import './interfaces/IAdaswapCallee.sol';
 
