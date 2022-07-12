@@ -66,7 +66,7 @@ const mineBlock = async function (timestamp) {
 }
 
 const encodePrice = function (reserve0, reserve1) {
-  return [reserve1.mul(BigNumber.from(2).pow(BigNumber.from(112))).div(reserve0), reserve0.mul(BigNumber.from(2).pow(BigNumber.from(112))).div(reserve1)]
+  return [reserve1.mul(BigNumber.from(2).pow(112)).div(reserve0), reserve0.mul(BigNumber.from(2).pow(112)).div(reserve1)]
 }
 
 const getCreate2Address = function (
