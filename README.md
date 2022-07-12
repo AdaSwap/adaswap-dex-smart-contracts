@@ -43,6 +43,8 @@
 
 - Local blockchain deployment: `yarn deploy-dev`
 
+*Note: After core contracts deployment replace acutual PairCodeHash in periphery/contracts/libraries/AdaswapLibrary.sol `pairFor` function*
+
 ---
 
 ## Periphery
