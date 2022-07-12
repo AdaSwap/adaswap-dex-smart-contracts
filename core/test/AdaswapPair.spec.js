@@ -213,41 +213,41 @@ describe('AdaswapPair', () => {
     expect(balance1).to.eq(totalSupplyToken1.sub(BigNumber.from(1000)))
   })
 
-  // // TODO: fix ganache issue
-  // it('price{0,1}CumulativeLast', async () => {
-  //   const token0Amount = expandTo18Decimals('3')
-  //   const token1Amount = expandTo18Decimals('3')
-  //   await addLiquidity(token0Amount, token1Amount)
+  // TODO: fix ganache issue
+  it('price{0,1}CumulativeLast', async () => {
+    const token0Amount = expandTo18Decimals('3')
+    const token1Amount = expandTo18Decimals('3')
+    await addLiquidity(token0Amount, token1Amount)
 
-  //   console.log((await provider.getBlock(await provider.getBlockNumber())))
-  //   const blockTimestamp = (await pair.getReserves())[2]
-  //   console.log(blockTimestamp)
-  //   await mineBlock(blockTimestamp + 1)
-  //   await pair.sync()
-  //   console.log((await provider.getBlock(await provider.getBlockNumber())))
-  //   const initialPrice = encodePrice(token0Amount, token1Amount)
-  //   // expect((await pair.price0CumulativeLast())).to.eq(initialPrice[1])
-  //   // expect((await pair.price1CumulativeLast())).to.eq(initialPrice[1])
-  //   expect((await pair.getReserves())[2]).to.eq(blockTimestamp + 1)
+    console.log((await provider.getBlock(await provider.getBlockNumber())))
+    const blockTimestamp = (await pair.getReserves())[2]
+    console.log(blockTimestamp)
+    await mineBlock(blockTimestamp + 1)
+    await pair.sync()
+    // console.log((await provider.getBlock(await provider.getBlockNumber())))
+    const initialPrice = encodePrice(token0Amount, token1Amount)
+    expect((await pair.price0CumulativeLast())).to.eq(initialPrice[1])
+    expect((await pair.price1CumulativeLast())).to.eq(initialPrice[1])
+    expect((await pair.getReserves())[2]).to.eq(blockTimestamp + 1)
 
-  //   const swapAmount = expandTo18Decimals('3')
-  //   await token0.transfer(pair.address, swapAmount)
-  //   await mineBlock(blockTimestamp.add(BigNumber.from(10)))
-  //   // swap to a new price eagerly instead of syncing
-  //   await pair.swap(0, expandTo18Decimals('1'), accounts[0].address, '0x') // make the price nice
+    const swapAmount = expandTo18Decimals('3')
+    await token0.transfer(pair.address, swapAmount)
+    await mineBlock(blockTimestamp.add(BigNumber.from(10)))
+    // swap to a new price eagerly instead of syncing
+    await pair.swap(0, expandTo18Decimals('1'), accounts[0].address, '0x') // make the price nice
 
-  //   expect((await pair.price0CumulativeLast())).to.eq(initialPrice[0].mul(BigNumber.from(10)))
-  //   expect((await pair.price1CumulativeLast())).to.eq(initialPrice[1].mul(BigNumber.from(10)))
-  //   expect((await pair.getReserves())[2]).to.eq(blockTimestamp.add(BigNumber.from(10)))
+    expect((await pair.price0CumulativeLast())).to.eq(initialPrice[0].mul(BigNumber.from(10)))
+    expect((await pair.price1CumulativeLast())).to.eq(initialPrice[1].mul(BigNumber.from(10)))
+    expect((await pair.getReserves())[2]).to.eq(blockTimestamp.add(BigNumber.from(10)))
 
-  //   await mineBlock(blockTimestamp.add(BigNumber.from(20)))
-  //   await pair.sync()
+    await mineBlock(blockTimestamp.add(BigNumber.from(20)))
+    await pair.sync()
 
-  //   const newPrice = encodePrice(expandTo18Decimals('6'), expandTo18Decimals('2'))
-  //   expect((await pair.price0CumulativeLast())).to.eq(initialPrice[0].mul(BigNumber.from(10)).add(newPrice[0].mul(BigNumber.from(10))))
-  //   expect((await pair.price1CumulativeLast())).to.eq(initialPrice[1].mul(BigNumber.from(10)).add(newPrice[1].mul(BigNumber.from(10))))
-  //   expect((await pair.getReserves())[2]).to.eq(blockTimestamp.add(BigNumber.from(20)))
-  // })
+    const newPrice = encodePrice(expandTo18Decimals('6'), expandTo18Decimals('2'))
+    expect((await pair.price0CumulativeLast())).to.eq(initialPrice[0].mul(BigNumber.from(10)).add(newPrice[0].mul(BigNumber.from(10))))
+    expect((await pair.price1CumulativeLast())).to.eq(initialPrice[1].mul(BigNumber.from(10)).add(newPrice[1].mul(BigNumber.from(10))))
+    expect((await pair.getReserves())[2]).to.eq(blockTimestamp.add(BigNumber.from(20)))
+  })
 
   it('feeTo:off', async () => {
     const token0Amount = expandTo18Decimals('1000')
