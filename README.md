@@ -7,7 +7,7 @@
 
 ## First steps
 
-1. Clone repository git clone `git@bitbucket.org:adaswap/adaswap-dex-smart-contracts.git`
+1. Clone the repository
 2. Run `npm i` to install common environment package `dotenv`
 3. Create a `.env` file, copy all fields from `.env.example` to created file and paste your private keys
 
