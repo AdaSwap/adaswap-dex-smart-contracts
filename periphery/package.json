@@ -11,6 +11,7 @@
     "compile": "yarn hardhat compile",
     "chain": "hardhat node --network hardhat",
     "deploy-testnet": "yarn hardhat run --network milkomedaTestnet scripts/deploy.js",
+    "script": "yarn hardhat run --network milkomedaTestnet scripts/contract-interaction.js",
     "deploy-mainnet": "yarn hardhat run --network milkomedaMainnet scripts/deploy.js",
     "deploy-dev": "yarn hardhat run --network hardhat scripts/deploy.js"
   },
@@ -18,15 +19,15 @@
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.6",
     "@nomiclabs/hardhat-waffle": "^2.0.3",
+    "@openzeppelin/contracts": "^4.7.0",
     "chai": "^4.3.6",
     "ethereum-waffle": "^3.4.4",
     "ethers": "^5.6.9",
     "hardhat": "^2.9.9",
-    "hardhat-contract-sizer": "^2.6.1",
-    "@openzeppelin/contracts": "^4.7.0"
+    "hardhat-contract-sizer": "^2.6.1"
   },
   "dependencies": {
-    "@adaswap-testnet/core": "^0.0.6",
-    "@adaswap-testnet/lib": "^0.0.5"
+    "@adaswap-testnet/core": "^0.0.7",
+    "@adaswap-testnet/lib": "^0.0.8"
   }
 }

@@ -1,6 +1,8 @@
 const { solidity } = require("ethereum-waffle");
-const AdaswapFactoryJson = require('../../core/artifacts/contracts/AdaswapFactory.sol/AdaswapFactory.json')
-const AdaswapPairJson = require('../../core/artifacts/contracts/AdaswapPair.sol/AdaswapPair.json')
+// const AdaswapFactoryJson = require('../../core/artifacts/contracts/AdaswapFactory.sol/AdaswapFactory.json')
+// const AdaswapPairJson = require('../../core/artifacts/contracts/AdaswapPair.sol/AdaswapPair.json')
+const AdaswapFactoryJson = require('@adaswap-testnet/core/artifacts/contracts/AdaswapFactory.sol/AdaswapFactory.json')
+const AdaswapPairJson = require('@adaswap-testnet/core/artifacts/contracts/AdaswapPair.sol/AdaswapPair.json')
 const { use, expect } = require('chai')
 const {
   ecsign
@@ -18,7 +20,6 @@ use(solidity)
 
 const TOKEN0_TOTAL_SUPPLY = expandTo18Decimals('2000')
 const TOKEN1_TOTAL_SUPPLY = expandTo18Decimals('8000')
-const AdaswapFactoryInterface = AdaswapFactoryJson.abi
 const AdaswapFactoryByteCode = AdaswapFactoryJson.bytecode
 
 describe('AdaswapRouter02', () => {
