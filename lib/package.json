@@ -1,6 +1,6 @@
 {
   "name": "@adaswap-testnet/lib",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "📖 Solidity libraries that are shared across AdaSwap contracts",
   "files": [
     "contracts",
