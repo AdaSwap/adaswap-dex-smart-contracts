@@ -48,7 +48,6 @@ contract MasterAdaSwap is Ownable, Batchable, TimeLock, ReentrancyGuard {
   uint256 public totalAllocPoint = 0;
 
   uint256 public adaswapPerSecond;
-  uint256 private constant ACC_ADASWAP_PRECISION = 1e12;
 
   event Deposit(address indexed user, uint256 indexed pid, uint256 amount, address indexed to);
   event Withdraw(address indexed user, uint256 indexed pid, uint256 amount, address indexed to);
@@ -118,9 +117,9 @@ contract MasterAdaSwap is Ownable, Batchable, TimeLock, ReentrancyGuard {
     if (block.timestamp > pool.lastRewardTime && lpSupply != 0) {
       uint256 time = block.timestamp - pool.lastRewardTime;
       uint256 adaswapReward = time * adaswapPerSecond * pool.allocPoint / totalAllocPoint;
-      accAdaSwapPerShare += adaswapReward * ACC_ADASWAP_PRECISION / lpSupply;
+      accAdaSwapPerShare += adaswapReward / lpSupply;
     }
-    pending = user.amount * accAdaSwapPerShare / ACC_ADASWAP_PRECISION - user.rewardDebt;
+    pending = user.amount * accAdaSwapPerShare - user.rewardDebt;
   }
 
   /// @notice Update reward variables for all pools. Be careful of gas spending!
@@ -142,7 +141,7 @@ contract MasterAdaSwap is Ownable, Batchable, TimeLock, ReentrancyGuard {
       if (lpSupply > 0) {
         uint256 time = block.timestamp - pool.lastRewardTime;
         uint256 adaswapReward = time * adaswapPerSecond * pool.allocPoint / totalAllocPoint;
-        pool.accAdaSwapPerShare += adaswapReward * ACC_ADASWAP_PRECISION / lpSupply;
+        pool.accAdaSwapPerShare += adaswapReward / lpSupply;
       }
       pool.lastRewardTime = block.timestamp;
       poolInfo[pid] = pool;
@@ -160,7 +159,7 @@ contract MasterAdaSwap is Ownable, Batchable, TimeLock, ReentrancyGuard {
 
     // Effects
     user.amount += amount;
-    user.rewardDebt += amount * pool.accAdaSwapPerShare / ACC_ADASWAP_PRECISION;
+    user.rewardDebt += amount * pool.accAdaSwapPerShare;
 
     // Interactions
     IRewarder _rewarder = rewarder[pid];
@@ -184,7 +183,7 @@ contract MasterAdaSwap is Ownable, Batchable, TimeLock, ReentrancyGuard {
     UserInfo storage user = userInfo[pid][msg.sender];
 
     // Effects
-    user.rewardDebt -= amount * pool.accAdaSwapPerShare / ACC_ADASWAP_PRECISION;
+    user.rewardDebt -= amount * pool.accAdaSwapPerShare;
     user.amount -= amount;
 
     // Interactions
@@ -204,7 +203,7 @@ contract MasterAdaSwap is Ownable, Batchable, TimeLock, ReentrancyGuard {
   function harvest(uint256 pid, address to) public whenUnlocked nonReentrant {
     PoolInfo memory pool = updatePool(pid);
     UserInfo storage user = userInfo[pid][msg.sender];
-    uint256 accumulatedAdaSwap = user.amount * pool.accAdaSwapPerShare / ACC_ADASWAP_PRECISION;
+    uint256 accumulatedAdaSwap = user.amount * pool.accAdaSwapPerShare;
     uint256 _pendingAdaSwap = accumulatedAdaSwap - user.rewardDebt;
 
     // Effects
@@ -230,11 +229,11 @@ contract MasterAdaSwap is Ownable, Batchable, TimeLock, ReentrancyGuard {
   function withdrawAndHarvest(uint256 pid, uint256 amount, address to) public whenUnlocked nonReentrant {
     PoolInfo memory pool = updatePool(pid);
     UserInfo storage user = userInfo[pid][msg.sender];
-    uint256 accumulatedAdaSwap = user.amount * pool.accAdaSwapPerShare / ACC_ADASWAP_PRECISION;
+    uint256 accumulatedAdaSwap = user.amount * pool.accAdaSwapPerShare;
     uint256 _pendingAdaSwap = accumulatedAdaSwap - user.rewardDebt;
 
     // Effects
-    user.rewardDebt = accumulatedAdaSwap - (amount * pool.accAdaSwapPerShare / ACC_ADASWAP_PRECISION);
+    user.rewardDebt = accumulatedAdaSwap - (amount * pool.accAdaSwapPerShare);
     user.amount -= amount;
     
     // Interactions
