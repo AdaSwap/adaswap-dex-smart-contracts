@@ -1,7 +1,7 @@
 require("@nomiclabs/hardhat-waffle");
 require("@nomiclabs/hardhat-waffle");
 const fs = require("fs");
-require('dotenv').config({path:'.env'});
+require('dotenv').config({path:'../.env'});
 require('hardhat-contract-sizer');
 
 // This is a sample Hardhat task. To learn how to create your own go to
@@ -46,7 +46,7 @@ module.exports = {
   networks: {
     hardhat: {
       forking: {
-        url: process.env.PROVIDER,
+        url: process.env.MILKOMEDA_MAINNET_PROVIDER,
         blockNumber: 11797060
       },
       accounts: {
