@@ -4,19 +4,29 @@ pragma experimental ABIEncoderV2;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 interface IMasterAdaSwap {
-  struct UserInfo {
-    uint256 amount;     // How many LP tokens the user has provided.
-    uint256 rewardDebt; // Reward debt. See explanation below.
-  }
+    /// @notice Info of each MO user.
+    /// `amount` LP token amount the user has provided.
+    /// `rewardDebt` The amount of ADASWAP entitled to the user.
+    struct UserInfo {
+        uint256 amount; // How many LP tokens the user has provided.
+        uint256 rewardDebt; // Reward debt. See explanation below.
+    }
 
-  struct PoolInfo {
-    IERC20 lpToken;           // Address of LP token contract.
-    uint256 allocPoint;       // How many allocation points assigned to this pool. ADASWAP to distribute per second.
-    uint256 lastRewardBlock;  // Last block number that ADASWAP distribution occurs.
-    uint256 accAdaSwapPerShare; // Accumulated ADASWAP per share, times 1e12. See below.
-  }
+    /// @notice Info of each MO pool.
+    /// `allocPoint` The amount of allocation points assigned to the pool.
+    /// Also known as the amount of ADASWAP to distribute per block.
+    struct PoolInfo {
+        uint256 allocPoint; // How many allocation points assigned to this pool. ADASWAP to distribute per second.
+        uint256 lastRewardTime; // Last block number that ADASWAP distribution occurs.
+        uint256 accAdaSwapPerShare; // Accumulated ADASWAP per share, times 1e12. See below.
+    }
 
-  function poolInfo(uint256 pid) external view returns (IMasterAdaSwap.PoolInfo memory);
-  function totalAllocPoint() external view returns (uint256);
-  function deposit(uint256 _pid, uint256 _amount) external;
+    function poolLength() external view returns (uint256);
+    function updatePool(uint256 pid) external returns (IMasterAdaSwap.PoolInfo memory);
+    function userInfo(uint256 _pid, address _user) external view returns (uint256, uint256);
+    function deposit(uint256 pid, uint256 amount, address to) external;
+    function withdraw(uint256 pid, uint256 amount, address to) external;
+    function harvest(uint256 pid, address to) external;
+    function withdrawAndHarvest(uint256 pid, uint256 amount, address to) external;
+    function emergencyWithdraw(uint256 pid, address to) external;
 }

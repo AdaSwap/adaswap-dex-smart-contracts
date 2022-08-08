@@ -11,26 +11,10 @@ import "./interfaces/IRewarder.sol";
 import "./interfaces/IMasterAdaSwap.sol";
 import "./AdaSwapToken.sol";
 
-/// @notice The MasterAdaSwap (MO) contract gives out a constant number of ADASWAP tokens per second by minting right from ADASWAP token contract.
-contract MasterAdaSwap is Ownable, Batchable, TimeLock, ReentrancyGuard {
+/// @notice The MasterAdaSwap (MO) contract gives out a constant number of ADASWAP tokens per 
+/// second by transfering them from treasury.
+contract MasterAdaSwap is Ownable, Batchable, TimeLock, ReentrancyGuard, IMasterAdaSwap {
   using SafeERC20 for IERC20;
-
-  /// @notice Info of each MO user.
-  /// `amount` LP token amount the user has provided.
-  /// `rewardDebt` The amount of ADASWAP entitled to the user.
-  struct UserInfo {
-    uint256 amount;
-    uint256 rewardDebt;
-  }
-
-  /// @notice Info of each MO pool.
-  /// `allocPoint` The amount of allocation points assigned to the pool.
-  /// Also known as the amount of ADASWAP to distribute per block.
-  struct PoolInfo {
-    uint256 accAdaSwapPerShare;
-    uint256 lastRewardTime;
-    uint256 allocPoint;
-  }
 
   /// @notice Address of ADASWAP contract.
   AdaSwapToken public immutable ADASWAP;
@@ -64,7 +48,7 @@ contract MasterAdaSwap is Ownable, Batchable, TimeLock, ReentrancyGuard {
   }
 
   /// @notice Returns the number of MO pools.
-  function poolLength() public view returns (uint256 pools) {
+  function poolLength() public view override returns (uint256 pools) {
     pools = poolInfo.length;
   }
 
@@ -134,7 +118,7 @@ contract MasterAdaSwap is Ownable, Batchable, TimeLock, ReentrancyGuard {
   /// @notice Update reward variables of the given pool.
   /// @param pid The index of the pool. See `poolInfo`.
   /// @return pool Returns the pool that was updated.
-  function updatePool(uint256 pid) public returns (PoolInfo memory pool) {
+  function updatePool(uint256 pid) public override returns (PoolInfo memory pool) {
     pool = poolInfo[pid];
     if (block.timestamp > pool.lastRewardTime) {
       uint256 lpSupply = lpToken[pid].balanceOf(address(this));
@@ -153,7 +137,7 @@ contract MasterAdaSwap is Ownable, Batchable, TimeLock, ReentrancyGuard {
   /// @param pid The index of the pool. See `poolInfo`.
   /// @param amount LP token amount to deposit.
   /// @param to The receiver of `amount` deposit benefit.
-  function deposit(uint256 pid, uint256 amount, address to) public {
+  function deposit(uint256 pid, uint256 amount, address to) public override {
     PoolInfo memory pool = updatePool(pid);
     UserInfo storage user = userInfo[pid][to];
 
@@ -178,7 +162,7 @@ contract MasterAdaSwap is Ownable, Batchable, TimeLock, ReentrancyGuard {
   /// @param pid The index of the pool. See `poolInfo`.
   /// @param amount LP token amount to withdraw.
   /// @param to Receiver of the LP tokens.
-  function withdraw(uint256 pid, uint256 amount, address to) public whenUnlocked nonReentrant {
+  function withdraw(uint256 pid, uint256 amount, address to) public override whenUnlocked nonReentrant {
     PoolInfo memory pool = updatePool(pid);
     UserInfo storage user = userInfo[pid][msg.sender];
 
@@ -200,7 +184,7 @@ contract MasterAdaSwap is Ownable, Batchable, TimeLock, ReentrancyGuard {
   /// @notice Harvest proceeds for transaction sender to `to`.
   /// @param pid The index of the pool. See `poolInfo`.
   /// @param to Receiver of ADASWAP rewards.
-  function harvest(uint256 pid, address to) public whenUnlocked nonReentrant {
+  function harvest(uint256 pid, address to) public override whenUnlocked nonReentrant {
     PoolInfo memory pool = updatePool(pid);
     UserInfo storage user = userInfo[pid][msg.sender];
     uint256 accumulatedAdaSwap = user.amount * pool.accAdaSwapPerShare;
@@ -209,6 +193,7 @@ contract MasterAdaSwap is Ownable, Batchable, TimeLock, ReentrancyGuard {
     // Effects
     user.rewardDebt = accumulatedAdaSwap;
 
+    // replace to preminted version
     // Interactions
     if (_pendingAdaSwap != 0) {
       ADASWAP.mint(to, _pendingAdaSwap);
@@ -226,7 +211,7 @@ contract MasterAdaSwap is Ownable, Batchable, TimeLock, ReentrancyGuard {
   /// @param pid The index of the pool. See `poolInfo`.
   /// @param amount LP token amount to withdraw.
   /// @param to Receiver of the LP tokens and ADASWAP rewards.
-  function withdrawAndHarvest(uint256 pid, uint256 amount, address to) public whenUnlocked nonReentrant {
+  function withdrawAndHarvest(uint256 pid, uint256 amount, address to) public override whenUnlocked nonReentrant {
     PoolInfo memory pool = updatePool(pid);
     UserInfo storage user = userInfo[pid][msg.sender];
     uint256 accumulatedAdaSwap = user.amount * pool.accAdaSwapPerShare;
@@ -236,6 +221,7 @@ contract MasterAdaSwap is Ownable, Batchable, TimeLock, ReentrancyGuard {
     user.rewardDebt = accumulatedAdaSwap - (amount * pool.accAdaSwapPerShare);
     user.amount -= amount;
     
+    // replace to preminted version
     // Interactions
     ADASWAP.mint(to, _pendingAdaSwap);
 
@@ -253,7 +239,7 @@ contract MasterAdaSwap is Ownable, Batchable, TimeLock, ReentrancyGuard {
   /// @notice Withdraw without caring about rewards. EMERGENCY ONLY.
   /// @param pid The index of the pool. See `poolInfo`.
   /// @param to Receiver of the LP tokens.
-  function emergencyWithdraw(uint256 pid, address to) public {
+  function emergencyWithdraw(uint256 pid, address to) public override {
     UserInfo storage user = userInfo[pid][msg.sender];
     uint256 amount = user.amount;
     user.amount = 0;
