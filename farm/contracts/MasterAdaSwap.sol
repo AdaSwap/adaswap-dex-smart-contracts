@@ -2,34 +2,36 @@
 pragma solidity >=0.8.0 <0.9.0;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "./libraries/Batchable.sol";
-import "./libraries/TimeLock.sol";
+import "./libraries/NumberConverter.sol";
 import "./interfaces/IRewarder.sol";
 import "./interfaces/IMasterAdaSwap.sol";
 import "./AdaSwapToken.sol";
 
 /// @notice The MasterAdaSwap (MO) contract gives out a constant number of ADASWAP tokens per second by minting right from ADASWAP token contract.
-contract MasterAdaSwap is Ownable, Batchable, TimeLock, ReentrancyGuard {
+contract MasterAdaSwap is Ownable, Batchable {
   using SafeERC20 for IERC20;
+  using UInt256 for uint256;
+  using Int256 for int256;
+  using UInt128 for uint128;
 
   /// @notice Info of each MO user.
   /// `amount` LP token amount the user has provided.
   /// `rewardDebt` The amount of ADASWAP entitled to the user.
   struct UserInfo {
     uint256 amount;
-    uint256 rewardDebt;
+    int256 rewardDebt;
   }
 
   /// @notice Info of each MO pool.
   /// `allocPoint` The amount of allocation points assigned to the pool.
   /// Also known as the amount of ADASWAP to distribute per block.
   struct PoolInfo {
-    uint256 accAdaSwapPerShare;
-    uint256 lastRewardTime;
-    uint256 allocPoint;
+    uint128 accAdaSwapPerShare;
+    uint64 lastRewardTime;
+    uint64 allocPoint;
   }
 
   /// @notice Address of ADASWAP contract.
@@ -54,8 +56,8 @@ contract MasterAdaSwap is Ownable, Batchable, TimeLock, ReentrancyGuard {
   event EmergencyWithdraw(address indexed user, uint256 indexed pid, uint256 amount, address indexed to);
   event Harvest(address indexed user, uint256 indexed pid, uint256 amount);
   event LogPoolAddition(uint256 indexed pid, uint256 allocPoint, IERC20 indexed lpToken, IRewarder indexed rewarder);
-  event LogSetPool(uint256 indexed pid, uint256 allocPoint, IRewarder indexed rewarder, bool overwrite);
-  event LogUpdatePool(uint256 indexed pid, uint256 lastRewardTime, uint256 lpSupply, uint256 accAdaSwapPerShare);
+  event LogSetPool(uint256 indexed pid, uint64 allocPoint, IRewarder indexed rewarder, bool overwrite);
+  event LogUpdatePool(uint256 indexed pid, uint64 lastRewardTime, uint256 lpSupply, uint256 accAdaSwapPerShare);
   event LogAdaSwapPerSecond(uint256 adaswapPerSecond);
 
   /// @param _adaswap The ADASWAP token contract address.
@@ -73,14 +75,14 @@ contract MasterAdaSwap is Ownable, Batchable, TimeLock, ReentrancyGuard {
   /// @param allocPoint AP of the new pool.
   /// @param _lpToken Address of the LP ERC-20 token.
   /// @param _rewarder Address of the rewarder delegate.
-  function add(uint256 allocPoint, IERC20 _lpToken, IRewarder _rewarder) public onlyOwner {
+  function add(uint64 allocPoint, IERC20 _lpToken, IRewarder _rewarder) public onlyOwner {
     totalAllocPoint += allocPoint;
     lpToken.push(_lpToken);
     rewarder.push(_rewarder);
 
     poolInfo.push(PoolInfo({
       allocPoint: allocPoint,
-      lastRewardTime: block.timestamp,
+      lastRewardTime: block.timestamp.to64(),
       accAdaSwapPerShare: 0
     }));
     emit LogPoolAddition(lpToken.length - 1, allocPoint, _lpToken, _rewarder);
@@ -91,7 +93,7 @@ contract MasterAdaSwap is Ownable, Batchable, TimeLock, ReentrancyGuard {
   /// @param _allocPoint New AP of the pool.
   /// @param _rewarder Address of the rewarder delegate.
   /// @param overwrite True if _rewarder should be `set`. Otherwise `_rewarder` is ignored.
-  function set(uint256 _pid, uint256 _allocPoint, IRewarder _rewarder, bool overwrite) public onlyOwner {
+  function set(uint256 _pid, uint64 _allocPoint, IRewarder _rewarder, bool overwrite) public onlyOwner {
     totalAllocPoint = totalAllocPoint - poolInfo[_pid].allocPoint + _allocPoint;
     poolInfo[_pid].allocPoint = _allocPoint;
     if (overwrite) { rewarder[_pid] = _rewarder; }
@@ -119,7 +121,7 @@ contract MasterAdaSwap is Ownable, Batchable, TimeLock, ReentrancyGuard {
       uint256 adaswapReward = time * adaswapPerSecond * pool.allocPoint / totalAllocPoint;
       accAdaSwapPerShare += adaswapReward / lpSupply;
     }
-    pending = user.amount * accAdaSwapPerShare - user.rewardDebt;
+    pending = (int256(user.amount * accAdaSwapPerShare) - user.rewardDebt).toUInt256();
   }
 
   /// @notice Update reward variables for all pools. Be careful of gas spending!
@@ -141,9 +143,9 @@ contract MasterAdaSwap is Ownable, Batchable, TimeLock, ReentrancyGuard {
       if (lpSupply > 0) {
         uint256 time = block.timestamp - pool.lastRewardTime;
         uint256 adaswapReward = time * adaswapPerSecond * pool.allocPoint / totalAllocPoint;
-        pool.accAdaSwapPerShare += adaswapReward / lpSupply;
+        pool.accAdaSwapPerShare += (adaswapReward / lpSupply).to128();
       }
-      pool.lastRewardTime = block.timestamp;
+      pool.lastRewardTime = block.timestamp.to64();
       poolInfo[pid] = pool;
       emit LogUpdatePool(pid, pool.lastRewardTime, lpSupply, pool.accAdaSwapPerShare);
     }
@@ -159,15 +161,13 @@ contract MasterAdaSwap is Ownable, Batchable, TimeLock, ReentrancyGuard {
 
     // Effects
     user.amount += amount;
-    user.rewardDebt += amount * pool.accAdaSwapPerShare;
+    user.rewardDebt += int256(amount * pool.accAdaSwapPerShare);
 
     // Interactions
     IRewarder _rewarder = rewarder[pid];
     if (address(_rewarder) != address(0)) {
       _rewarder.onAdaSwapReward(pid, to, to, 0, user.amount);
     }
-
-    lock(msg.sender);
 
     lpToken[pid].safeTransferFrom(msg.sender, address(this), amount);
 
@@ -178,12 +178,12 @@ contract MasterAdaSwap is Ownable, Batchable, TimeLock, ReentrancyGuard {
   /// @param pid The index of the pool. See `poolInfo`.
   /// @param amount LP token amount to withdraw.
   /// @param to Receiver of the LP tokens.
-  function withdraw(uint256 pid, uint256 amount, address to) public whenUnlocked nonReentrant {
+  function withdraw(uint256 pid, uint256 amount, address to) public {
     PoolInfo memory pool = updatePool(pid);
     UserInfo storage user = userInfo[pid][msg.sender];
 
     // Effects
-    user.rewardDebt -= amount * pool.accAdaSwapPerShare;
+    user.rewardDebt -= int256(amount * pool.accAdaSwapPerShare);
     user.amount -= amount;
 
     // Interactions
@@ -200,17 +200,18 @@ contract MasterAdaSwap is Ownable, Batchable, TimeLock, ReentrancyGuard {
   /// @notice Harvest proceeds for transaction sender to `to`.
   /// @param pid The index of the pool. See `poolInfo`.
   /// @param to Receiver of ADASWAP rewards.
-  function harvest(uint256 pid, address to) public whenUnlocked nonReentrant {
+  function harvest(uint256 pid, address to) public {
     PoolInfo memory pool = updatePool(pid);
     UserInfo storage user = userInfo[pid][msg.sender];
-    uint256 accumulatedAdaSwap = user.amount * pool.accAdaSwapPerShare;
-    uint256 _pendingAdaSwap = accumulatedAdaSwap - user.rewardDebt;
+    int256 accumulatedAdaSwap = int256(user.amount * pool.accAdaSwapPerShare);
+    uint256 _pendingAdaSwap = (accumulatedAdaSwap - user.rewardDebt).toUInt256();
 
     // Effects
     user.rewardDebt = accumulatedAdaSwap;
 
     // Interactions
     if (_pendingAdaSwap != 0) {
+      // TODO: update this if there is another way to reward users.
       ADASWAP.mint(to, _pendingAdaSwap);
     }
 
@@ -226,17 +227,18 @@ contract MasterAdaSwap is Ownable, Batchable, TimeLock, ReentrancyGuard {
   /// @param pid The index of the pool. See `poolInfo`.
   /// @param amount LP token amount to withdraw.
   /// @param to Receiver of the LP tokens and ADASWAP rewards.
-  function withdrawAndHarvest(uint256 pid, uint256 amount, address to) public whenUnlocked nonReentrant {
+  function withdrawAndHarvest(uint256 pid, uint256 amount, address to) public {
     PoolInfo memory pool = updatePool(pid);
     UserInfo storage user = userInfo[pid][msg.sender];
-    uint256 accumulatedAdaSwap = user.amount * pool.accAdaSwapPerShare;
-    uint256 _pendingAdaSwap = accumulatedAdaSwap - user.rewardDebt;
+    int256 accumulatedAdaSwap = int256(user.amount * pool.accAdaSwapPerShare);
+    uint256 _pendingAdaSwap = uint256(accumulatedAdaSwap - user.rewardDebt);
 
     // Effects
-    user.rewardDebt = accumulatedAdaSwap - (amount * pool.accAdaSwapPerShare);
+    user.rewardDebt = accumulatedAdaSwap - int256(amount * pool.accAdaSwapPerShare);
     user.amount -= amount;
     
     // Interactions
+    // TODO: update this if there is another way to reward
     ADASWAP.mint(to, _pendingAdaSwap);
 
     IRewarder _rewarder = rewarder[pid];
