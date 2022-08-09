@@ -1,15 +1,16 @@
-import { ethers } from "hardhat"
+const { ethers } =require("hardhat")
 const { BigNumber } = require("ethers")
+const TIME_UTILS = require("./time")
 
-export const BASE_TEN = 10
-export const ADDRESS_ZERO = "0x0000000000000000000000000000000000000000"
+const BASE_TEN = 10
+const ADDRESS_ZERO = "0x0000000000000000000000000000000000000000"
 
-export function encodeParameters(types, values) {
+function encodeParameters(types, values) {
   const abi = new ethers.utils.AbiCoder()
   return abi.encode(types, values)
 }
 
-export async function prepare(thisObject, contracts) {
+async function prepare(thisObject, contracts) {
   for (let i in contracts) {
     let contract = contracts[i]
     thisObject[contract] = await ethers.getContractFactory(contract)
@@ -24,7 +25,7 @@ export async function prepare(thisObject, contracts) {
   thisObject.carolPrivateKey = "0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a"
 }
 
-export async function deploy(thisObject, contracts) {
+async function deploy(thisObject, contracts) {
   for (let i in contracts) {
     let contract = contracts[i]
     thisObject[contract[0]] = await contract[1].deploy(...(contract[2] || []))
@@ -32,7 +33,7 @@ export async function deploy(thisObject, contracts) {
   }
 }
 
-export async function createSLP(thisObject, name, tokenA, tokenB, amount) {
+async function createALP(thisObject, name, tokenA, tokenB, amount) {
   const createPairTx = await thisObject.factory.createPair(tokenA.address, tokenB.address)
 
   const _pair = (await createPairTx.wait()).events[0].args.pair
@@ -45,8 +46,17 @@ export async function createSLP(thisObject, name, tokenA, tokenB, amount) {
   await thisObject[name].mint(thisObject.alice.address)
 }
 // Defaults to e18 using amount * 10^18
-export function getBigNumber(amount, decimals = 18) {
+function getBigNumber(amount, decimals = 18) {
   return BigNumber.from(amount).mul(BigNumber.from(BASE_TEN).pow(decimals))
 }
 
-export * from "./time"
+module.exports = {
+  BASE_TEN,
+  ADDRESS_ZERO,
+  encodeParameters,
+  prepare,
+  deploy,
+  createALP,
+  getBigNumber,
+  ...TIME_UTILS
+}
