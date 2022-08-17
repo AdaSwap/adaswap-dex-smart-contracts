@@ -4,7 +4,7 @@ pragma solidity >=0.8.0 <0.9.0;
 
 library Int256 {
   function toUInt256(int256 a) internal pure returns (uint256) {
-    require(a >= 0, "NumverConverter: Integer < 0");
+    require(a >= 0, "Number: Integer < 0");
     return uint256(a);
   }
 }
