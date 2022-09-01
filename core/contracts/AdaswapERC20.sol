@@ -43,6 +43,9 @@ contract AdaswapERC20 is IAdaswapERC20 {
     }
 
     function _approve(address owner, address spender, uint value) private {
+        require(owner != address(0), "Adaswap: approve from the zero address");
+        require(spender != address(0), "Adaswap: approve to the zero address");
+
         allowance[owner][spender] = value;
         emit Approval(owner, spender, value);
     }
@@ -55,6 +58,21 @@ contract AdaswapERC20 is IAdaswapERC20 {
 
     function approve(address spender, uint value) external override returns (bool) {
         _approve(msg.sender, spender, value);
+        return true;
+    }
+
+    function increaseAllowance(address spender, uint256 addedValue) external returns (bool) {
+        _approve(msg.sender, spender, allowance[msg.sender][spender] + addedValue);
+        return true;
+    }
+
+    function decreaseAllowance(address spender, uint256 subtractedValue) external returns (bool) {
+        uint256 currentAllowance = allowance[msg.sender][spender];
+        require(currentAllowance >= subtractedValue, "Adaswap: decreased allowance below zero");
+        unchecked {
+            _approve(msg.sender, spender, currentAllowance - subtractedValue);
+        }
+
         return true;
     }
 
