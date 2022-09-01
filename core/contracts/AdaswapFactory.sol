@@ -12,6 +12,7 @@ contract AdaswapFactory is IAdaswapFactory {
     address[] public override allPairs;
 
     constructor(address _feeToSetter) {
+        require(_feeToSetter != address(0), "Adaswap: ZERO_ADDRESS");
         feeToSetter = _feeToSetter;
     }
 
