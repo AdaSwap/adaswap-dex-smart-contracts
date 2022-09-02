@@ -45,7 +45,7 @@ contract MasterAdaSwap is Ownable, Batchable {
     struct PoolInfo {
         uint256 lpSupply;
         uint256 accAdaSwapPerShare;
-        address rewarder;
+        IRewarder rewarder;
         uint64 lastRewardTime;
         uint64 allocPoint;
     }
@@ -107,10 +107,9 @@ contract MasterAdaSwap is Ownable, Batchable {
         uint8 lockTimeId
     );
     event LogPoolAddition(
-        address indexed lpToken,
         uint8 lockTimeId,
-        uint64[] allocPoints,
-        IERC20 indexed lpToken,
+        uint64 allocPoint,
+        address indexed lpToken,
         IRewarder indexed rewarder
     );
     event LogSetPool(
@@ -156,7 +155,7 @@ contract MasterAdaSwap is Ownable, Batchable {
         PoolInfo({
                lpSupply: 0,
                accAdaSwapPerShare: 0,
-               rewarder: _rewarder,
+               rewarder: IRewarder(_rewarder),
                lastRewardTime: block.timestamp.to64(),
                allocPoint: _allocPoint
         });
@@ -164,19 +163,18 @@ contract MasterAdaSwap is Ownable, Batchable {
         existingPoolOptions[_lpToken].push(_lockTimeId);
         
         emit LogPoolAddition(
-            lpToken.length - 1,
-            _allocPoints,
+            _lockTimeId,
+            _allocPoint,
             _lpToken,
-            _rewarder,
-            _allowedFixedTimeBitMask
+            IRewarder(_rewarder)
         );
     }
 
-    /// @notice Update the given pool's ASW allocation point and `IRewarder` contract. Can only be called by the owner.
-    /// @param _pid The index of the pool. See `poolInfo`.
-    /// @param _allocPoints New AP of the pool.
-    /// @param _rewarder Address of the rewarder delegate.
-    /// @param overwrite True if _rewarder should be `set`. Otherwise `_rewarder` is ignored.
+    // / @notice Update the given pool's ASW allocation point and `IRewarder` contract. Can only be called by the owner.
+    // / @param _pid The index of the pool. See `poolInfo`.1
+    // / @param _allocPoints New AP of the pool.
+    // / @param _rewarder Address of the rewarder delegate.
+    // / @param overwrite True if _rewarder should be `set`. Otherwise `_rewarder` is ignored.
     function set(
         address _lpToken,
         uint8 _lockTimeId,
@@ -184,14 +182,15 @@ contract MasterAdaSwap is Ownable, Batchable {
         IRewarder _rewarder, 
         bool overwrite
     ) public onlyOwner {
-        totalAllocPoint = totalAllocPoint.sub(poolInfo[_lpToken][_lockTimeId].allocPoint).add(_allocPoint);
+        totalAllocPoint = totalAllocPoint - poolInfo[_lpToken][_lockTimeId].allocPoint + _allocPoint;
         poolInfo[_lpToken][_lockTimeId].allocPoint = _allocPoint.to64();
         if (overwrite) { poolInfo[_lpToken][_lockTimeId].rewarder = _rewarder; }
+
         emit LogSetPool(
             _lpToken,
-            _allocPoints,
+            _lockTimeId,
+            _allocPoint.to64(),
             overwrite ? _rewarder : poolInfo[_lpToken][_lockTimeId].rewarder,
-            _allowedFixedTimeBitMask,
             overwrite
         );
     }
@@ -228,19 +227,19 @@ contract MasterAdaSwap is Ownable, Batchable {
             .toUInt256();
     }
 
-    /// @notice Update reward variables for all pools. Be careful of gas spending!
-    /// @param pids Pool IDs of all to be updated. Make sure to update all active pools.
+    // / @notice Update reward variables for all pools. Be careful of gas spending!
+    // / @param pids Pool IDs of all to be updated. Make sure to update all active pools.
     function massUpdatePools(address _lpToken) external {
-        uint256 len = existingPoolOptions[_lpToken].length();
+        uint256 len = existingPoolOptions[_lpToken].length;
         for (uint256 i = 0; i < len; ++i) {
             updatePool(_lpToken, existingPoolOptions[_lpToken][i]);
         }
     }
 
     // change to mapping
-    /// @notice Update reward variables of the given pool.
-    /// @param pid The index of the pool. See `poolInfo`.
-    /// @return pool Returns the pool that was updated.
+    // / @notice Update reward variables of the given pool.
+    // / @param pid The index of the pool. See `poolInfo`.
+    // / @return pool Returns the pool that was updated.
     function updatePool(
         address _lpToken,
         uint8 _lockTimeId
@@ -249,9 +248,9 @@ contract MasterAdaSwap is Ownable, Batchable {
         if (block.timestamp > pool.lastRewardTime) {
             uint256 lpSupply = pool.lpSupply;
             if (lpSupply > 0) {
-                uint256 timestamp = block.timestamp.sub(pool.lastRewardTime);
-                uint256 adaReward = timestamp.mul(adaswapPerSecond).mul(pool.allocPoint) / totalAllocPoint;
-                pool.accAdaSwapPerShare = pool.accAdaSwapPerShare.add((adaReward.mul(ACC_ADASWAP_PRECISION) / lpSupply).to128());
+                uint256 timestamp = block.timestamp - pool.lastRewardTime;
+                uint256 adaReward = timestamp * adaswapPerSecond * pool.allocPoint / totalAllocPoint;
+                pool.accAdaSwapPerShare = pool.accAdaSwapPerShare + (adaReward * ACC_ADASWAP_PRECISION / lpSupply).to128();
             }
             pool.lastRewardTime = block.timestamp.to64();
             poolInfo[_lpToken][_lockTimeId] = pool;
@@ -260,10 +259,10 @@ contract MasterAdaSwap is Ownable, Batchable {
     }
 
     // change to mapping
-    /// @notice Deposit LP tokens to MO for ASW allocation.
-    /// @param pid The index of the pool. See `poolInfo`.
-    /// @param amount LP token amount to deposit.
-    /// @param to The receiver of `amount` deposit benefit.
+    // / @notice Deposit LP tokens to MO for ASW allocation.
+    // / @param pid The index of the pool. See `poolInfo`.
+    // / @param amount LP token amount to deposit.
+    // / @param to The receiver of `amount` deposit benefit.
     function deposit(
         address _lpToken,
         address _to,
@@ -274,53 +273,54 @@ contract MasterAdaSwap is Ownable, Batchable {
         UserInfo storage user = userInfo[_to][_lpToken][_lockTimeId];
 
         // Effects
-        user.amount = user.amount.add(_amount);
-        user.rewardDebt = user.rewardDebt.add(int256(_amount.mul(pool.accAdaSwapPerShare) / ACC_ADASWAP_PRECISION));
+        user.amount = user.amount + _amount;
+        user.rewardDebt = user.rewardDebt+ int256(_amount * pool.accAdaSwapPerShare / ACC_ADASWAP_PRECISION);
 
 
         // Interactions
-        IRewarder _rewarder = rewarder[pid];
+        IRewarder _rewarder = pool.rewarder;
         if (address(_rewarder) != address(0)) {
-            _rewarder.onAdaSwapReward(pid, _to, _to, 0, user.amount);
+            _rewarder.onAdaSwapReward(_lpToken, _to, _to, 0, user.amount, _lockTimeId);
         }
 
-        IERC20(pool.rewarder).safeTransferFrom(msg.sender, address(this), _amount);
+        IERC20(_lpToken).safeTransferFrom(msg.sender, address(this), _amount);
 
-        emit Deposit(msg.sender, _lpToken, pid, _amount, _lockTimeId, _to);
+        emit Deposit(msg.sender, _lpToken, _amount, _lockTimeId, _to);
     }
 
     // change to mapping
-    /// @notice Withdraw LP tokens from MO.
-    /// @param pid The index of the pool. See `poolInfo`.
-    /// @param amount LP token amount to withdraw.
-    /// @param to Receiver of the LP tokens.
+    // / @notice Withdraw LP tokens from MO.
+    // / @param pid The index of the pool. See `poolInfo`.
+    // / @param amount LP token amount to withdraw.
+    // / @param to Receiver of the LP tokens.
     function withdraw(
         address _lpToken,
         uint256 _amount,
+        address _to,
         uint8 _lockTimeId
     ) public {
         PoolInfo memory pool = updatePool(_lpToken, _lockTimeId);
         UserInfo storage user = userInfo[msg.sender][_lpToken][_lockTimeId];
 
        // Effects
-        user.amount = user.amount.add(_amount);
-        user.rewardDebt = user.rewardDebt.add(int256(amount.mul(pool.accAdaSwapPerShare) / ACC_ADASWAP_PRECISION));
+        user.amount = user.amount + _amount;
+        user.rewardDebt = user.rewardDebt + int256(_amount * pool.accAdaSwapPerShare / ACC_ADASWAP_PRECISION);
 
         // Interactions
-        IRewarder _rewarder = rewarder[pid];
+        IRewarder _rewarder = pool.rewarder;
         if (address(_rewarder) != address(0)) {
             _rewarder.onAdaSwapReward(_lpToken, msg.sender, _to, 0, user.amount, _lockTimeId);
         }
 
-        IERC20(pool.rewarder).safeTransfer(_to, _amount);
+        IERC20(_lpToken).safeTransfer(_to, _amount);
 
-        emit Withdraw(msg.sender, _lpToken, pid, _amount, _lockTimeId, _to);
+        emit Withdraw(msg.sender, _lpToken, _amount, _lockTimeId, _to);
     }
 
     // change to mapping
-    /// @notice Harvest proceeds for transaction sender to `to`.
-    /// @param pid The index of the pool. See `poolInfo`.
-    /// @param to Receiver of ASW rewards.
+    // / @notice Harvest proceeds for transaction sender to `to`.
+    // / @param pid The index of the pool. See `poolInfo`.
+    // / @param to Receiver of ASW rewards.
     function harvest(
         address _lpToken, 
         address to,
@@ -329,7 +329,7 @@ contract MasterAdaSwap is Ownable, Batchable {
         PoolInfo memory pool = updatePool(_lpToken, _lockTimeId);
         UserInfo storage user = userInfo[msg.sender][_lpToken][_lockTimeId];
 
-        int256 accumulatedAdaSwap = int256(user.amount.mul(pool.accAdaSwapPerShare) / ACC_ADASWAP_PRECISION);
+        int256 accumulatedAdaSwap = int256(user.amount * pool.accAdaSwapPerShare / ACC_ADASWAP_PRECISION);
         uint256 _pendingAdaSwap = (accumulatedAdaSwap - user.rewardDebt)
             .toUInt256();
 
@@ -342,7 +342,7 @@ contract MasterAdaSwap is Ownable, Batchable {
             ASW.safeTransferFrom(AdaSwapTreasury, to, _pendingAdaSwap);
         }
 
-        IRewarder _rewarder = rewarder[pid];
+        IRewarder _rewarder = pool.rewarder;
         if (address(_rewarder) != address(0)) {
             _rewarder.onAdaSwapReward(
                 _lpToken,
@@ -354,14 +354,14 @@ contract MasterAdaSwap is Ownable, Batchable {
             );
         }
 
-        // emit Harvest(msg.sender, pid, _pendingAdaSwap);
+        emit Harvest(msg.sender, _lpToken, _pendingAdaSwap, _lockTimeId);
     }
 
     // change to mapping 
-    /// @notice Withdraw LP tokens from MO and harvest proceeds for transaction sender to `to`.
-    /// @param pid The index of the pool. See `poolInfo`.
-    /// @param amount LP token amount to withdraw.
-    /// @param to Receiver of the LP tokens and ASW rewards.
+    // / @notice Withdraw LP tokens from MO and harvest proceeds for transaction sender to `to`.
+    // / @param pid The index of the pool. See `poolInfo`.
+    // / @param amount LP token amount to withdraw.
+    // / @param to Receiver of the LP tokens and ASW rewards.
     function withdrawAndHarvest(
         address _lpToken, 
         uint256 _amount,
@@ -372,21 +372,21 @@ contract MasterAdaSwap is Ownable, Batchable {
         UserInfo storage user = userInfo[msg.sender][_lpToken][_lockTimeId];
 
         int256 accumulatedAdaSwap = int256(
-            user.amount * fixedTimeInfo.accAdaSwapPerShare / ACC_ADASWAP_PRECISION
+            user.amount * pool.accAdaSwapPerShare / ACC_ADASWAP_PRECISION
         );
         uint256 _pendingAdaSwap = uint256(accumulatedAdaSwap - user.rewardDebt);
 
         // Effects
         user.rewardDebt =
             accumulatedAdaSwap -
-            int256(_amount * fixedTimeInfo.accAdaSwapPerShare);
+            int256(_amount * pool.accAdaSwapPerShare);
         user.amount -= _amount;
 
         // Interactions
         // TODO: update this if there is another way to reward
         ASW.safeTransferFrom(AdaSwapTreasury, _to, _pendingAdaSwap);
 
-        IRewarder _rewarder = rewarder[pid];
+        IRewarder _rewarder = pool.rewarder;
         if (address(_rewarder) != address(0)) {
             _rewarder.onAdaSwapReward(
                 _lpToken,
@@ -398,16 +398,16 @@ contract MasterAdaSwap is Ownable, Batchable {
             );
         }
 
-        IERC20(pool.rewarder).safeTransfer(_to, _amount);
+        IERC20(_lpToken).safeTransfer(_to, _amount);
 
-        emit Withdraw(msg.sender, _lpToken, pid, _amount,_lockTimeId , _to);
-        emit Harvest(msg.sender, _lpToken, pid, _pendingAdaSwap, _lockTimeId);
+        emit Withdraw(msg.sender, _lpToken, _amount,_lockTimeId , _to);
+        emit Harvest(msg.sender, _lpToken, _pendingAdaSwap, _lockTimeId);
     }
 
     // change to mapping
-    /// @notice Withdraw without caring about rewards. EMERGENCY ONLY.
-    /// @param pid The index of the pool. See `poolInfo`.
-    /// @param to Receiver of the LP tokens.
+    // / @notice Withdraw without caring about rewards. EMERGENCY ONLY.
+    // / @param pid The index of the pool. See `poolInfo`.
+    // / @param to Receiver of the LP tokens.
     function emergencyWithdraw(
         address _lpToken, 
         address _to,        
@@ -418,13 +418,13 @@ contract MasterAdaSwap is Ownable, Batchable {
         user.amount = 0;
         user.rewardDebt = 0;
 
-        IRewarder _rewarder = rewarder[pid];
+        IRewarder _rewarder =  poolInfo[_lpToken][_lockTimeId].rewarder;
         if (address(_rewarder) != address(0)) {
             _rewarder.onAdaSwapReward( _lpToken, msg.sender, _to, 0, 0, _lockTimeId);
         }
 
         // Note: transfer can fail or succeed if `amount` is zero.
-        IERC20(pool.rewarder).safeTransfer(_to, amount);
-        emit EmergencyWithdraw(msg.sender, _lpToken, pid, amount, _lockTimeId, _to);
+        IERC20(_lpToken).safeTransfer(_to, amount);
+        emit EmergencyWithdraw(msg.sender, _lpToken, amount, _lockTimeId, _to);
     }
 }
