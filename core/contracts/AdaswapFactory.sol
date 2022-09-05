@@ -5,26 +5,26 @@ import './interfaces/IAdaswapFactory.sol';
 import './AdaswapPair.sol';
 
 contract AdaswapFactory is IAdaswapFactory {
-    address public override feeTo;
-    address public override feeToSetter;
+    address public feeTo;
+    address public feeToSetter;
 
-    mapping(address => mapping(address => address)) public override getPair;
-    address[] public override allPairs;
+    mapping(address => mapping(address => address)) public getPair;
+    address[] public allPairs;
 
     constructor(address _feeToSetter) {
         require(_feeToSetter != address(0), "Adaswap: ZERO_ADDRESS");
         feeToSetter = _feeToSetter;
     }
 
-    function allPairsLength() external view override returns (uint) {
+    function allPairsLength() external view returns (uint) {
         return allPairs.length;
     }
 
-    function pairCodeHash() external pure override returns (bytes32) {
+    function pairCodeHash() external pure returns (bytes32) {
         return keccak256(type(AdaswapPair).creationCode);
     }
 
-    function createPair(address tokenA, address tokenB) external override returns (address pair) {
+    function createPair(address tokenA, address tokenB) external returns (address pair) {
         require(tokenA != tokenB, 'Adaswap: IDENTICAL_ADDRESSES');
         (address token0, address token1) = tokenA < tokenB ? (tokenA, tokenB) : (tokenB, tokenA);
         require(token0 != address(0), 'Adaswap: ZERO_ADDRESS');
@@ -41,12 +41,12 @@ contract AdaswapFactory is IAdaswapFactory {
         emit PairCreated(token0, token1, pair, allPairs.length);
     }
 
-    function setFeeTo(address _feeTo) external override {
+    function setFeeTo(address _feeTo) external {
         require(msg.sender == feeToSetter, 'Adaswap: FORBIDDEN');
         feeTo = _feeTo;
     }
 
-    function setFeeToSetter(address _feeToSetter) external override {
+    function setFeeToSetter(address _feeToSetter) external {
         require(msg.sender == feeToSetter, 'Adaswap: FORBIDDEN');
         feeToSetter = _feeToSetter;
     }

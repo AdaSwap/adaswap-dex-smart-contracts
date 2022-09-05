@@ -9,8 +9,8 @@ import './interfaces/IWETH.sol';
 
 contract AdaswapRouter02 is IAdaswapRouter02 {
 
-    address public immutable override factory;
-    address public immutable override WETH;
+    address public immutable factory;
+    address public immutable WETH;
 
     modifier ensure(uint256 deadline) {
         require(deadline >= block.timestamp, 'AdaswapRouter: EXPIRED');
@@ -218,7 +218,7 @@ contract AdaswapRouter02 is IAdaswapRouter02 {
         uint8 v,
         bytes32 r,
         bytes32 s
-    ) external virtual override returns (uint256 amountA, uint256 amountB) {
+    ) external virtual returns (uint256 amountA, uint256 amountB) {
         address pair = AdaswapLibrary.pairFor(factory, tokenA, tokenB);
         uint256 value = approveMax ? type(uint256).max : liquidity;
         IAdaswapPair(pair).permit(
@@ -287,7 +287,7 @@ contract AdaswapRouter02 is IAdaswapRouter02 {
         uint256 amountETHMin,
         address to,
         uint256 deadline
-    ) public virtual override ensure(deadline) returns (uint256 amountETH) {
+    ) public virtual ensure(deadline) returns (uint256 amountETH) {
         (, amountETH) = removeLiquidity(
             token,
             WETH,
@@ -317,7 +317,7 @@ contract AdaswapRouter02 is IAdaswapRouter02 {
         uint8 v,
         bytes32 r,
         bytes32 s
-    ) external virtual override returns (uint256 amountETH) {
+    ) external virtual returns (uint256 amountETH) {
         address pair = AdaswapLibrary.pairFor(factory, token, WETH);
         uint256 value = approveMax ? type(uint256).max : liquidity;
         IAdaswapPair(pair).permit(
@@ -579,7 +579,7 @@ contract AdaswapRouter02 is IAdaswapRouter02 {
         address[] calldata path,
         address to,
         uint256 deadline
-    ) external virtual override ensure(deadline) {
+    ) external virtual ensure(deadline) {
         TransferHelper.safeTransferFrom(
             path[0],
             msg.sender,
@@ -600,7 +600,7 @@ contract AdaswapRouter02 is IAdaswapRouter02 {
         address[] calldata path,
         address to,
         uint256 deadline
-    ) external payable virtual override ensure(deadline) {
+    ) external payable virtual ensure(deadline) {
         require(path[0] == WETH, 'AdaswapRouter: INVALID_PATH');
         uint256 amountIn = msg.value;
         IWETH(WETH).deposit{value: amountIn}();
@@ -624,7 +624,7 @@ contract AdaswapRouter02 is IAdaswapRouter02 {
         address[] calldata path,
         address to,
         uint256 deadline
-    ) external virtual override ensure(deadline) {
+    ) external virtual ensure(deadline) {
         require(path[path.length - 1] == WETH, 'AdaswapRouter: INVALID_PATH');
         TransferHelper.safeTransferFrom(
             path[0],
@@ -647,7 +647,7 @@ contract AdaswapRouter02 is IAdaswapRouter02 {
         uint256 amountA,
         uint256 reserveA,
         uint256 reserveB
-    ) public pure virtual override returns (uint256 amountB) {
+    ) public pure virtual returns (uint256 amountB) {
         return AdaswapLibrary.quote(amountA, reserveA, reserveB);
     }
 
@@ -655,7 +655,7 @@ contract AdaswapRouter02 is IAdaswapRouter02 {
         uint256 amountIn,
         uint256 reserveIn,
         uint256 reserveOut
-    ) public pure virtual override returns (uint256 amountOut) {
+    ) public pure virtual returns (uint256 amountOut) {
         return AdaswapLibrary.getAmountOut(amountIn, reserveIn, reserveOut);
     }
 
@@ -663,7 +663,7 @@ contract AdaswapRouter02 is IAdaswapRouter02 {
         uint256 amountOut,
         uint256 reserveIn,
         uint256 reserveOut
-    ) public pure virtual override returns (uint256 amountIn) {
+    ) public pure virtual returns (uint256 amountIn) {
         return AdaswapLibrary.getAmountIn(amountOut, reserveIn, reserveOut);
     }
 
