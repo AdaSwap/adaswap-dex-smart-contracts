@@ -26,11 +26,11 @@ contract MasterAdaSwap is Ownable, Batchable {
         uint256 amount;
         int256 rewardDebt;
         uint8 lockTimeId;
+        uint64 lastDepositTime;
     }
 
     /// @notice The fixedTimes could be able to use in each pools. first element 0 second also meaning the flexible farming.
     uint32[] public fixedTimes = [
-        0 seconds,
         7 days,
         14 days,
         30 days,
@@ -49,6 +49,17 @@ contract MasterAdaSwap is Ownable, Batchable {
         uint64 lastRewardTime;
         uint64 allocPoint;
     }
+
+
+    modifier IsExistPool (PoolInfo memory _poolInfo) {
+        require(
+            _poolInfo.lpSupply !=  0 && 
+            _poolInfo.accAdaSwapPerShare != 0, 
+            'MasterAdaSwap: pool does not exist'
+        );
+        _;
+    }
+
 
     /// @notice Address of AdaSwapTreasury contract.
     address public immutable AdaSwapTreasury;
@@ -181,7 +192,7 @@ contract MasterAdaSwap is Ownable, Batchable {
         uint256 _allocPoint, 
         IRewarder _rewarder, 
         bool overwrite
-    ) public onlyOwner {
+    ) public onlyOwner IsExistPool(poolInfo[_lpToken][_lockTimeId]) {
         totalAllocPoint = totalAllocPoint - poolInfo[_lpToken][_lockTimeId].allocPoint + _allocPoint;
         poolInfo[_lpToken][_lockTimeId].allocPoint = _allocPoint.to64();
         if (overwrite) { poolInfo[_lpToken][_lockTimeId].rewarder = _rewarder; }
@@ -274,8 +285,8 @@ contract MasterAdaSwap is Ownable, Batchable {
 
         // Effects
         user.amount = user.amount + _amount;
-        user.rewardDebt = user.rewardDebt+ int256(_amount * pool.accAdaSwapPerShare / ACC_ADASWAP_PRECISION);
-
+        user.rewardDebt = user.rewardDebt + int256(_amount * pool.accAdaSwapPerShare / ACC_ADASWAP_PRECISION);
+        user.lastDepositTime = block.timestamp.to64();
 
         // Interactions
         IRewarder _rewarder = pool.rewarder;
@@ -302,9 +313,13 @@ contract MasterAdaSwap is Ownable, Batchable {
         PoolInfo memory pool = updatePool(_lpToken, _lockTimeId);
         UserInfo storage user = userInfo[msg.sender][_lpToken][_lockTimeId];
 
+        require(
+            user.lastDepositTime + fixedTimes[_lockTimeId] >= block.timestamp,
+            'MasterAdaSwap: FixedLockTimeIsNotOver'
+        );
        // Effects
-        user.amount = user.amount + _amount;
-        user.rewardDebt = user.rewardDebt + int256(_amount * pool.accAdaSwapPerShare / ACC_ADASWAP_PRECISION);
+        user.amount = user.amount - _amount;
+        user.rewardDebt = user.rewardDebt - int256(_amount * pool.accAdaSwapPerShare / ACC_ADASWAP_PRECISION);
 
         // Interactions
         IRewarder _rewarder = pool.rewarder;
@@ -328,6 +343,11 @@ contract MasterAdaSwap is Ownable, Batchable {
     ) public {
         PoolInfo memory pool = updatePool(_lpToken, _lockTimeId);
         UserInfo storage user = userInfo[msg.sender][_lpToken][_lockTimeId];
+
+        require(
+            user.lastDepositTime + fixedTimes[_lockTimeId] >= block.timestamp,
+            'MasterAdaSwap: FixedLockTimeIsNotOver'
+        );
 
         int256 accumulatedAdaSwap = int256(user.amount * pool.accAdaSwapPerShare / ACC_ADASWAP_PRECISION);
         uint256 _pendingAdaSwap = (accumulatedAdaSwap - user.rewardDebt)
@@ -370,6 +390,11 @@ contract MasterAdaSwap is Ownable, Batchable {
     ) public {
         PoolInfo memory pool = updatePool(_lpToken, _lockTimeId);
         UserInfo storage user = userInfo[msg.sender][_lpToken][_lockTimeId];
+
+        require(
+            user.lastDepositTime + fixedTimes[_lockTimeId] >= block.timestamp,
+            'MasterAdaSwap: FixedLockTimeIsNotOver'
+        );
 
         int256 accumulatedAdaSwap = int256(
             user.amount * pool.accAdaSwapPerShare / ACC_ADASWAP_PRECISION
@@ -414,6 +439,12 @@ contract MasterAdaSwap is Ownable, Batchable {
         uint8 _lockTimeId
     ) public {
         UserInfo storage user = userInfo[msg.sender][_lpToken][_lockTimeId];
+        if(_lockTimeId != 0){
+            require(
+                user.lastDepositTime + fixedTimes[_lockTimeId] >= block.timestamp,
+                'MasterAdaSwap: FixedLockTimeIsNotOver'
+            );
+        }
         uint256 amount = user.amount;
         user.amount = 0;
         user.rewardDebt = 0;
