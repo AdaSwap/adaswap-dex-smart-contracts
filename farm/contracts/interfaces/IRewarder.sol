@@ -7,11 +7,11 @@ interface IRewarder {
     address lpToken, 
     address user, 
     address recipient, 
-    uint256 sushiAmount, 
+    uint256 adaswapAmount, 
     uint256 newLpAmount, 
     uint8 lockTimeId
   ) external;
-  
+
   function pendingTokens(
     uint256 pid, 
     address user, 

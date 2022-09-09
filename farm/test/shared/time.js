@@ -28,6 +28,7 @@ async function advanceBlockWithTime(time) {
 
 async function advanceIncreaseTime(time) {
   await ethers.provider.send("evm_increaseTime", [time])
+  await ethers.provider.send("evm_mine")
 }
 
 async function advanceNextBlockTime(time) {
