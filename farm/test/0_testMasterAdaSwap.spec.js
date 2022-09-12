@@ -34,7 +34,7 @@ describe("MasterAdaSwap", function(){
         adaToken = await adaToken.connect(ADMIN).deploy();
         chef = await chef.connect(ADMIN).deploy(adaToken.address, alice.address);
         rewarder = await rewarder.connect(ADMIN).deploy(getBigNumber(1), adaToken.address, chef.address);
-        await adaToken.connect(ADMIN).mint(ALICE.address, getBigNumber(12096000));
+        await adaToken.connect(ADMIN).mint(ALICE.address, getBigNumber(12096000000));
 
         expect(lpToken.deployed);
         expect(adaToken.deployed);
@@ -49,6 +49,7 @@ describe("MasterAdaSwap", function(){
         await lpToken.transfer(BOB.address, getBigNumber(10));
         await lpToken.transfer(ALICE.address, getBigNumber(10));
         await lpToken.transfer(STEAVE.address, getBigNumber(10));
+        await adaToken.connect(ALICE).approve(chef.address, getBigNumber(100000000));
 
         // fixedTimes = await chef.fixedTimes();
     });
@@ -116,9 +117,10 @@ describe("MasterAdaSwap", function(){
 
     describe('7. Harvest', () => { 
         it('Harvest lock time is not over', async () => {
-            await adaToken.connect(ALICE).approve(chef.address, getBigNumber(100000000));
+            expect((await chef.isExistPool(lpToken.address, 1))).to.be.equal(false);
             await chef.connect(ADMIN).add(15, lpToken.address, 1, rewarder.address);
-
+            expect((await chef.isExistPool(lpToken.address, 1))).to.be.equal(true);
+            const log1 =  await chef.connect(BOB).deposit(lpToken.address, BOB.address, getBigNumber(1), 1);
             await expect(chef.connect(BOB)
                 .harvest(lpToken.address, BOB.address, 1))
                 .to.revertedWith('MasterAdaSwap: FIXED_LOCK_TIME_IS_NOT_OVER');
@@ -126,10 +128,14 @@ describe("MasterAdaSwap", function(){
 
         it('Harvest ', async () => {
             advanceIncreaseTime(3600 * 24 * 14); // to unlock lock time
+            pendingAdaSwap = await chef.pendingAdaSwap(lpToken.address, BOB.address, 1);
+            const balanceBefore = await adaToken.balanceOf(BOB.address);
             await chef.connect(BOB)
                 .harvest(lpToken.address, BOB.address, 1);
-            
-            
+            const balanceAfter = await adaToken.balanceOf(BOB.address);
+            expect(balanceAfter.toString()).to.be.eq(balanceBefore.add(pendingAdaSwap).toString());
+            // console.log('pdppdpdpd: ', pendingAdaSwap);
+
         });
 
     });
