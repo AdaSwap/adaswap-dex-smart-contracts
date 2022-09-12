@@ -55,7 +55,7 @@ contract MasterAdaSwap is Ownable, Batchable {
     address public immutable AdaSwapTreasury;
     /// @notice Address of ASW contract.
     IERC20 public immutable ASW;
-    
+
     /// @notice Info of each user that stakes LP tokens.
     // user -> lpToken -> fixedOptionId -> UserInfo
     mapping(address => mapping(address => mapping(uint8 => UserInfo)))
@@ -122,7 +122,7 @@ contract MasterAdaSwap is Ownable, Batchable {
     );
     event LogAdaSwapPerSecond(uint256 adaswapPerSecond);
 
-    /// @param _adaswapTreasury The AdaSwapTreasury contract address.
+    /// @param _adaswapTreasury The  contract address.
     constructor(address _adaswapToken, address _adaswapTreasury) {
         ASW = AdaSwapToken(_adaswapToken);
         AdaSwapTreasury = _adaswapTreasury;
@@ -133,11 +133,18 @@ contract MasterAdaSwap is Ownable, Batchable {
     //     pools = poolInfo.length;
     // }
 
-    function isExistPool(
+    function isAllocatedPool(
         address _lpToken,
         uint8 _lockTimeId
     ) public view returns (bool) {
         return poolInfo[_lpToken][_lockTimeId].allocPoint != 0; 
+    }
+
+    function isExistPool(
+        address _lpToken,
+        uint8 _lockTimeId
+    ) public view returns (bool) {
+        return poolInfo[_lpToken][_lockTimeId].lastRewardTime != 0; 
     }
 
     // / @notice Add a new LP to the pool. Can only be called by the owner.
@@ -443,12 +450,7 @@ contract MasterAdaSwap is Ownable, Batchable {
         uint8 _lockTimeId
     ) public {
         UserInfo storage user = userInfo[msg.sender][_lpToken][_lockTimeId];
-        if(_lockTimeId != 0){
-            require(
-                user.lastDepositTime + fixedTimes[_lockTimeId] <= block.timestamp,
-                'MasterAdaSwap: FIXED_LOCK_TIME_IS_NOT_OVER'
-            );
-        }
+    
         uint256 amount = user.amount;
         user.amount = 0;
         user.rewardDebt = 0;
