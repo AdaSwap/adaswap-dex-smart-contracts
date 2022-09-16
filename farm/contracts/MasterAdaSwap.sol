@@ -328,10 +328,11 @@ contract MasterAdaSwap is Ownable, Batchable {
             user.lastDepositTime + fixedTimes[_lockTimeId] <= block.timestamp,
             'MasterAdaSwap: FIXED_LOCK_TIME_IS_NOT_OVER'
         );
-       // Effects
+        // Effects
         user.amount = user.amount - _amount;
         user.rewardDebt = user.rewardDebt - int256(_amount * pool.accAdaSwapPerShare / ACC_ADASWAP_PRECISION);
-
+        pool.lpSupply -= _amount;
+        
         // Interactions
         IRewarder _rewarder = pool.rewarder;
         if (address(_rewarder) != address(0)) {
@@ -362,7 +363,7 @@ contract MasterAdaSwap is Ownable, Batchable {
             user.lastDepositTime + fixedTimes[_lockTimeId] <= block.timestamp,
             'MasterAdaSwap: FIXED_LOCK_TIME_IS_NOT_OVER'
         );
-
+        
         int256 accumulatedAdaSwap = int256(user.amount * pool.accAdaSwapPerShare / ACC_ADASWAP_PRECISION);
         uint256 _pendingAdaSwap = (accumulatedAdaSwap - user.rewardDebt)
             .toUInt256();
@@ -420,6 +421,7 @@ contract MasterAdaSwap is Ownable, Batchable {
             accumulatedAdaSwap -
             int256(_amount * pool.accAdaSwapPerShare);
         user.amount -= _amount;
+        pool.lpSupply -= _amount;
 
         // Interactions
         // TODO: update this if there is another way to reward
@@ -452,11 +454,13 @@ contract MasterAdaSwap is Ownable, Batchable {
         address _to,        
         uint8 _lockTimeId
     ) public {
+        PoolInfo memory pool = updatePool(_lpToken, _lockTimeId);
         UserInfo storage user = userInfo[msg.sender][_lpToken][_lockTimeId];
     
         uint256 amount = user.amount;
         user.amount = 0;
         user.rewardDebt = 0;
+        pool.lpSupply -= amount;
 
         IRewarder _rewarder =  poolInfo[_lpToken][_lockTimeId].rewarder;
         if (address(_rewarder) != address(0)) {
