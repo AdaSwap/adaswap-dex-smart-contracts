@@ -251,7 +251,7 @@ describe("MasterAdaSwap", function(){
         })
     })
 
-    describe('10. Update pool', () => {
+    describe('10. Update Pool', () => {
         it("Total LP supply is zero", async () => {
             expect((await chef.isExistPool(lpToken.address, 3))).to.be.false;
             await chef.connect(ADMIN).add(5, lpToken.address, 3, rewarder.address);
@@ -268,7 +268,7 @@ describe("MasterAdaSwap", function(){
                 .withArgs(lpToken.address, 3, timestamp, 0, 0);
         })
 
-        it("Total LP supple is nonzero", async () => {
+        it("Total LP supply is nonzero", async () => {
             await chef.connect(STEAVE).deposit(lpToken.address, STEAVE.address, getBigNumber(3), 3);
             await chef.connect(ALICE).deposit(lpToken.address, STEAVE.address, getBigNumber(4), 3);
   

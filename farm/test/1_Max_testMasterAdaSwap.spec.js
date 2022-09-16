@@ -98,9 +98,6 @@ describe("MasterAdaSwap Use Cases", () => {
 
     it('2. Two stakers already in pool, 1 entered and then first two exit positions.', async () => {
         await chef.add(45, lpToken.address, 1, rewarder.address)
-        // BOB
-        // ALICE
-        // STEAVE
 
         // Two stakers entered the pool
         await chef.connect(BOB).deposit(lpToken.address, BOB.address, getBigNumber(11), 1)
@@ -108,7 +105,7 @@ describe("MasterAdaSwap Use Cases", () => {
 
         await advanceIncreaseTime(3600 * 24 * 14)
 
-        // New staker entered also        
+        // New staker entered        
         await chef.connect(STEAVE).deposit(lpToken.address, STEAVE.address, getBigNumber(23), 1)
         
         // They wait until lock time is over
