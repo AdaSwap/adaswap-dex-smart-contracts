@@ -166,7 +166,7 @@ describe("MasterAdaSwap", function(){
 
         it("Lock time is over", async () => {
             await lpToken.connect(STEAVE).approve(chef.address, getBigNumber(10000));
-            await chef.connect(STEAVE).deposit(lpToken.address, STEAVE.address, 1e+9, 0)
+            await chef.connect(STEAVE).deposit(lpToken.address, STEAVE.address, getBigNumber(20), 0)
             
             await advanceIncreaseTime(3600 * 24 * 7)
             
@@ -179,7 +179,7 @@ describe("MasterAdaSwap", function(){
 
             await expect(tx)
                 .to.emit(chef, 'EmergencyWithdraw')
-                .withArgs(STEAVE.address, lpToken.address, 1e+9, 0, STEAVE.address)
+                .withArgs(STEAVE.address, lpToken.address, getBigNumber(20), 0, STEAVE.address)
         })
 
         it("Transfer amount is zero", async () => {
@@ -188,7 +188,7 @@ describe("MasterAdaSwap", function(){
 
             await expect(tx)
                 .to.emit(chef, 'EmergencyWithdraw')
-                .withArgs(ALICE.address, lpToken.address, 0, 0, ALICE.address)
+                .withArgs(ALICE.address, lpToken.address, getBigNumber(0), 0, ALICE.address)
         })
 
     });

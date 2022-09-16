@@ -220,7 +220,7 @@ describe("MasterAdaSwap Use Cases", () => {
         expect(infoAfterALICE.rewardDebt).to.eq(accumulatedAdaSwapALICE)
     })
 
-    it('4. Two users are staking, then other two user start staking. After that first two increase their staking amount.', async () => {
+    it('4. Two users are staking, then other two users start staking. After that first two increase their staking amount.', async () => {
         await chef.add(111, lpToken.address, 3, rewarder.address)
 
         // Two stakers entered the pool
