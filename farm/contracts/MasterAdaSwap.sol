@@ -318,8 +318,9 @@ contract MasterAdaSwap is Ownable, Batchable {
         uint256 _amount,
         uint8 _lockTimeId
     ) public {
-        PoolInfo memory pool = updatePool(_lpToken, _lockTimeId);
+        PoolInfo storage pool = poolInfo[_lpToken][_lockTimeId];
         UserInfo storage user = userInfo[msg.sender][_lpToken][_lockTimeId];
+        updatePool(_lpToken, _lockTimeId);
         
         // console.log('LAST_DEPOSIT: ', user.lastDepositTime);
         // console.log('fixed time: ', fixedTimes[_lockTimeId]);
@@ -403,8 +404,9 @@ contract MasterAdaSwap is Ownable, Batchable {
         address _to,
         uint8 _lockTimeId
     ) public {
-        PoolInfo memory pool = updatePool(_lpToken, _lockTimeId);
+        PoolInfo storage pool = poolInfo[_lpToken][_lockTimeId];
         UserInfo storage user = userInfo[msg.sender][_lpToken][_lockTimeId];
+        updatePool(_lpToken, _lockTimeId);
 
         require(
             user.lastDepositTime + fixedTimes[_lockTimeId] <= block.timestamp,
@@ -454,8 +456,9 @@ contract MasterAdaSwap is Ownable, Batchable {
         address _to,        
         uint8 _lockTimeId
     ) public {
-        PoolInfo memory pool = updatePool(_lpToken, _lockTimeId);
+        PoolInfo storage pool = poolInfo[_lpToken][_lockTimeId];
         UserInfo storage user = userInfo[msg.sender][_lpToken][_lockTimeId];
+        updatePool(_lpToken, _lockTimeId);
     
         uint256 amount = user.amount;
         user.amount = 0;

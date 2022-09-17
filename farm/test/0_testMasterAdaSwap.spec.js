@@ -144,8 +144,8 @@ describe("MasterAdaSwap", function(){
             expect(balanceAfter).to.be.eq(balanceBefore.add(pendingAdaSwap));
             
             await expect(tx)
-            .to.emit(chef, 'Harvest')
-            .withArgs(BOB.address, lpToken.address, balanceBefore.add(pendingAdaSwap), 1);
+                .to.emit(chef, 'Harvest')
+                .withArgs(BOB.address, lpToken.address, balanceBefore.add(pendingAdaSwap), 1);
             
         });
         

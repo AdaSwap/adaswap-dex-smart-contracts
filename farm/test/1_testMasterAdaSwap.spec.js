@@ -13,6 +13,7 @@ const advanceIncreaseTime = async (time) => {
 
 describe("MasterAdaSwap Use Cases", () => {
     let lpToken, chef, adaToken, rewarder, pool, ADMIN, ALICE, BOB, STEAVE, JOHN;
+    const adaswapPerSecond = getBigNumber(10)
 
     before((done) => {
         setTimeout(done, 2000);
@@ -51,10 +52,8 @@ describe("MasterAdaSwap Use Cases", () => {
         await chef.add(15, lpToken.address, 0, rewarder.address)
         
         // One staker entered the pool
-        const tx1 = await chef.connect(ALICE).deposit(lpToken.address, ALICE.address, getBigNumber(3), 0)
+        const tx1 = await chef.connect(ALICE).deposit(lpToken.address, ALICE.address, getBigNumber(2), 0)
         let timestamp1 = (await ethers.provider.getBlock(tx1.blockNumber)).timestamp
-
-        let pool = await chef.poolInfo(lpToken.address, 0)
 
         // The staker waits until lock time is over
         await advanceIncreaseTime(3600 * 24 * 7)
@@ -64,14 +63,11 @@ describe("MasterAdaSwap Use Cases", () => {
         let timestamp2 = (await ethers.provider.getBlock(tx2.blockNumber)).timestamp
         
         let dt = BigNumber.from(timestamp2).sub(timestamp1)
-        let adaReward = dt.mul(getBigNumber(10)).mul(15/15)
-        let accAdaSwapPerShare = (pool.accAdaSwapPerShare).add(adaReward.mul(1e+12).div(getBigNumber(3)))
-        let accumulatedAdaSwap = getBigNumber(3).mul(accAdaSwapPerShare).div(1e+12)
         let infoAfter = await chef.userInfo(ALICE.address, lpToken.address, 0)
+        let aliceRewards = dt.mul(adaswapPerSecond).mul(getBigNumber(2).div(getBigNumber(2))).mul(15/15)
 
         // Before check
-        console.log('infoAfter.rewardDebt: ', infoAfter.rewardDebt)
-        expect(infoAfter.rewardDebt).to.eq(accumulatedAdaSwap)
+        expect(infoAfter.rewardDebt).to.eq(aliceRewards)
 
         
         // Two new stakers entered pool
@@ -95,7 +91,6 @@ describe("MasterAdaSwap Use Cases", () => {
         infoAfter = await chef.userInfo(ALICE.address, lpToken.address, 0)
         
         // Checking results
-        console.log('infoAfter.rewardDebt: ', infoAfter.rewardDebt)
         expect(infoAfter.rewardDebt).to.eq(accumulatedAdaSwap)
     })
 
@@ -123,7 +118,7 @@ describe("MasterAdaSwap Use Cases", () => {
         let pool = await chef.poolInfo(lpToken.address, 1)
 
         // We precompute accumulated rewards
-        let accumulatedAdaSwapBOB = bob.amount.mul(pool.accAdaSwapPerShare).div(1e+12)
+        let accAdaSwapBOB = bob.amount.mul(pool.accAdaSwapPerShare).div(1e+12)
         
         // Get actual data
         let infoAfterBOB = await chef.userInfo(BOB.address, lpToken.address, 1)
@@ -132,19 +127,18 @@ describe("MasterAdaSwap Use Cases", () => {
         let alice = await chef.userInfo(ALICE.address, lpToken.address, 1)
         await chef.connect(ALICE).harvest(lpToken.address, ALICE.address, 1)
         pool = await chef.poolInfo(lpToken.address, 1)
-        let accumulatedAdaSwapALICE = alice.amount.mul(pool.accAdaSwapPerShare).div(1e+12)
+        let accAdaSwapALICE = alice.amount.mul(pool.accAdaSwapPerShare).div(1e+12)
         let infoAfterALICE = await chef.userInfo(ALICE.address, lpToken.address, 1)
         
         let steave = await chef.userInfo(STEAVE.address, lpToken.address, 1)
         await chef.connect(STEAVE).harvest(lpToken.address, STEAVE.address, 1)
         pool = await chef.poolInfo(lpToken.address, 1)
-        let accumulatedAdaSwapSTEAVE = steave.amount.mul(pool.accAdaSwapPerShare).div(1e+12)
+        let accAdaSwapSTEAVE = steave.amount.mul(pool.accAdaSwapPerShare).div(1e+12)
         let infoAfterSTEAVE = await chef.userInfo(STEAVE.address, lpToken.address, 1)
         
-        // checking all results
-        expect(infoAfterBOB.rewardDebt).to.eq(accumulatedAdaSwapBOB)
-        expect(infoAfterALICE.rewardDebt).to.eq(accumulatedAdaSwapALICE)
-        expect(infoAfterSTEAVE.rewardDebt).to.eq(accumulatedAdaSwapSTEAVE)
+        expect(infoAfterBOB.rewardDebt).to.eq(accAdaSwapBOB)
+        expect(infoAfterALICE.rewardDebt).to.eq(accAdaSwapALICE)
+        expect(infoAfterSTEAVE.rewardDebt).to.eq(accAdaSwapSTEAVE)
 
         
         // First two leave their positions
@@ -158,10 +152,10 @@ describe("MasterAdaSwap Use Cases", () => {
         steave = await chef.userInfo(STEAVE.address, lpToken.address, 1)
         await chef.connect(STEAVE).harvest(lpToken.address, STEAVE.address, 1)
         pool = await chef.poolInfo(lpToken.address, 1)
-        accumulatedAdaSwapSTEAVE = steave.amount.mul(pool.accAdaSwapPerShare).div(1e+12)
+        accAdaSwapSTEAVE = steave.amount.mul(pool.accAdaSwapPerShare).div(1e+12)
         infoAfterSTEAVE = await chef.userInfo(STEAVE.address, lpToken.address, 1)
         
-        expect(infoAfterSTEAVE.rewardDebt).to.eq(accumulatedAdaSwapSTEAVE)
+        expect(infoAfterSTEAVE.rewardDebt).to.eq(accAdaSwapSTEAVE)
     })
 
     it('3. Two users are already staking and harvesting in different periods of time.', async () => {
