@@ -124,14 +124,15 @@ describe("MasterAdaSwap", function(){
                 .to.revertedWith('MasterAdaSwap: FIXED_LOCK_TIME_IS_NOT_OVER');
         });
 
-        it('Harvest', async () => {
+        
+        it('Should give back the correct amount of reward', async () => {
             await advanceIncreaseTime(3600 * 24 * 14); // to unlock lock time
 
             const balanceBefore = await adaToken.balanceOf(BOB.address);
             
             const info = await chef.poolInfo(lpToken.address, 1)
             const timestamp1 = info.lastRewardTime
-
+            
             const tx = await chef.connect(BOB).harvest(lpToken.address, BOB.address, 1);
             await tx.wait()
             
@@ -141,13 +142,23 @@ describe("MasterAdaSwap", function(){
             let pendingAdaSwap = getBigNumber((timestamp2 - timestamp1) * 15 / 30 * 10);
             
             expect(balanceAfter).to.be.eq(balanceBefore.add(pendingAdaSwap));
+            
+            await expect(tx)
+            .to.emit(chef, 'Harvest')
+            .withArgs(BOB.address, lpToken.address, balanceBefore.add(pendingAdaSwap), 1);
+            
+        });
+        
+        it('Harvest with empty user balance', async () => {
+            await chef.connect(ALICE).deposit(lpToken.address, ALICE.address, getBigNumber(0), 1);
+            await advanceIncreaseTime(3600 * 24 * 14)
+            const tx = await chef.connect(ALICE).harvest(lpToken.address, ALICE.address, 1)
+            await tx.wait()
 
             await expect(tx)
                 .to.emit(chef, 'Harvest')
-                .withArgs(BOB.address, lpToken.address, balanceBefore.add(pendingAdaSwap), 1);
-            
+                .withArgs(ALICE.address, lpToken.address, getBigNumber(0), 1);
         });
-
     });
 
     describe('8. Emergency Withdraw', () => {         
@@ -291,7 +302,7 @@ describe("MasterAdaSwap", function(){
     })
 
     describe('11. Add', () => {
-        it('Should add a new LP to the pool', async () => {
+        it('Should add pool with corresponding allocation points', async () => {
             const tx = await chef.connect(ADMIN).add(25, lpToken.address, 4, rewarder.address)
             await tx.wait()
 

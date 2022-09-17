@@ -70,18 +70,20 @@ describe("MasterAdaSwap Use Cases", () => {
         let infoAfter = await chef.userInfo(ALICE.address, lpToken.address, 0)
 
         // Before check
+        console.log('infoAfter.rewardDebt: ', infoAfter.rewardDebt)
         expect(infoAfter.rewardDebt).to.eq(accumulatedAdaSwap)
+
         
         // Two new stakers entered pool
         await chef.connect(BOB).deposit(lpToken.address, BOB.address, getBigNumber(4), 0)
         await chef.connect(STEAVE).deposit(lpToken.address, STEAVE.address, getBigNumber(13), 0)
         
         await advanceIncreaseTime(3600 * 24 * 7)
-
+        
         // And then leave their positions
         await chef.connect(BOB).withdraw(lpToken.address, BOB.address, getBigNumber(4), 0)
         await chef.connect(STEAVE).withdraw(lpToken.address, STEAVE.address, getBigNumber(13), 0)
-
+        
         let alice = await chef.userInfo(ALICE.address, lpToken.address, 0)
         
         // Initial staker harvests again
@@ -93,6 +95,7 @@ describe("MasterAdaSwap Use Cases", () => {
         infoAfter = await chef.userInfo(ALICE.address, lpToken.address, 0)
         
         // Checking results
+        console.log('infoAfter.rewardDebt: ', infoAfter.rewardDebt)
         expect(infoAfter.rewardDebt).to.eq(accumulatedAdaSwap)
     })
 
