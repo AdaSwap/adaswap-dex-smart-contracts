@@ -236,11 +236,13 @@ contract MasterAdaSwap is Ownable, Batchable {
             console.log('time: ',time);
             console.log('adaswapPerSecond: ', adaswapPerSecond);
             console.log('totalAllocPoint: ', totalAllocPoint);
-            console.log('pool.allocPoin: ', pool.allocPoint);
+            console.log('pool.allocPoint: ', pool.allocPoint);
             console.log('accAdaSwapPerShare: ', accAdaSwapPerShare);
         }
         pending = (int256(user.amount * accAdaSwapPerShare / ACC_ADASWAP_PRECISION) - user.rewardDebt)
             .toUInt256();
+
+            console.log('pending', pending);
     }
 
     // / @notice Update reward variables for all pools. Be careful of gas spending!

@@ -146,7 +146,6 @@ describe("MasterAdaSwap", function(){
             await expect(tx)
                 .to.emit(chef, 'Harvest')
                 .withArgs(BOB.address, lpToken.address, balanceBefore.add(pendingAdaSwap), 1);
-            
         });
         
         it('Harvest with empty user balance', async () => {
@@ -320,3 +319,4 @@ describe("MasterAdaSwap", function(){
         })
     })
 })
+
