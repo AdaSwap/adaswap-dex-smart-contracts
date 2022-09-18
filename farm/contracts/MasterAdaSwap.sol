@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.0 <0.9.0;
-
+//import "hardhat/console.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import "hardhat/console.sol";
+import "../node_modules/hardhat/console.sol";   //
 import "./libraries/Batchable.sol";
 import "./libraries/Number.sol";
 import "./interfaces/IRewarder.sol";
@@ -236,11 +236,13 @@ contract MasterAdaSwap is Ownable, Batchable {
             console.log('time: ',time);
             console.log('adaswapPerSecond: ', adaswapPerSecond);
             console.log('totalAllocPoint: ', totalAllocPoint);
-            console.log('pool.allocPoin: ', pool.allocPoint);
+            console.log('pool.allocPoint: ', pool.allocPoint);
             console.log('accAdaSwapPerShare: ', accAdaSwapPerShare);
         }
         pending = (int256(user.amount * accAdaSwapPerShare / ACC_ADASWAP_PRECISION) - user.rewardDebt)
             .toUInt256();
+
+            console.log('pending', pending);
     }
 
     // / @notice Update reward variables for all pools. Be careful of gas spending!
