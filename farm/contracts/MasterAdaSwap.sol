@@ -345,9 +345,6 @@ contract MasterAdaSwap is Ownable, Batchable {
         PoolInfo memory pool = updatePool(_lpToken, _lockTimeId);
         UserInfo storage user = userInfo[msg.sender][_lpToken][_lockTimeId];
 
-        console.log('user.lastDepositTime: ', user.lastDepositTime);
-        console.log('fixed time: ', fixedTimes[_lockTimeId]);
-        console.log('NOW: ', block.timestamp);
         require(
             user.lastDepositTime + fixedTimes[_lockTimeId] <= block.timestamp,
             'MasterAdaSwap: FIXED_LOCK_TIME_IS_NOT_OVER'
