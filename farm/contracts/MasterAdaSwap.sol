@@ -11,17 +11,18 @@ import "./interfaces/IRewarder.sol";
 import "./interfaces/IMasterAdaSwap.sol";
 import "./AdaSwapToken.sol";
 
-/// @notice The MasterAdaSwap (MO) contract gives out a constant number of ASW tokens per second by minting right from AdaSwapToken contract.
+/// @notice The MasterAdaSwap (MO) contract gives out a constant number of ASW tokens per second by minting right from the AdaSwapToken contract.
 contract MasterAdaSwap is Ownable, Batchable {
     using SafeERC20 for IERC20;
     using UInt256 for uint256;
     using Int256 for int256;
     using UInt128 for uint128;
 
-    /// @notice Info of each MO user.
+    /// @notice Info about each MO user.
     /// `amount` LP token amount the user has provided.
     /// `rewardDebt` The amount of ASW entitled to the user.
-    /// `lockTimeId` The lock time when the user will be able to withdraw or harvest his ASW
+    /// `lockTimeId` The lock time when the user will be able to withdraw or harvest his ASW.
+    /// `lastDepositTime` The latest time when stakers deposited LP tokens.
     /// This value referrence to index fixedTime on PoolInfo.
     struct UserInfo {
         uint256 amount;
@@ -56,17 +57,18 @@ contract MasterAdaSwap is Ownable, Batchable {
     /// @notice Address of ASW contract.
     IERC20 public immutable ASW;
 
-    /// @notice Info of each user that stakes LP tokens.
+    /// @notice Info about each user that stakes LP tokens.
     // user -> lpToken -> fixedOptionId -> UserInfo
     mapping(address => mapping(address => mapping(uint8 => UserInfo)))
         public userInfo;
-    // lp token -> staking oprtion (locktime) -> poolInfo struct
+    // lp token -> staking option (locktime) -> poolInfo struct
     mapping(address => mapping(uint8 => PoolInfo))
         public poolInfo;
     /// @notice Info of each user that stakes LP tokens.
     mapping(address => uint8[])
         public existingPoolOptions;
-    /// @dev Total allocation points. Must be the sum of all allocation points in all pools.
+    
+    /// @dev Total amount of allocation points. Must be the sum of all allocation points from all pools.
     uint256 public totalAllocPoint = 0;
 
     uint256 private constant ACC_ADASWAP_PRECISION = 1e12;
@@ -122,16 +124,11 @@ contract MasterAdaSwap is Ownable, Batchable {
     );
     event LogAdaSwapPerSecond(uint256 adaswapPerSecond);
 
-    /// @param _adaswapTreasury The  contract address.
+    /// @param _adaswapTreasury The contract address.
     constructor(address _adaswapToken, address _adaswapTreasury) {
         ASW = AdaSwapToken(_adaswapToken);
         AdaSwapTreasury = _adaswapTreasury;
     }
-
-    // /// @notice Returns the number of MO pools.
-    // function poolLength() public view returns (uint256 pools) {
-    //     pools = poolInfo.length;
-    // }
 
     function isAllocatedPool(
         address _lpToken,
@@ -147,11 +144,12 @@ contract MasterAdaSwap is Ownable, Batchable {
         return poolInfo[_lpToken][_lockTimeId].lastRewardTime != 0; 
     }
 
-    // / @notice Add a new LP to the pool. Can only be called by the owner.
-    // / DO NOT add the same LP token more than once. Rewards will be messed up if you do.
-    // / @param _allocPoints AP list of the new pool for each fixed time.
-    // / @param _lpToken Address of the LP ERC-20 token.
-    // / @param _rewarder Address of the rewarder delegate.
+    /// @notice Creates a new staking pool with fixed LP token. Can only be called by the owner.
+    /// DO NOT add the same LP token more than once. Rewards will be messed up if you do.
+    /// @param _allocPoint AP for new pool which are generated for each fixed time.
+    /// @param _lpToken Address of the LP ERC-20 token.
+    /// @param _lockTimeId The lock time when the user will be able to withdraw or harvest his ASW.
+    /// @param _rewarder Address of the rewarder delegate.
     function add(
         uint64 _allocPoint,
         address _lpToken,
@@ -178,11 +176,12 @@ contract MasterAdaSwap is Ownable, Batchable {
         );
     }
 
-    // / @notice Update the given pool's ASW allocation point and `IRewarder` contract. Can only be called by the owner.
-    // / @param _pid The index of the pool. See `poolInfo`.1
-    // / @param _allocPoints New AP of the pool.
-    // / @param _rewarder Address of the rewarder delegate.
-    // / @param overwrite True if _rewarder should be `set`. Otherwise `_rewarder` is ignored.
+    /// @notice Update the given pool's ASW allocation point and `IRewarder` contract. Can only be called by the owner.
+    /// @param _lpToken Address of the LP ERC-20 token.
+    /// @param _lockTimeId The lock time when the user will be able to withdraw or harvest his ASW.
+    /// @param _allocPoint New AP of the pool.
+    /// @param _rewarder Address of the rewarder delegate.
+    /// @param overwrite True if _rewarder should be `set`. Otherwise `_rewarder` is ignored.
     function set(
         address _lpToken,
         uint8 _lockTimeId,
@@ -203,17 +202,17 @@ contract MasterAdaSwap is Ownable, Batchable {
         );
     }
 
-    /// @notice Sets the adaswap per second to be distributed. Can only be called by the owner.
+    /// @notice Sets the adaswap per second value to be distributed. Can only be called by the owner.
     /// @param _adaswapPerSecond The amount of AdaSwap to be distributed per second.
     function setAdaSwapPerSecond(uint256 _adaswapPerSecond) public onlyOwner {
         adaswapPerSecond = _adaswapPerSecond;
         emit LogAdaSwapPerSecond(_adaswapPerSecond);
     }
 
-    // / @notice View function to see pending ASW on frontend.
-    // / @param _pid The index of the pool. See `poolInfo`.
-    // / @param _user Address of user.
-    // / @return pending ASW reward for a given user.
+    /// @notice View function to see pending ASW on frontend.
+    /// @param _lpToken Address of the LP ERC-20 token.
+    /// @param _user Address of the user.
+    /// @param _lockTimeId The lock time when the user will be able to withdraw or harvest his ASW.
     function pendingAdaSwap(
         address _lpToken,
         address _user,
@@ -223,8 +222,7 @@ contract MasterAdaSwap is Ownable, Batchable {
         UserInfo storage user = userInfo[_user][_lpToken][_lockTimeId];
         uint256 accAdaSwapPerShare = pool.accAdaSwapPerShare;
         uint256 lpSupply = pool.lpSupply;
-        console.log('block.timestamp :', block.timestamp);
-        console.log('pool.lastRewardTime :', pool.lastRewardTime);
+
         if (
             block.timestamp > pool.lastRewardTime &&
             lpSupply > 0
@@ -232,21 +230,13 @@ contract MasterAdaSwap is Ownable, Batchable {
             uint256 time = block.timestamp - pool.lastRewardTime;
             uint256 adaswapReward = (time * adaswapPerSecond * pool.allocPoint) / totalAllocPoint;
             accAdaSwapPerShare = accAdaSwapPerShare + (adaswapReward * ACC_ADASWAP_PRECISION / lpSupply);
-
-            console.log('time: ',time);
-            console.log('adaswapPerSecond: ', adaswapPerSecond);
-            console.log('totalAllocPoint: ', totalAllocPoint);
-            console.log('pool.allocPoint: ', pool.allocPoint);
-            console.log('accAdaSwapPerShare: ', accAdaSwapPerShare);
         }
         pending = (int256(user.amount * accAdaSwapPerShare / ACC_ADASWAP_PRECISION) - user.rewardDebt)
             .toUInt256();
-
-            console.log('pending', pending);
     }
 
-    // / @notice Update reward variables for all pools. Be careful of gas spending!
-    // / @param pids Pool IDs of all to be updated. Make sure to update all active pools.
+    /// @notice Updates reward variables for all pools. Be careful of gas spending!
+    /// @param _lpToken Address of the LP ERC-20 token.
     function massUpdatePools(address _lpToken) external {
         uint256 len = existingPoolOptions[_lpToken].length;
         for (uint256 i = 0; i < len; ++i) {
@@ -254,10 +244,9 @@ contract MasterAdaSwap is Ownable, Batchable {
         }
     }
 
-    // change to mapping
-    // / @notice Update reward variables of the given pool.
-    // / @param pid The index of the pool. See `poolInfo`.
-    // / @return pool Returns the pool that was updated.
+    /// @notice Update reward variables of the given pool.
+    /// @param _lpToken Address of the LP ERC-20 token.
+    /// @param _lockTimeId The lock time when the user will be able to withdraw or harvest his ASW.
     function updatePool(
         address _lpToken,
         uint8 _lockTimeId
@@ -276,11 +265,11 @@ contract MasterAdaSwap is Ownable, Batchable {
         }
     }
 
-    // change to mapping
-    // / @notice Deposit LP tokens to MO for ASW allocation.
-    // / @param pid The index of the pool. See `poolInfo`.
-    // / @param amount LP token amount to deposit.
-    // / @param to The receiver of `amount` deposit benefit.
+    /// @notice Deposit LP tokens to MO for ASW allocation.
+    /// @param _lpToken Address of the LP ERC-20 token.
+    /// @param _amount LP token amount to deposit.
+    /// @param _to The receiver of `amount` deposit benefit.
+    /// @param _lockTimeId The lock time when the user will be able to withdraw or harvest his ASW.
     function deposit(
         address _lpToken,
         address _to,
@@ -309,11 +298,11 @@ contract MasterAdaSwap is Ownable, Batchable {
         emit Deposit(msg.sender, _lpToken, _amount, _lockTimeId, _to);
     }
 
-    // change to mapping
-    // / @notice Withdraw LP tokens from MO.
-    // / @param pid The index of the pool. See `poolInfo`.
-    // / @param amount LP token amount to withdraw.
-    // / @param to Receiver of the LP tokens.
+    /// @notice Withdraw LP tokens from MO.
+    /// @param _lpToken Address of the LP ERC-20 token.
+    /// @param _to Receiver of the LP tokens.
+    /// @param _amount LP token amount to withdraw.
+    /// @param _lockTimeId The lock time when the user will be able to withdraw or harvest his ASW.
     function withdraw(
         address _lpToken,
         address _to,
@@ -323,10 +312,7 @@ contract MasterAdaSwap is Ownable, Batchable {
         PoolInfo storage pool = poolInfo[_lpToken][_lockTimeId];
         UserInfo storage user = userInfo[msg.sender][_lpToken][_lockTimeId];
         updatePool(_lpToken, _lockTimeId);
-        
-        // console.log('LAST_DEPOSIT: ', user.lastDepositTime);
-        // console.log('fixed time: ', fixedTimes[_lockTimeId]);
-        // console.log('NOW: ', block.timestamp);
+
         require(
             user.lastDepositTime + fixedTimes[_lockTimeId] <= block.timestamp,
             'MasterAdaSwap: FIXED_LOCK_TIME_IS_NOT_OVER'
@@ -347,10 +333,10 @@ contract MasterAdaSwap is Ownable, Batchable {
         emit Withdraw(msg.sender, _lpToken, _amount, _lockTimeId, _to);
     }
 
-    // change to mapping
-    // / @notice Harvest proceeds for transaction sender to `to`.
-    // / @param pid The index of the pool. See `poolInfo`.
-    // / @param to Receiver of ASW rewards.
+    /// @notice Harvest proceeds for transaction sender to `to`.
+    /// @param _lpToken Address of the LP ERC-20 token.
+    /// @param to Receiver of ASW rewards.
+    /// @param _lockTimeId The lock time when the user will be able to withdraw or harvest his ASW.
     function harvest(
         address _lpToken, 
         address to,
@@ -359,9 +345,6 @@ contract MasterAdaSwap is Ownable, Batchable {
         PoolInfo memory pool = updatePool(_lpToken, _lockTimeId);
         UserInfo storage user = userInfo[msg.sender][_lpToken][_lockTimeId];
 
-        console.log('user.lastDepositTime: ', user.lastDepositTime);
-        console.log('fixed time: ', fixedTimes[_lockTimeId]);
-        console.log('NOW: ', block.timestamp);
         require(
             user.lastDepositTime + fixedTimes[_lockTimeId] <= block.timestamp,
             'MasterAdaSwap: FIXED_LOCK_TIME_IS_NOT_OVER'
@@ -376,7 +359,6 @@ contract MasterAdaSwap is Ownable, Batchable {
 
         // Interactions
         if (_pendingAdaSwap != 0) {
-            // TODO: update this if there is another way to reward users.
             ASW.safeTransferFrom(AdaSwapTreasury, to, _pendingAdaSwap);
         }
 
@@ -395,11 +377,11 @@ contract MasterAdaSwap is Ownable, Batchable {
         emit Harvest(msg.sender, _lpToken, _pendingAdaSwap, _lockTimeId);
     }
 
-    // change to mapping 
-    // / @notice Withdraw LP tokens from MO and harvest proceeds for transaction sender to `to`.
-    // / @param pid The index of the pool. See `poolInfo`.
-    // / @param amount LP token amount to withdraw.
-    // / @param to Receiver of the LP tokens and ASW rewards.
+    /// @notice Withdraw LP tokens from MO and harvest proceeds for transaction sender to `to`.
+    /// @param _lpToken Address of the LP ERC-20 token.
+    /// @param _amount LP token amount to withdraw.
+    /// @param _to Receiver of the LP tokens and ASW rewards.
+    /// @param _lockTimeId The lock time when the user will be able to withdraw or harvest his ASW.
     function withdrawAndHarvest(
         address _lpToken, 
         uint256 _amount,
@@ -428,7 +410,6 @@ contract MasterAdaSwap is Ownable, Batchable {
         pool.lpSupply -= _amount;
 
         // Interactions
-        // TODO: update this if there is another way to reward
         ASW.safeTransferFrom(AdaSwapTreasury, _to, _pendingAdaSwap);
 
         IRewarder _rewarder = pool.rewarder;
@@ -449,10 +430,10 @@ contract MasterAdaSwap is Ownable, Batchable {
         emit Harvest(msg.sender, _lpToken, _pendingAdaSwap, _lockTimeId);
     }
 
-    // change to mapping
-    // / @notice Withdraw without caring about rewards. EMERGENCY ONLY.
-    // / @param pid The index of the pool. See `poolInfo`.
-    // / @param to Receiver of the LP tokens.
+    /// @notice Withdraw without caring about rewards. EMERGENCY ONLY.
+    /// @param _lpToken Address of the LP ERC-20 token.
+    /// @param _to Receiver of the LP tokens.
+    /// @param _lockTimeId The lock time when the user will be able to withdraw or harvest his ASW.
     function emergencyWithdraw(
         address _lpToken, 
         address _to,        
