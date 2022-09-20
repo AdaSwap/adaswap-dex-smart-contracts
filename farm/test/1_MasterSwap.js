@@ -174,7 +174,7 @@ describe("MasterAdaSwap", function(){
             const accumulatedAdaSwapYOR = yorr.amount.mul(pool1.accAdaSwapPerShare).div(1e+12)
             let pendingAdaSwap_4 = (accumulatedAdaSwapYOR).sub(getBigNumber(4).mul(pool1.accAdaSwapPerShare));
             const infoAfterYOR = await chef.userInfo(YOR.address, lpToken.address, 0) 
-//////////////////////////////
+
 
             let bobb = await chef.userInfo(BOB.address, lpTokenSecond.address, 0)
             await chef.connect(BOB)
@@ -244,7 +244,6 @@ describe("MasterAdaSwap", function(){
             advanceIncreaseTime(3600 * 24 * 14); // to unlock lock time
 
             pendingAdaSwap1 = await chef.pendingAdaSwap(lpToken.address, BOB.address, 1);
-            console.log("1", pendingAdaSwap1);
             await expect( chef.connect(TOM)
                 .withdrawAndHarvest(lpToken.address,getBigNumber(10), TOM.address, 1)).to.be.reverted;
 
