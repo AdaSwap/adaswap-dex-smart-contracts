@@ -176,9 +176,9 @@ contract MasterAdaSwap is Ownable, Batchable {
         );
     }
 
-    /// @notice Update the given pool's ASW allocation point and `IRewarder` contract. Can only be called by the owner.
+    /// @notice Updates the given pool's ASW allocation point and `IRewarder` contract. Can only be called by the owner.
     /// @param _lpToken Address of the LP ERC-20 token.
-    /// @param _lockTimeId The lock time when the user will be able to withdraw or harvest his ASW.
+    /// @param _lockTimeId The lock time when the user will be able to withdraw or harvest ASW.
     /// @param _allocPoint New AP of the pool.
     /// @param _rewarder Address of the rewarder delegate.
     /// @param overwrite True if _rewarder should be `set`. Otherwise `_rewarder` is ignored.
@@ -209,10 +209,10 @@ contract MasterAdaSwap is Ownable, Batchable {
         emit LogAdaSwapPerSecond(_adaswapPerSecond);
     }
 
-    /// @notice View function to see pending ASW on frontend.
+    /// @notice Views function to see pending ASW on frontend.
     /// @param _lpToken Address of the LP ERC-20 token.
     /// @param _user Address of the user.
-    /// @param _lockTimeId The lock time when the user will be able to withdraw or harvest his ASW.
+    /// @param _lockTimeId The lock time when the user will be able to withdraw or harvest ASW.
     function pendingAdaSwap(
         address _lpToken,
         address _user,
@@ -244,7 +244,7 @@ contract MasterAdaSwap is Ownable, Batchable {
         }
     }
 
-    /// @notice Update reward variables of the given pool.
+    /// @notice Updates reward variables of the given pool.
     /// @param _lpToken Address of the LP ERC-20 token.
     /// @param _lockTimeId The lock time when the user will be able to withdraw or harvest his ASW.
     function updatePool(
@@ -265,7 +265,7 @@ contract MasterAdaSwap is Ownable, Batchable {
         }
     }
 
-    /// @notice Deposit LP tokens to MO for ASW allocation.
+    /// @notice Deposits LP tokens to MO for ASW allocation.
     /// @param _lpToken Address of the LP ERC-20 token.
     /// @param _amount LP token amount to deposit.
     /// @param _to The receiver of `amount` deposit benefit.
@@ -298,7 +298,7 @@ contract MasterAdaSwap is Ownable, Batchable {
         emit Deposit(msg.sender, _lpToken, _amount, _lockTimeId, _to);
     }
 
-    /// @notice Withdraw LP tokens from MO.
+    /// @notice Withdraws LP tokens from MO.
     /// @param _lpToken Address of the LP ERC-20 token.
     /// @param _to Receiver of the LP tokens.
     /// @param _amount LP token amount to withdraw.
@@ -333,7 +333,7 @@ contract MasterAdaSwap is Ownable, Batchable {
         emit Withdraw(msg.sender, _lpToken, _amount, _lockTimeId, _to);
     }
 
-    /// @notice Harvest proceeds for transaction sender to `to`.
+    /// @notice Harvests proceeds for transaction sender to `to`.
     /// @param _lpToken Address of the LP ERC-20 token.
     /// @param to Receiver of ASW rewards.
     /// @param _lockTimeId The lock time when the user will be able to withdraw or harvest his ASW.
@@ -377,7 +377,7 @@ contract MasterAdaSwap is Ownable, Batchable {
         emit Harvest(msg.sender, _lpToken, _pendingAdaSwap, _lockTimeId);
     }
 
-    /// @notice Withdraw LP tokens from MO and harvest proceeds for transaction sender to `to`.
+    /// @notice Withdraws LP tokens from MO and harvest proceeds for transaction sender to `to`.
     /// @param _lpToken Address of the LP ERC-20 token.
     /// @param _amount LP token amount to withdraw.
     /// @param _to Receiver of the LP tokens and ASW rewards.
@@ -430,7 +430,7 @@ contract MasterAdaSwap is Ownable, Batchable {
         emit Harvest(msg.sender, _lpToken, _pendingAdaSwap, _lockTimeId);
     }
 
-    /// @notice Withdraw without caring about rewards. EMERGENCY ONLY.
+    /// @notice Withdraws without caring about rewards. EMERGENCY ONLY.
     /// @param _lpToken Address of the LP ERC-20 token.
     /// @param _to Receiver of the LP tokens.
     /// @param _lockTimeId The lock time when the user will be able to withdraw or harvest his ASW.
@@ -453,7 +453,6 @@ contract MasterAdaSwap is Ownable, Batchable {
             _rewarder.onAdaSwapReward( _lpToken, msg.sender, _to, 0, 0, _lockTimeId);
         }
 
-        // Note: transfer can fail or succeed if `amount` is zero.
         IERC20(_lpToken).safeTransfer(_to, amount);
         emit EmergencyWithdraw(msg.sender, _lpToken, amount, _lockTimeId, _to);
     }
