@@ -5,8 +5,8 @@ pragma experimental ABIEncoderV2;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./interfaces/IRewarder.sol";
-import "./MasterAdaSwap.sol";
 
+// Custom reward mechanism
 // contract EmptyRewarder is IRewarder, Ownable{
 //   function onAdaSwapReward (uint256 pid, address _user, address to, uint256, uint256 lpToken) override external onlyOwner {
 //   }

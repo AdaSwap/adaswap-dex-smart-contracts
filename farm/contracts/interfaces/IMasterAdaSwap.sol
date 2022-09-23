@@ -16,7 +16,10 @@ interface IMasterAdaSwap {
     uint256 accAdaSwapPerShare; // Accumulated ADASWAP per share, times 1e12. See below.
   }
 
-  function poolInfo(uint256 pid) external view returns (IMasterAdaSwap.PoolInfo memory);
+  function poolInfo(uint256 pid) 
+    external 
+    view 
+    returns (IMasterAdaSwap.PoolInfo memory);
   function totalAllocPoint() external view returns (uint256);
   function deposit(uint256 _pid, uint256 _amount) external;
 }

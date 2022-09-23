@@ -9,7 +9,6 @@ import "./libraries/Batchable.sol";
 import "./libraries/Number.sol";
 import "./interfaces/IRewarder.sol";
 import "./interfaces/IMasterAdaSwap.sol";
-import "./AdaSwapToken.sol";
 
 /// @notice The MasterAdaSwap (MO) contract gives out a constant number of ASW tokens per second by minting right from the AdaSwapToken contract.
 contract MasterAdaSwap is Ownable, Batchable {
@@ -126,7 +125,7 @@ contract MasterAdaSwap is Ownable, Batchable {
 
     /// @param _adaswapTreasury The contract address.
     constructor(address _adaswapToken, address _adaswapTreasury) {
-        ASW = AdaSwapToken(_adaswapToken);
+        ASW = IERC20(_adaswapToken);
         AdaSwapTreasury = _adaswapTreasury;
     }
 
@@ -165,9 +164,7 @@ contract MasterAdaSwap is Ownable, Batchable {
                 lastRewardTime: block.timestamp.to64(),
                 allocPoint: _allocPoint
             });
-
         existingPoolOptions[_lpToken].push(_lockTimeId);
-        
         emit LogPoolAddition(
             _lockTimeId,
             _allocPoint,
@@ -189,10 +186,14 @@ contract MasterAdaSwap is Ownable, Batchable {
         IRewarder _rewarder, 
         bool overwrite
     ) public onlyOwner {
-        totalAllocPoint = totalAllocPoint - poolInfo[_lpToken][_lockTimeId].allocPoint + _allocPoint;
+        totalAllocPoint = 
+            totalAllocPoint 
+            - poolInfo[_lpToken][_lockTimeId].allocPoint 
+            + _allocPoint;
         poolInfo[_lpToken][_lockTimeId].allocPoint = _allocPoint.to64();
-        if (overwrite) { poolInfo[_lpToken][_lockTimeId].rewarder = _rewarder; }
-
+        if (overwrite) { 
+            poolInfo[_lpToken][_lockTimeId].rewarder = _rewarder; 
+        }
         emit LogSetPool(
             _lpToken,
             _lockTimeId,
@@ -222,16 +223,32 @@ contract MasterAdaSwap is Ownable, Batchable {
         UserInfo storage user = userInfo[_user][_lpToken][_lockTimeId];
         uint256 accAdaSwapPerShare = pool.accAdaSwapPerShare;
         uint256 lpSupply = pool.lpSupply;
-
         if (
-            block.timestamp > pool.lastRewardTime &&
-            lpSupply > 0
+            block.timestamp > pool.lastRewardTime && lpSupply > 0
         ) {
             uint256 time = block.timestamp - pool.lastRewardTime;
-            uint256 adaswapReward = (time * adaswapPerSecond * pool.allocPoint) / totalAllocPoint;
-            accAdaSwapPerShare = accAdaSwapPerShare + (adaswapReward * ACC_ADASWAP_PRECISION / lpSupply);
+            uint256 adaswapReward = 
+                (
+                    time 
+                    * adaswapPerSecond 
+                    * pool.allocPoint
+                ) 
+                / totalAllocPoint;
+            accAdaSwapPerShare = 
+                accAdaSwapPerShare 
+                + (
+                    adaswapReward 
+                    * ACC_ADASWAP_PRECISION 
+                    / lpSupply
+                );
         }
-        pending = (int256(user.amount * accAdaSwapPerShare / ACC_ADASWAP_PRECISION) - user.rewardDebt)
+        pending = (
+            int256(
+                user.amount
+                * accAdaSwapPerShare 
+                / ACC_ADASWAP_PRECISION
+            ) 
+            - user.rewardDebt)
             .toUInt256();
     }
 
@@ -240,7 +257,10 @@ contract MasterAdaSwap is Ownable, Batchable {
     function massUpdatePools(address _lpToken) external {
         uint256 len = existingPoolOptions[_lpToken].length;
         for (uint256 i = 0; i < len; ++i) {
-            updatePool(_lpToken, existingPoolOptions[_lpToken][i]);
+            updatePool(
+                _lpToken, 
+                existingPoolOptions[_lpToken][i]
+            );
         }
     }
 
@@ -255,13 +275,31 @@ contract MasterAdaSwap is Ownable, Batchable {
         if (block.timestamp > pool.lastRewardTime) {
             uint256 lpSupply = pool.lpSupply;
             if (lpSupply > 0) {
-                uint256 timestamp = block.timestamp - pool.lastRewardTime;
-                uint256 adaReward = timestamp * adaswapPerSecond * pool.allocPoint / totalAllocPoint;
-                pool.accAdaSwapPerShare = pool.accAdaSwapPerShare + (adaReward * ACC_ADASWAP_PRECISION / lpSupply).to128();
+                uint256 timestamp = block.timestamp 
+                    - pool.lastRewardTime;
+                uint256 adaReward = 
+                    timestamp 
+                    * adaswapPerSecond 
+                    * pool.allocPoint 
+                    / totalAllocPoint;
+                pool.accAdaSwapPerShare = 
+                    pool.accAdaSwapPerShare 
+                    + (
+                        adaReward 
+                        * ACC_ADASWAP_PRECISION 
+                        / lpSupply
+                    )
+                    .to128();
             }
             pool.lastRewardTime = block.timestamp.to64();
             poolInfo[_lpToken][_lockTimeId] = pool;
-            emit LogUpdatePool(_lpToken, _lockTimeId, pool.lastRewardTime, lpSupply, pool.accAdaSwapPerShare);
+            emit LogUpdatePool(
+                _lpToken, 
+                _lockTimeId, 
+                pool.lastRewardTime, 
+                lpSupply, 
+                pool.accAdaSwapPerShare
+            );
         }
     }
 
@@ -276,25 +314,39 @@ contract MasterAdaSwap is Ownable, Batchable {
         uint256 _amount,
         uint8 _lockTimeId
     ) public {
-        require(isExistPool(_lpToken, _lockTimeId), 'MasterAdaSwap: POOL_DOES_NOT_EXIST');
+        require(
+            isExistPool(_lpToken, _lockTimeId), 
+            'MasterAdaSwap: POOL_DOES_NOT_EXIST'
+        );
         PoolInfo storage pool = poolInfo[_lpToken][_lockTimeId];
         UserInfo storage user = userInfo[_to][_lpToken][_lockTimeId];
         updatePool(_lpToken, _lockTimeId);
-
-        // Effects
         user.amount = user.amount + _amount;
-        user.rewardDebt = user.rewardDebt + int256(_amount * pool.accAdaSwapPerShare / ACC_ADASWAP_PRECISION);
+        user.rewardDebt = 
+            user.rewardDebt 
+            + int256(
+                _amount 
+                * pool.accAdaSwapPerShare 
+                / ACC_ADASWAP_PRECISION
+            );
         user.lastDepositTime = block.timestamp.to64();
         pool.lpSupply = pool.lpSupply + _amount;
-
-        // Interactions
         IRewarder _rewarder = pool.rewarder;
         if (address(_rewarder) != address(0)) {
-            _rewarder.onAdaSwapReward(_lpToken, _to, _to, 0, user.amount, _lockTimeId);
+            _rewarder.onAdaSwapReward(
+                _lpToken, 
+                _to, 
+                _to, 
+                0, 
+                user.amount, 
+                _lockTimeId
+            );
         }
-
-        IERC20(_lpToken).safeTransferFrom(msg.sender, address(this), _amount);
-
+        IERC20(_lpToken).safeTransferFrom(
+            msg.sender, 
+            address(this), 
+            _amount
+        );
         emit Deposit(msg.sender, _lpToken, _amount, _lockTimeId, _to);
     }
 
@@ -312,25 +364,40 @@ contract MasterAdaSwap is Ownable, Batchable {
         PoolInfo storage pool = poolInfo[_lpToken][_lockTimeId];
         UserInfo storage user = userInfo[msg.sender][_lpToken][_lockTimeId];
         updatePool(_lpToken, _lockTimeId);
-
         require(
-            user.lastDepositTime + fixedTimes[_lockTimeId] <= block.timestamp,
+            user.lastDepositTime + fixedTimes[_lockTimeId] 
+            <= 
+            block.timestamp,
             'MasterAdaSwap: FIXED_LOCK_TIME_IS_NOT_OVER'
         );
-        // Effects
         user.amount = user.amount - _amount;
-        user.rewardDebt = user.rewardDebt - int256(_amount * pool.accAdaSwapPerShare / ACC_ADASWAP_PRECISION);
+        user.rewardDebt = 
+            user.rewardDebt 
+            - int256(
+                _amount 
+                * pool.accAdaSwapPerShare 
+                / ACC_ADASWAP_PRECISION
+            );
         pool.lpSupply -= _amount;
-        
-        // Interactions
         IRewarder _rewarder = pool.rewarder;
         if (address(_rewarder) != address(0)) {
-            _rewarder.onAdaSwapReward(_lpToken, msg.sender, _to, 0, user.amount, _lockTimeId);
+            _rewarder.onAdaSwapReward(
+                _lpToken, 
+                msg.sender, 
+                _to, 
+                0, 
+                user.amount, 
+                _lockTimeId
+            );
         }
-
         IERC20(_lpToken).safeTransfer(_to, _amount);
-
-        emit Withdraw(msg.sender, _lpToken, _amount, _lockTimeId, _to);
+        emit Withdraw(
+            msg.sender, 
+            _lpToken, 
+            _amount, 
+            _lockTimeId, 
+            _to
+        );
     }
 
     /// @notice Harvests proceeds for transaction sender to `to`.
@@ -344,24 +411,27 @@ contract MasterAdaSwap is Ownable, Batchable {
     ) public {
         PoolInfo memory pool = updatePool(_lpToken, _lockTimeId);
         UserInfo storage user = userInfo[msg.sender][_lpToken][_lockTimeId];
-
         require(
-            user.lastDepositTime + fixedTimes[_lockTimeId] <= block.timestamp,
+            user.lastDepositTime + fixedTimes[_lockTimeId] 
+            <= 
+            block.timestamp,
             'MasterAdaSwap: FIXED_LOCK_TIME_IS_NOT_OVER'
         );
-        
-        int256 accumulatedAdaSwap = int256(user.amount * pool.accAdaSwapPerShare / ACC_ADASWAP_PRECISION);
+        int256 accumulatedAdaSwap = int256(
+            user.amount 
+            * pool.accAdaSwapPerShare 
+            / ACC_ADASWAP_PRECISION
+        );
         uint256 _pendingAdaSwap = (accumulatedAdaSwap - user.rewardDebt)
             .toUInt256();
-
-        // Effects
         user.rewardDebt = accumulatedAdaSwap;
-
-        // Interactions
         if (_pendingAdaSwap != 0) {
-            ASW.safeTransferFrom(AdaSwapTreasury, to, _pendingAdaSwap);
+            ASW.safeTransferFrom(
+                AdaSwapTreasury, 
+                to, 
+                _pendingAdaSwap
+            );
         }
-
         IRewarder _rewarder = pool.rewarder;
         if (address(_rewarder) != address(0)) {
             _rewarder.onAdaSwapReward(
@@ -373,8 +443,12 @@ contract MasterAdaSwap is Ownable, Batchable {
                 _lockTimeId
             );
         }
-
-        emit Harvest(msg.sender, _lpToken, _pendingAdaSwap, _lockTimeId);
+        emit Harvest(
+            msg.sender, 
+            _lpToken, 
+            _pendingAdaSwap, 
+            _lockTimeId
+        );
     }
 
     /// @notice Withdraws LP tokens from MO and harvest proceeds for transaction sender to `to`.
@@ -391,27 +465,30 @@ contract MasterAdaSwap is Ownable, Batchable {
         PoolInfo storage pool = poolInfo[_lpToken][_lockTimeId];
         UserInfo storage user = userInfo[msg.sender][_lpToken][_lockTimeId];
         updatePool(_lpToken, _lockTimeId);
-
         require(
-            user.lastDepositTime + fixedTimes[_lockTimeId] <= block.timestamp,
+            user.lastDepositTime + fixedTimes[_lockTimeId] 
+            <= 
+            block.timestamp,
             'MasterAdaSwap: FIXED_LOCK_TIME_IS_NOT_OVER'
         );
-
         int256 accumulatedAdaSwap = int256(
-            user.amount * pool.accAdaSwapPerShare / ACC_ADASWAP_PRECISION
+            user.amount 
+            * pool.accAdaSwapPerShare 
+            / ACC_ADASWAP_PRECISION
         );
-        uint256 _pendingAdaSwap = uint256(accumulatedAdaSwap - user.rewardDebt);
-
-        // Effects
+        uint256 _pendingAdaSwap = uint256(
+            accumulatedAdaSwap - user.rewardDebt
+        );
         user.rewardDebt =
-            accumulatedAdaSwap -
-            int256(_amount * pool.accAdaSwapPerShare);
+            accumulatedAdaSwap 
+            - int256(_amount * pool.accAdaSwapPerShare);
         user.amount -= _amount;
         pool.lpSupply -= _amount;
-
-        // Interactions
-        ASW.safeTransferFrom(AdaSwapTreasury, _to, _pendingAdaSwap);
-
+        ASW.safeTransferFrom(
+            AdaSwapTreasury, 
+            _to, 
+            _pendingAdaSwap
+        );
         IRewarder _rewarder = pool.rewarder;
         if (address(_rewarder) != address(0)) {
             _rewarder.onAdaSwapReward(
@@ -423,9 +500,7 @@ contract MasterAdaSwap is Ownable, Batchable {
                 _lockTimeId
             );
         }
-
         IERC20(_lpToken).safeTransfer(_to, _amount);
-
         emit Withdraw(msg.sender, _lpToken, _amount,_lockTimeId , _to);
         emit Harvest(msg.sender, _lpToken, _pendingAdaSwap, _lockTimeId);
     }
@@ -442,18 +517,28 @@ contract MasterAdaSwap is Ownable, Batchable {
         PoolInfo storage pool = poolInfo[_lpToken][_lockTimeId];
         UserInfo storage user = userInfo[msg.sender][_lpToken][_lockTimeId];
         updatePool(_lpToken, _lockTimeId);
-    
         uint256 amount = user.amount;
         user.amount = 0;
         user.rewardDebt = 0;
         pool.lpSupply -= amount;
-
         IRewarder _rewarder =  poolInfo[_lpToken][_lockTimeId].rewarder;
         if (address(_rewarder) != address(0)) {
-            _rewarder.onAdaSwapReward( _lpToken, msg.sender, _to, 0, 0, _lockTimeId);
+            _rewarder.onAdaSwapReward(
+                _lpToken, 
+                msg.sender, 
+                _to, 
+                0, 
+                0, 
+                _lockTimeId
+            );
         }
-
         IERC20(_lpToken).safeTransfer(_to, amount);
-        emit EmergencyWithdraw(msg.sender, _lpToken, amount, _lockTimeId, _to);
+        emit EmergencyWithdraw(
+            msg.sender, 
+            _lpToken, 
+            amount, 
+            _lockTimeId, 
+            _to
+        );
     }
 }
