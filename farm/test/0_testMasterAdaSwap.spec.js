@@ -18,7 +18,7 @@ describe("MasterAdaSwap", function(){
         setTimeout(done, 2000);
     });
     
-    it("1. testMasterAdaSwap: Deploy contracts", async function(){
+    it("0. testMasterAdaSwap: Deploy contracts", async function(){
         const [admin, alice, bob, steave] = await ethers.getSigners();
         ADMIN = admin;
         ALICE = alice;
@@ -42,7 +42,7 @@ describe("MasterAdaSwap", function(){
         expect(rewarder.deployed);
     });
 
-    it("2. testMasterAdaSwap: prepare parametrs", async function(){
+    it("1. testMasterAdaSwap: prepare parametrs", async function(){
         await adaToken.transferOwnership(chef.address);
         await lpToken.approve(chef.address, getBigNumber(100));
         await chef.setAdaSwapPerSecond(getBigNumber(10));
@@ -52,14 +52,14 @@ describe("MasterAdaSwap", function(){
         await adaToken.connect(ALICE).approve(chef.address, getBigNumber(100000000));
     });
 
-    it("3. Pool should exist", async function () {
+    it("2. testMasterAdaSwap:  Pool should exist", async function () {
         await chef.connect(ADMIN).add(15, lpToken.address, 0, rewarder.address)
 
         expect((await chef.isExistPool(lpToken.address, 0))).to.be.equal(true);
         expect((await chef.adaswapPerSecond())).to.be.equal(getBigNumber(10));
       }) 
 
-    it("4. PendingAdaSwap should equal ExpectedAdaSwap", async function () {
+    it("3. testMasterAdaSwap: PendingAdaSwap should equal ExpectedAdaSwap", async function () {
         await lpToken.connect(BOB).approve(chef.address, getBigNumber(10000));
         expect((await chef.isExistPool(lpToken.address, 0))).to.be.equal(true);
 
@@ -75,29 +75,29 @@ describe("MasterAdaSwap", function(){
       })
 
 
-    describe('5. Deposit', () => { 
-        it('Deposit 1 lp token', async () => {
+    describe('Deposit', () => { 
+        it('4. testMasterAdaSwap:  Deposit 1 lp token', async () => {
             await lpToken.connect(ALICE).approve(chef.address, getBigNumber(10000));
             await expect(chef.connect(ALICE)
                 .deposit(lpToken.address, ALICE.address, getBigNumber(4), 0))
                 .to.emit(chef, "Deposit");
         });
 
-        it('Deposit does not exist', async () => {
+        it('5. testMasterAdaSwap:  Deposit does not exist', async () => {
             await expect(chef.connect(ALICE)
                 .deposit(lpToken.address, ALICE.address, getBigNumber(4), 2))
                 .to.be.revertedWith('MasterAdaSwap: POOL_DOES_NOT_EXIST');
         });
     });
 
-    describe('6. Withdraw', () => { 
-        it('Withdraw 10 amount lock time is not over', async () => {
+    describe('Withdraw', () => { 
+        it('6. testMasterAdaSwap: Withdraw 10 amount lock time is not over', async () => {
             await expect(chef.connect(BOB)
                 .withdraw(lpToken.address, BOB.address, getBigNumber(1), 0))
                 .to.revertedWith('MasterAdaSwap: FIXED_LOCK_TIME_IS_NOT_OVER');
         });
 
-        it('Withdraw 10 amount', async () => {
+        it('7. testMasterAdaSwap: Withdraw 10 amount', async () => {
             await advanceIncreaseTime(3600 * 24 * 7); // to unlock lock time
             await chef.connect(BOB)
                 .withdraw(lpToken.address, BOB.address, getBigNumber(1), 0)
@@ -106,15 +106,15 @@ describe("MasterAdaSwap", function(){
             expect('-'+pendingAdaSwap).to.be.eq(userInfo.rewardDebt);
         });
 
-        it('Withdraw 0 amount', async () => {
+        it('8. testMasterAdaSwap: Withdraw 0 amount', async () => {
             await expect(chef.connect(ALICE)
                 .withdraw(lpToken.address, ALICE.address, getBigNumber(0), 0))
                 .to.emit(chef, "Withdraw");
         });
     });
 
-    describe('7. Harvest', () => { 
-        it('Harvest lock time is not over', async () => {
+    describe('Harvest', () => { 
+        it('9. testMasterAdaSwap: Harvest lock time is not over', async () => {
             expect((await chef.isExistPool(lpToken.address, 1))).to.be.equal(false);
             await chef.connect(ADMIN).add(15, lpToken.address, 1, rewarder.address);
             expect((await chef.isExistPool(lpToken.address, 1))).to.be.equal(true);
@@ -125,7 +125,7 @@ describe("MasterAdaSwap", function(){
         });
 
         
-        it('Should give back the correct amount of reward', async () => {
+        it('10. testMasterAdaSwap: Should give back the correct amount of reward', async () => {
             await advanceIncreaseTime(3600 * 24 * 14); // to unlock lock time
 
             const balanceBefore = await adaToken.balanceOf(BOB.address);
@@ -148,7 +148,7 @@ describe("MasterAdaSwap", function(){
                 .withArgs(BOB.address, lpToken.address, balanceBefore.add(pendingAdaSwap), 1);
         });
         
-        it('Harvest with empty user balance', async () => {
+        it('11. testMasterAdaSwap: Harvest with empty user balance', async () => {
             await chef.connect(ALICE).deposit(lpToken.address, ALICE.address, getBigNumber(0), 1);
             await advanceIncreaseTime(3600 * 24 * 14)
             const tx = await chef.connect(ALICE).harvest(lpToken.address, ALICE.address, 1)
@@ -160,8 +160,8 @@ describe("MasterAdaSwap", function(){
         });
     });
 
-    describe('8. Emergency Withdraw', () => {         
-        it("Lock time is not over", async () => {
+    describe('Emergency Withdraw', () => {         
+        it("12. testMasterAdaSwap: Lock time is not over", async () => {
             const tx = await chef.connect(ALICE).emergencyWithdraw(lpToken.address, ALICE.address, 0)
             await tx.wait()
 
@@ -174,7 +174,7 @@ describe("MasterAdaSwap", function(){
                 .withArgs(ALICE.address, lpToken.address, getBigNumber(4), 0, ALICE.address)
         })
 
-        it("Lock time is over", async () => {
+        it("13. testMasterAdaSwap: Lock time is over", async () => {
             await lpToken.connect(STEAVE).approve(chef.address, getBigNumber(10000));
             await chef.connect(STEAVE).deposit(lpToken.address, STEAVE.address, getBigNumber(20), 0)
             
@@ -192,7 +192,7 @@ describe("MasterAdaSwap", function(){
                 .withArgs(STEAVE.address, lpToken.address, getBigNumber(20), 0, STEAVE.address)
         })
 
-        it("Transfer amount is zero", async () => {
+        it("14. testMasterAdaSwap: Transfer amount is zero", async () => {
             const tx = await chef.connect(ALICE).emergencyWithdraw(lpToken.address, ALICE.address, 0)
             await tx.wait()
 
@@ -203,8 +203,8 @@ describe("MasterAdaSwap", function(){
 
     });
 
-    describe('9. Withdraw And Harvest', () => {
-        it('Lock time is not over', async () => {
+    describe('Withdraw And Harvest', () => {
+        it('15. testMasterAdaSwap: Lock time is not over', async () => {
             expect((await chef.isExistPool(lpToken.address, 2))).to.be.false;
             await chef.connect(ADMIN).add(40, lpToken.address, 2, rewarder.address);
             expect((await chef.isExistPool(lpToken.address, 2))).to.be.true;
@@ -216,7 +216,7 @@ describe("MasterAdaSwap", function(){
                 .to.revertedWith('MasterAdaSwap: FIXED_LOCK_TIME_IS_NOT_OVER');
         })
 
-        it('Withdrawal of nonzero amount', async () => {
+        it('16. testMasterAdaSwap: Withdrawal of nonzero amount', async () => {
             await advanceIncreaseTime(3600 * 24 * 30); // to unlock lock time
 
             const userInfoBefore = await chef.userInfo(STEAVE.address, lpToken.address, 2)
@@ -240,7 +240,7 @@ describe("MasterAdaSwap", function(){
             
         })
 
-        it('Withdrawal of zero amount', async () => {
+        it('17. testMasterAdaSwap: Withdrawal of zero amount', async () => {
             await chef.connect(BOB).deposit(lpToken.address, BOB.address, getBigNumber(2), 0)
             
             await advanceIncreaseTime(3600 * 24 * 30)
@@ -261,8 +261,8 @@ describe("MasterAdaSwap", function(){
         })
     })
 
-    describe('10. Update Pool', () => {
-        it("Total LP supply is zero", async () => {
+    describe('Update Pool', () => {
+        it("18. testMasterAdaSwap: Total LP supply is zero", async () => {
             expect((await chef.isExistPool(lpToken.address, 3))).to.be.false;
             await chef.connect(ADMIN).add(5, lpToken.address, 3, rewarder.address);
             expect((await chef.isExistPool(lpToken.address, 3))).to.be.true;
@@ -278,7 +278,7 @@ describe("MasterAdaSwap", function(){
                 .withArgs(lpToken.address, 3, timestamp, 0, 0);
         })
 
-        it("Total LP supply is nonzero", async () => {
+        it("19. testMasterAdaSwap: Total LP supply is nonzero", async () => {
             await chef.connect(STEAVE).deposit(lpToken.address, STEAVE.address, getBigNumber(3), 3);
             await chef.connect(ALICE).deposit(lpToken.address, STEAVE.address, getBigNumber(4), 3);
   
@@ -300,8 +300,8 @@ describe("MasterAdaSwap", function(){
         })
     })
 
-    describe('11. Add', () => {
-        it('Should add pool with corresponding allocation points', async () => {
+    describe('Add', () => {
+        it('20. testMasterAdaSwap: Should add pool with corresponding allocation points', async () => {
             const tx = await chef.connect(ADMIN).add(25, lpToken.address, 4, rewarder.address)
             await tx.wait()
 

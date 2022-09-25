@@ -18,7 +18,7 @@ describe("MasterAdaSwap", function(){
         setTimeout(done, 2000);
     });
     
-    it("1. testMasterAdaSwap: Deploy contracts", async function(){
+    it("33. testMasterAdaSwap: Deploy contracts", async function(){
         const [admin, alice, bob, steave,sam,tom,gor,tor,yor,j,k,l] = await ethers.getSigners();
         ADMIN = admin;
         ALICE = alice;
@@ -57,7 +57,7 @@ describe("MasterAdaSwap", function(){
         expect(rewarder.deployed);
     });
 
-    it("2. testMasterAdaSwap: prepare parametrs", async function(){
+    it("34. testMasterAdaSwap: prepare parametrs", async function(){
         await adaToken.transferOwnership(chef.address);
         await lpToken.approve(chef.address, getBigNumber(100));
         await chef.setAdaSwapPerSecond(getBigNumber(10));
@@ -92,9 +92,9 @@ describe("MasterAdaSwap", function(){
 
 
 
-    describe('3. Creating pools with different time lock', async()=>{
+    describe('Creating pools with different time lock', async()=>{
 
-        it('Pool with time lock - 14 days', async()=>{
+        it('35. testMasterAdaSwap: Pool with time lock - 14 days', async()=>{
             // first pool
             // lock time - 14 days
             await chef.connect(ADMIN).add(5, lpToken.address, 1, rewarder.address);
@@ -112,7 +112,7 @@ describe("MasterAdaSwap", function(){
      
         });
 
-        it('Pool with time lock - 60 days',async()=>{
+        it('36. testMasterAdaSwap: Pool with time lock - 60 days',async()=>{
             await chef.connect(ADMIN).add(10, lpTokenSecond.address, 3, rewarder.address);
 
             expect((await chef.isExistPool(lpTokenSecond.address, 3))).to.be.equal(true);
@@ -130,7 +130,7 @@ describe("MasterAdaSwap", function(){
 
         })
 
-        it('Pool with time lock - 365 days ', async()=>{
+        it('37. testMasterAdaSwap: Pool with time lock - 365 days ', async()=>{
 
             await chef.connect(ADMIN).add(5, lpTokenThird.address, 5, rewarder.address);
 
@@ -147,7 +147,7 @@ describe("MasterAdaSwap", function(){
   
         })
 
-        it('4. Check reward after 60 days', async()=>{
+        it('38. testMasterAdaSwap: Check reward after 60 days', async()=>{
             advanceIncreaseTime(3600 * 24 * 60);
 
             let tom = await chef.userInfo(TOM.address, lpTokenSecond.address, 3)
@@ -182,7 +182,7 @@ describe("MasterAdaSwap", function(){
 
         });
 
-        it('5. Check reward after 14 days', async()=>{
+        it('39. testMasterAdaSwap: Check reward after 14 days', async()=>{
             
             advanceIncreaseTime(3600 * 24 * 14);
 
@@ -212,7 +212,7 @@ describe("MasterAdaSwap", function(){
         });
 
         
-        it('6. Check reward after 365 days', async()=>{
+        it('40. testMasterAdaSwap: Check reward after 365 days', async()=>{
    
             advanceIncreaseTime(3600 * 24 * 365);
 
