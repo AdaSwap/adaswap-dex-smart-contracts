@@ -254,7 +254,11 @@ contract MasterAdaSwap is Ownable, Batchable {
     /// @param _lpToken Address of the LP ERC-20 token.
     function massUpdatePools(address _lpToken) external {
         uint256 len = existingPoolOptions[_lpToken].length;
-        for (uint256 i = 0; i < len; ++i) {
+        for (
+            uint256 i = 0; 
+            i < len; 
+            ++i
+        ) {
             updatePool(
                 _lpToken, 
                 existingPoolOptions[_lpToken][i]
