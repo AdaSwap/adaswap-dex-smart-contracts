@@ -2,7 +2,9 @@
 pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
+// custom reward mechanisms
 interface IRewarder {
+  // this hook is while reward distribution if farm has custom reward mechanism
   function onAdaSwapReward(
     address lpToken, 
     address user, 

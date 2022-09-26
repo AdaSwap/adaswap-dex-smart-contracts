@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.0 <0.9.0;
 import "../interfaces/IRewarder.sol";
-import "../interfaces/IRewarder.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
@@ -30,7 +29,7 @@ contract RewarderMock is IRewarder {
     uint256 adaswapAmount, 
     uint256 newLpAmount, 
     uint8 lockTimeId
-  ) external override onlyMCV2 {
+  ) external onlyMCV2 {
     uint256 pendingReward = adaswapAmount * rewardMultiplier / REWARD_TOKEN_DIVISOR;
     uint256 rewardBal = rewardToken.balanceOf(address(this));
     if (pendingReward > rewardBal) {

@@ -4,17 +4,22 @@ pragma experimental ABIEncoderV2;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 interface IMasterAdaSwap {
-  struct UserInfo {
-    uint256 amount;     // How many LP tokens the user has provided.
-    uint256 rewardDebt; // Reward debt. See explanation below.
-  }
+    /// @notice Info of each MO user.
+    /// `amount` LP token amount the user has provided.
+    /// `rewardDebt` The amount of ADASWAP entitled to the user.
+    struct UserInfo {
+        uint256 amount; // How many LP tokens the user has provided.
+        uint256 rewardDebt; // Reward debt. See explanation below.
+    }
 
-  struct PoolInfo {
-    IERC20 lpToken;           // Address of LP token contract.
-    uint256 allocPoint;       // How many allocation points assigned to this pool. ADASWAP to distribute per second.
-    uint256 lastRewardBlock;  // Last block number that ADASWAP distribution occurs.
-    uint256 accAdaSwapPerShare; // Accumulated ADASWAP per share, times 1e12. See below.
-  }
+    /// @notice Info of each MO pool.
+    /// `allocPoint` The amount of allocation points assigned to the pool.
+    /// Also known as the amount of ADASWAP to distribute per block.
+    struct PoolInfo {
+        uint256 allocPoint; // How many allocation points assigned to this pool. ADASWAP to distribute per second.
+        uint256 lastRewardTime; // Last block number that ADASWAP distribution occurs.
+        uint256 accAdaSwapPerShare; // Accumulated ADASWAP per share, times 1e12. See below.
+    }
 
   function poolInfo(uint256 pid) 
     external 
