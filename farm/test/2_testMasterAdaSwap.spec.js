@@ -48,7 +48,7 @@ describe("MasterAdaSwap Use Cases", () => {
     })
 
 
-    it('29. testMasterAdaSwap: One staker already in pool, 2 entered and then exit positions.', async () => {
+    it('29. testMasterAdaSwap: One staker already in pool, 2 entered and then exit positions', async () => {
         await chef.add(15, lpToken.address, 0, rewarder.address)
         
         // One staker entered the pool
@@ -94,7 +94,7 @@ describe("MasterAdaSwap Use Cases", () => {
         expect(infoAfter.rewardDebt).to.eq(accumulatedAdaSwap)
     })
 
-    it('30. testMasterAdaSwap: Two stakers already in pool, 1 entered and then first two exit positions.', async () => {
+    it('30. testMasterAdaSwap: Two stakers already in pool, 1 entered and then first two exit positions', async () => {
         await chef.add(45, lpToken.address, 1, rewarder.address)
 
         // Two stakers entered the pool
@@ -158,7 +158,7 @@ describe("MasterAdaSwap Use Cases", () => {
         expect(infoAfterSTEAVE.rewardDebt).to.eq(accAdaSwapSTEAVE)
     })
 
-    it('31. testMasterAdaSwap: Two users are already staking and harvesting in different periods of time.', async () => {
+    it('31. testMasterAdaSwap: Two users are already staking and harvesting in different periods of time', async () => {
         await chef.add(111, lpToken.address, 2, rewarder.address)
 
         // Two stakers entered the pool
@@ -214,7 +214,7 @@ describe("MasterAdaSwap Use Cases", () => {
         expect(infoAfterALICE.rewardDebt).to.eq(accumulatedAdaSwapALICE)
     })
 
-    it('32. testMasterAdaSwap: Two users are staking, then other two users start staking. After that first two increase their staking amount.', async () => {
+    it('32. testMasterAdaSwap: Two users are staking, then other two users start staking. After that first two increase their staking amount', async () => {
         await chef.add(111, lpToken.address, 3, rewarder.address)
 
         // Two stakers entered the pool

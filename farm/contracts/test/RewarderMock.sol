@@ -24,12 +24,8 @@ contract RewarderMock is IRewarder {
   }
 
   function onAdaSwapReward(
-    address lpToken, 
-    address user, 
     address recipient, 
-    uint256 adaswapAmount, 
-    uint256 newLpAmount, 
-    uint8 lockTimeId
+    uint256 adaswapAmount 
   ) external override onlyMCV2 {
     uint256 pendingReward = adaswapAmount * rewardMultiplier / REWARD_TOKEN_DIVISOR;
     uint256 rewardBal = rewardToken.balanceOf(address(this));
@@ -40,11 +36,7 @@ contract RewarderMock is IRewarder {
     }
   }
 
-  function pendingTokens(
-    uint256 pid,
-    address user, 
-    uint256 adaswapAmount
-  )
+  function pendingTokens(uint256 adaswapAmount)
     external
     view
     override

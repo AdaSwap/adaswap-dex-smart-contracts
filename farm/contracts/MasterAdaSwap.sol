@@ -336,12 +336,8 @@ contract MasterAdaSwap is Ownable, Batchable {
         IRewarder _rewarder = pool.rewarder;
         if (address(_rewarder) != address(0)) {
             _rewarder.onAdaSwapReward(
-                _lpToken, 
                 _to, 
-                _to, 
-                0, 
-                user.amount, 
-                _lockTimeId
+                0 
             );
         }
         IERC20(_lpToken).safeTransferFrom(
@@ -384,12 +380,8 @@ contract MasterAdaSwap is Ownable, Batchable {
         IRewarder _rewarder = pool.rewarder;
         if (address(_rewarder) != address(0)) {
             _rewarder.onAdaSwapReward(
-                _lpToken, 
-                msg.sender, 
                 _to, 
-                0, 
-                user.amount, 
-                _lockTimeId
+                0 
             );
         }
         IERC20(_lpToken).safeTransfer(_to, _amount);
@@ -437,12 +429,8 @@ contract MasterAdaSwap is Ownable, Batchable {
         IRewarder _rewarder = pool.rewarder;
         if (address(_rewarder) != address(0)) {
             _rewarder.onAdaSwapReward(
-                _lpToken,
-                msg.sender,
                 to,
-                _pendingAdaSwap,
-                user.amount,
-                _lockTimeId
+                _pendingAdaSwap
             );
         }
         emit Harvest(
@@ -494,12 +482,8 @@ contract MasterAdaSwap is Ownable, Batchable {
         IRewarder _rewarder = pool.rewarder;
         if (address(_rewarder) != address(0)) {
             _rewarder.onAdaSwapReward(
-                _lpToken,
-                msg.sender,
                 _to,
-                _pendingAdaSwap,
-                user.amount,
-                _lockTimeId
+                _pendingAdaSwap
             );
         }
         IERC20(_lpToken).safeTransfer(_to, _amount);
@@ -526,12 +510,8 @@ contract MasterAdaSwap is Ownable, Batchable {
         IRewarder _rewarder =  poolInfo[_lpToken][_lockTimeId].rewarder;
         if (address(_rewarder) != address(0)) {
             _rewarder.onAdaSwapReward(
-                _lpToken, 
-                msg.sender, 
                 _to, 
-                0, 
-                0, 
-                _lockTimeId
+                0 
             );
         }
         IERC20(_lpToken).safeTransfer(_to, amount);

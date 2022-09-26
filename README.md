@@ -47,6 +47,36 @@
 
 ---
 
+## Farm
+
+`cd farm`
+
+### Install dependencies
+
+`yarn`
+
+### Compile contracts
+
+`yarn compile`
+
+### Run tests 
+
+`yarn test`
+
+### Run your local blockchain 
+
+`yarn chain`
+
+### Deploy contracts
+
+- Milkomeda Testnet deployment: `yarn deploy-testnet`
+
+- Milkomeda Mainnet deployment: `yarn deploy-mainnet`
+
+- Local blockchain deployment: `yarn deploy-dev`
+
+---
+
 ## Periphery
 
 `cd periphery`
@@ -89,6 +119,7 @@
 
 `yarn compile`
 
+---
 
 ## Publishing NPM packages for each core/lib/periphery
 
