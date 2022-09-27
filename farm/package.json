@@ -1,7 +1,7 @@
 {
-    "name": "@adaswap/core",
+    "name": "@adaswap/farm",
     "version": "0.0.1",
-    "description": "📖 Core contracts for AdaSwap dApp",
+    "description": "📖 Farm contracts for AdaSwap dApp",
     "files": [
         "contracts",
         "artifacts"
