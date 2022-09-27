@@ -82,62 +82,81 @@ interface IMasterAdaSwap {
     event LogAdaSwapPerSecond(uint256 adaswapPerSecond);
 
     function fixedTimes(uint256) external view returns (uint32);
+
     function AdaSwapTreasury() external view returns (address);
+
     function totalAllocPoint() external view returns (uint256);
+
     function adaswapPerSecond() external view returns (uint256);
-    function isAllocatedPool(address _lpToken, uint8 _lockTimeId) external view returns (bool);
-    function isExistPool(address _lpToken, uint8 _lockTimeId) external view returns (bool);
+
+    function isAllocatedPool(address _lpToken, uint8 _lockTimeId)
+        external
+        view
+        returns (bool);
+
+    function isExistPool(address _lpToken, uint8 _lockTimeId)
+        external
+        view
+        returns (bool);
+
     function add(
         uint64 _allocPoint,
         address _lpToken,
         uint8 _lockTimeId,
         address _rewarder
     ) external;
+
     function set(
         address _lpToken,
         uint8 _lockTimeId,
-        uint256 _allocPoint, 
-        IRewarder _rewarder, 
+        uint256 _allocPoint,
+        IRewarder _rewarder,
         bool overwrite
     ) external;
+
     function pendingAdaSwap(
         address _lpToken,
         address _user,
         uint8 _lockTimeId
     ) external view returns (uint256 pending);
+
     function setAdaSwapPerSecond(uint256 _adaswapPerSecond) external;
-    function massUpdatePools(
-        address _lpToken
-    ) external;
-    function updatePool(
-        address _lpToken,
-        uint8 _lockTimeId
-    ) external returns (PoolInfo memory pool);
+
+    function massUpdatePools(address[] memory _lpToken) external;
+
+    function updatePool(address _lpToken, uint8 _lockTimeId)
+        external
+        returns (PoolInfo memory pool);
+
     function deposit(
         address _lpToken,
         address _to,
         uint256 _amount,
         uint8 _lockTimeId
     ) external;
+
     function withdraw(
         address _lpToken,
         address _to,
         uint256 _amount,
         uint8 _lockTimeId
     ) external;
+
     function withdrawAndHarvest(
-        address _lpToken, 
+        address _lpToken,
         uint256 _amount,
         address _to,
         uint8 _lockTimeId
     ) external;
+
     function emergencyWithdraw(
-        address _lpToken, 
-        address _to,        
+        address _lpToken,
+        address _to,
         uint8 _lockTimeId
     ) external;
+
     function harvest(
-        address _lpToken, 
+        address _lpToken,
         address to,
         uint8 _lockTimeId
     ) external;

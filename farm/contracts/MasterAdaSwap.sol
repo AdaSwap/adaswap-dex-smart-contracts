@@ -76,7 +76,7 @@ contract MasterAdaSwap is Ownable, IMasterAdaSwap {
         address _lpToken,
         uint8 _lockTimeId,
         address _rewarder
-    ) public onlyOwner {
+    ) external onlyOwner {
         totalAllocPoint += _allocPoint;
         poolInfo[_lpToken][_lockTimeId] = 
             PoolInfo({
@@ -107,7 +107,7 @@ contract MasterAdaSwap is Ownable, IMasterAdaSwap {
         uint256 _allocPoint, 
         IRewarder _rewarder, 
         bool overwrite
-    ) public onlyOwner {
+    ) external onlyOwner {
         totalAllocPoint = 
             totalAllocPoint 
             - poolInfo[_lpToken][_lockTimeId].allocPoint 
@@ -127,7 +127,7 @@ contract MasterAdaSwap is Ownable, IMasterAdaSwap {
 
     /// @notice Sets the adaswap per second value to be distributed. Can only be called by the owner.
     /// @param _adaswapPerSecond The amount of AdaSwap to be distributed per second.
-    function setAdaSwapPerSecond(uint256 _adaswapPerSecond) public onlyOwner {
+    function setAdaSwapPerSecond(uint256 _adaswapPerSecond) external onlyOwner {
         adaswapPerSecond = _adaswapPerSecond;
         emit LogAdaSwapPerSecond(_adaswapPerSecond);
     }
@@ -174,19 +174,23 @@ contract MasterAdaSwap is Ownable, IMasterAdaSwap {
             .toUInt256();
     }
 
-    /// @notice Updates reward variables for all pools. Be careful of gas spending!
-    /// @param _lpToken Address of the LP ERC-20 token.
-    function massUpdatePools(address _lpToken) external {
-        uint256 len = existingPoolOptions[_lpToken].length;
-        for (
-            uint256 i = 0; 
-            i < len; 
-            ++i
-        ) {
-            updatePool(
-                _lpToken, 
-                existingPoolOptions[_lpToken][i]
-            );
+    /// @notice Updates reward variables for all pools. Max length of _lpToken array
+    /// should not exceed 1290. Be careful of gas spending!
+    /// @param _lpToken Array of addresses of the LP ERC-20 token.
+    function massUpdatePools(address[] memory _lpToken) external {
+        uint256 arrLen = _lpToken.length;
+        for (uint256 k = 0; k < arrLen; ++k) {
+            uint256 len = existingPoolOptions[_lpToken[k]].length;
+            for (
+                uint256 i = 0; 
+                i < len; 
+                ++i
+            ) {
+                updatePool(
+                    _lpToken[k],  
+                    existingPoolOptions[_lpToken[k]][i]
+                );
+            }
         }
     }
 
@@ -326,7 +330,7 @@ contract MasterAdaSwap is Ownable, IMasterAdaSwap {
         address _lpToken, 
         address to,
         uint8 _lockTimeId
-    ) public {
+    ) external {
         PoolInfo memory pool = updatePool(_lpToken, _lockTimeId);
         UserInfo storage user = userInfo[msg.sender][_lpToken][_lockTimeId];
         require(
@@ -375,7 +379,7 @@ contract MasterAdaSwap is Ownable, IMasterAdaSwap {
         uint256 _amount,
         address _to,
         uint8 _lockTimeId
-    ) public {
+    ) external {
         PoolInfo storage pool = poolInfo[_lpToken][_lockTimeId];
         UserInfo storage user = userInfo[msg.sender][_lpToken][_lockTimeId];
         updatePool(_lpToken, _lockTimeId);
@@ -423,7 +427,7 @@ contract MasterAdaSwap is Ownable, IMasterAdaSwap {
         address _lpToken, 
         address _to,        
         uint8 _lockTimeId
-    ) public {
+    ) external {
         PoolInfo storage pool = poolInfo[_lpToken][_lockTimeId];
         UserInfo storage user = userInfo[msg.sender][_lpToken][_lockTimeId];
         updatePool(_lpToken, _lockTimeId);
