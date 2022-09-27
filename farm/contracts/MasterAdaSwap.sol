@@ -4,28 +4,14 @@ pragma solidity >=0.8.0 <0.9.0;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "./libraries/Number.sol";
-import "./interfaces/IRewarder.sol";
 import "./interfaces/IMasterAdaSwap.sol";
 
 /// @notice The MasterAdaSwap (MO) contract gives out a constant number of ASW tokens per second by minting right from the AdaSwapToken contract.
-contract MasterAdaSwap is Ownable {
+contract MasterAdaSwap is Ownable, IMasterAdaSwap {
     using SafeERC20 for IERC20;
     using UInt256 for uint256;
     using Int256 for int256;
     using UInt128 for uint128;
-
-    /// @notice Info about each MO user.
-    /// `amount` LP token amount the user has provided.
-    /// `rewardDebt` The amount of ASW entitled to the user.
-    /// `lockTimeId` The lock time when the user will be able to withdraw or harvest his ASW.
-    /// `lastDepositTime` The latest time when stakers deposited LP tokens.
-    /// This value referrence to index fixedTime on PoolInfo.
-    struct UserInfo {
-        uint256 amount;
-        int256 rewardDebt;
-        uint8 lockTimeId;
-        uint64 lastDepositTime;
-    }
 
     /// @notice The fixedTimes could be able to use in each pools. first element 0 second also meaning the flexible farming.
     uint32[] public fixedTimes = [
@@ -36,17 +22,6 @@ contract MasterAdaSwap is Ownable {
         90 days,
         365 days
     ];
-
-    /// @notice Info of each MO pool.
-    /// `allocPoint` The amount of allocation points assigned to the pool.
-    /// Also known as the amount of ASW to distribute per seconds.
-    struct PoolInfo {
-        uint256 lpSupply;
-        uint256 accAdaSwapPerShare;
-        IRewarder rewarder;
-        uint64 lastRewardTime;
-        uint64 allocPoint;
-    }
 
     /// @notice Address of AdaSwapTreasury contract.
     address public immutable AdaSwapTreasury;
@@ -61,8 +36,7 @@ contract MasterAdaSwap is Ownable {
     mapping(address => mapping(uint8 => PoolInfo))
         public poolInfo;
     /// @notice Info of each user that stakes LP tokens.
-    mapping(address => uint8[])
-        public existingPoolOptions;
+    mapping(address => uint8[]) public existingPoolOptions;
     
     /// @dev Total amount of allocation points. Must be the sum of all allocation points from all pools.
     uint256 public totalAllocPoint = 0;
@@ -70,55 +44,6 @@ contract MasterAdaSwap is Ownable {
     uint256 private constant ACC_ADASWAP_PRECISION = 1e12;
 
     uint256 public adaswapPerSecond;
-
-    event Deposit(
-        address indexed user,
-        address indexed lpToken,
-        uint256 amount,
-        uint8 lockTimeId,
-        address indexed to
-    );
-    event Withdraw(
-        address indexed user,
-        address indexed lpToken,
-        uint256 amount,
-        uint8 lockTimeId,
-        address indexed to
-    );
-    event EmergencyWithdraw(
-        address indexed user,
-        address indexed lpToken,
-        uint256 amount,
-        uint8 lockTimeId,
-        address indexed to
-    );
-    event Harvest(
-        address indexed user, 
-        address indexed lpToken,
-        uint256 amount,
-        uint8 lockTimeId
-    );
-    event LogPoolAddition(
-        uint8 lockTimeId,
-        uint64 allocPoint,
-        address indexed lpToken,
-        IRewarder indexed rewarder
-    );
-    event LogSetPool(
-        address indexed lpToken,
-        uint8 lockTimeId,
-        uint64 allocPoint,
-        IRewarder indexed rewarder,
-        bool overwrite
-    );
-    event LogUpdatePool(
-        address indexed lpToken,
-        uint8 _lockTimeId,
-        uint64 lastRewardTime,
-        uint256 lpSupply,
-        uint256 totalWeight
-    );
-    event LogAdaSwapPerSecond(uint256 adaswapPerSecond);
 
     /// @param _adaswapTreasury The contract address.
     constructor(address _adaswapToken, address _adaswapTreasury) {
@@ -314,7 +239,7 @@ contract MasterAdaSwap is Ownable {
         address _to,
         uint256 _amount,
         uint8 _lockTimeId
-    ) public {
+    ) external {
         require(
             isExistPool(_lpToken, _lockTimeId), 
             'MasterAdaSwap: POOL_DOES_NOT_EXIST'
@@ -357,7 +282,7 @@ contract MasterAdaSwap is Ownable {
         address _to,
         uint256 _amount,
         uint8 _lockTimeId
-    ) public {
+    ) external {
         PoolInfo storage pool = poolInfo[_lpToken][_lockTimeId];
         UserInfo storage user = userInfo[msg.sender][_lpToken][_lockTimeId];
         updatePool(_lpToken, _lockTimeId);
