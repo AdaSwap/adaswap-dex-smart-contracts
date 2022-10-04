@@ -11,8 +11,8 @@
         "compile": "yarn hardhat compile",
         "chain": "hardhat node --network hardhat",
         "local": "hardhat run --network localhost scripts/deploy.js",
-        "deploy-testnet": "yarn hardhat run --network avaxTestnet scripts/deploy.js",
-        "deploy-mainnet": "yarn hardhat run --network avaxTestnet scripts/deploy.js",
+        "deploy-testnet": "yarn hardhat run --network milkomedaTestnet scripts/deploy.js",
+        "deploy-mainnet": "yarn hardhat run --network milkomedaMainnet scripts/deploy.js",
         "deploy-dev": "yarn hardhat run --network hardhat scripts/deploy.js"
     },
     "license": "MIT",
