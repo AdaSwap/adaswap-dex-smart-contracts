@@ -92,7 +92,6 @@ async function getTokenAllowance(tokenAddress, ownerAddress, spenderAddress) {
 //         path,
 //         signer.address, 
 //         timestamp + 1000,
-//         authorizations,
 //         {
 //             gasLimit: '15000000'
 //         }
