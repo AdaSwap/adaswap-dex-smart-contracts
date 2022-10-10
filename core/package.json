@@ -1,6 +1,6 @@
 {
-  "name": "@adaswap-testnet/core",
-  "version": "0.0.7",
+  "name": "@adaswap/core",
+  "version": "1.0.0",
   "description": "📖 Core contracts for AdaSwap DEX",
   "files": [
     "contracts",

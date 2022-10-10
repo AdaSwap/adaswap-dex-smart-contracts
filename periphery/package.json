@@ -1,6 +1,6 @@
 {
-  "name": "@adaswap-testnet/periphery",
-  "version": "0.0.2",
+  "name": "@adaswap/periphery",
+  "version": "1.0.0",
   "description": "📖 Periphery contracts for AdaSwap DEX",
   "files": [
     "contracts",
@@ -27,7 +27,7 @@
     "hardhat-contract-sizer": "^2.6.1"
   },
   "dependencies": {
-    "@adaswap-testnet/core": "^0.0.7",
-    "@adaswap-testnet/lib": "^0.0.8"
+    "@adaswap/core": "^0.0.7",
+    "@adaswap/lib": "^0.0.8"
   }
 }
