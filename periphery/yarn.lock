@@ -2,14 +2,14 @@
 # yarn lockfile v1
 
 
-"@adaswap-testnet/core@^0.0.7":
+"@adaswap/core@^0.0.7":
   version "0.0.7"
-  resolved "https://registry.yarnpkg.com/@adaswap-testnet/core/-/core-0.0.7.tgz#b5b46fbef3fae7b942b3ce80090e74fadc4faa25"
+  resolved "https://registry.yarnpkg.com/@adaswap/core/-/core-0.0.7.tgz#b5b46fbef3fae7b942b3ce80090e74fadc4faa25"
   integrity sha512-P0Ip0Y32bjFQhK6emCxM8RnE5IU/MuhUmT97D0P22VpxGxOTybu1iYX1pg1xo7ac3+VPM68nicp9ScdtYLnx3w==
 
-"@adaswap-testnet/lib@^0.0.8":
+"@adaswap/lib@^0.0.8":
   version "0.0.8"
-  resolved "https://registry.yarnpkg.com/@adaswap-testnet/lib/-/lib-0.0.8.tgz#05309d5115cfa2883b197ed64e4cd36b5b2567f5"
+  resolved "https://registry.yarnpkg.com/@adaswap/lib/-/lib-0.0.8.tgz#05309d5115cfa2883b197ed64e4cd36b5b2567f5"
   integrity sha512-VcNJZRddlTf9K4tHy3DD9TArrSHvMzm419aJvMgtOLBg1iE6eEqosPdYz/qqTIL6CXg+hGDkA/pJYU3kvIb8Ow==
 
 "@colors/colors@1.5.0":

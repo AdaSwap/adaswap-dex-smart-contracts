@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity =0.8.13;
 
-import '@adaswap-testnet/core/contracts/interfaces/IAdaswapFactory.sol';
-import '@adaswap-testnet/lib/contracts/libraries/TransferHelper.sol';
+import '@adaswap/core/contracts/interfaces/IAdaswapFactory.sol';
+import '@adaswap/lib/contracts/libraries/TransferHelper.sol';
 import './interfaces/IAdaswapRouter02.sol';
 import './libraries/AdaswapLibrary.sol';
 import './interfaces/IWETH.sol';

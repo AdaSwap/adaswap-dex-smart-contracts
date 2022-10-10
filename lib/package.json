@@ -1,11 +1,15 @@
 {
-  "name": "@adaswap-testnet/lib",
-  "version": "0.0.9",
+  "name": "@adaswap/lib",
+  "version": "1.0.0",
   "description": "📖 Solidity libraries that are shared across AdaSwap contracts",
   "files": [
     "contracts",
     "artifacts"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AdaSwap/adaswap-dex-smart-contracts/tree/v1.0.0/lib"
+  },
   "scripts": {
     "compile": "yarn hardhat compile",
     "chain": "hardhat node --network hardhat"
