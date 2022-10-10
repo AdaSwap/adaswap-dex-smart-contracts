@@ -6,6 +6,10 @@
     "contracts",
     "artifacts"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AdaSwap/adaswap-dex-smart-contracts/tree/v1.0.0/periphery"
+  },
   "scripts": {
     "test": "yarn hardhat test --network hardhat",
     "compile": "yarn hardhat compile",
