@@ -2,15 +2,15 @@
 # yarn lockfile v1
 
 
-"@adaswap/core@^0.0.7":
-  version "0.0.7"
-  resolved "https://registry.yarnpkg.com/@adaswap/core/-/core-0.0.7.tgz#b5b46fbef3fae7b942b3ce80090e74fadc4faa25"
-  integrity sha512-P0Ip0Y32bjFQhK6emCxM8RnE5IU/MuhUmT97D0P22VpxGxOTybu1iYX1pg1xo7ac3+VPM68nicp9ScdtYLnx3w==
+"@adaswap/core@^1.0.3":
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/@adaswap/core/-/core-1.0.3.tgz#fea0e1ee3f35165e012d56a9493c453a7971b941"
+  integrity sha512-ikz7L9Dv2/hDD4CYiXxpOJXKsWvOXNV8KbpFDpEUb+X9T20Bb3b/R5QTX3jdmHxlwNcbjytPthAA7rTUHDNo3g==
 
-"@adaswap/lib@^0.0.8":
-  version "0.0.8"
-  resolved "https://registry.yarnpkg.com/@adaswap/lib/-/lib-0.0.8.tgz#05309d5115cfa2883b197ed64e4cd36b5b2567f5"
-  integrity sha512-VcNJZRddlTf9K4tHy3DD9TArrSHvMzm419aJvMgtOLBg1iE6eEqosPdYz/qqTIL6CXg+hGDkA/pJYU3kvIb8Ow==
+"@adaswap/lib@^1.0.3":
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/@adaswap/lib/-/lib-1.0.3.tgz#05d7401743349c5d71734f67c67ba5987d70e945"
+  integrity sha512-RLD6jlpKr4CNCI5Xd65ifczx+mkB28SADEIjGEv3wuFiuglTnXow6805yESKYbMesPyI8nkaux2cogwt4glxPw==
 
 "@colors/colors@1.5.0":
   version "1.5.0"
