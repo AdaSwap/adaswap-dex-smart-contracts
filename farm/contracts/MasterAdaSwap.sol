@@ -137,11 +137,14 @@ contract MasterAdaSwap is Ownable, IMasterAdaSwap {
         uint8 _lid,
         uint256 _allocPoint
     ) external onlyOwner {
+        LockInfo storage lock = lockInfo[_pid][_lid];
+        PoolInfo memory pool = updatePool(_pid);
         totalAllocPoint =
             totalAllocPoint -
-            lockInfo[_pid][_lid].allocPoint +
+            lock.allocPoint +
             _allocPoint;
-        lockInfo[_pid][_lid].allocPoint = _allocPoint.to64();
+        poolInfo[_pid].weight = pool.weight - lock.allocPoint*lock.supply + _allocPoint * lock.supply;
+        lock.allocPoint = _allocPoint.to64();
         emit LogSetPool(_pid, _lid, _allocPoint.to64());
     }
 
@@ -196,27 +199,17 @@ contract MasterAdaSwap is Ownable, IMasterAdaSwap {
     function massUpdatePools(uint256[] calldata pids) external {
         uint256 len = pids.length;
         for (uint256 k = 0; k < len; ++k) {
-            uint8 pos = 0;
-            while (pos < lockTimes.length) {
-                if (existingPoolBitMasks[pids[k]] & uint8(1 << pos) == 1) {
-                    for (uint256 i = 0; i < len; ++i) {
-                        updatePool(pids[k], pos);
-                    }
-                }
-                pos++;
-            }
+            updatePool(pids[k]);
         }
     }
 
     /// @notice Updates reward variables of the given pool.
     /// @param _pid indexed of the LP ERC-20 token.
-    /// @param _lid The lock time when the user will be able to withdraw or harvest his ASW.
-    function updatePool(uint256 _pid, uint8 _lid)
+    function updatePool(uint256 _pid)
         public
-        returns (PoolInfo memory pool, LockInfo memory lock)
+        returns (PoolInfo memory pool)
     {
         pool = poolInfo[_pid];
-        lock = lockInfo[_pid][_lid];
         if (block.timestamp > pool.lastRewardTime) {
             if (pool.weight > 0) {
                 uint256 timestamp = block.timestamp - pool.lastRewardTime;
@@ -232,7 +225,6 @@ contract MasterAdaSwap is Ownable, IMasterAdaSwap {
             poolInfo[_pid] = pool;
             emit LogUpdatePool(
                 _pid,
-                _lid,
                 pool.lastRewardTime,
                 pool.accAdaSwapPerShare,
                 pool.weight
@@ -252,7 +244,7 @@ contract MasterAdaSwap is Ownable, IMasterAdaSwap {
         address _to
     ) external {
         require(isExistPool(_pid, _lid), "MasterAdaSwap: POOL_DOES_NOT_EXIST");
-        updatePool(_pid, _lid);
+        updatePool(_pid);
         PoolInfo storage pool = poolInfo[_pid];
         LockInfo storage lock = lockInfo[_pid][_lid];
         UserInfo storage user = userInfo[_pid][_lid][_to];
@@ -287,7 +279,7 @@ contract MasterAdaSwap is Ownable, IMasterAdaSwap {
             user.lastDepositTime + lockTimes[_lid] <= block.timestamp,
             "MasterAdaSwap: FIXED_LOCK_TIME_IS_NOT_OVER"
         );
-        updatePool(_pid, _lid);
+        updatePool(_pid);
         PoolInfo storage pool = poolInfo[_pid];
         LockInfo storage lock = lockInfo[_pid][_lid];
         user.amount = user.amount - _amount;
@@ -318,7 +310,8 @@ contract MasterAdaSwap is Ownable, IMasterAdaSwap {
             user.lastDepositTime + lockTimes[_lid] <= block.timestamp,
             "MasterAdaSwap: FIXED_LOCK_TIME_IS_NOT_OVER"
         );
-        (PoolInfo memory pool, LockInfo memory lock) = updatePool(_pid, _lid);
+        PoolInfo memory pool = updatePool(_pid);
+        LockInfo memory lock = lockInfo[_pid][_lid];
         int256 accumulatedAdaSwap = int256(
             (user.amount * pool.accAdaSwapPerShare) / ACC_ADASWAP_PRECISION
         );
@@ -359,7 +352,7 @@ contract MasterAdaSwap is Ownable, IMasterAdaSwap {
             user.lastDepositTime + lockTimes[_lid] <= block.timestamp,
             "MasterAdaSwap: FIXED_LOCK_TIME_IS_NOT_OVER"
         );
-        updatePool(_pid, _lid);
+        updatePool(_pid);
         PoolInfo storage pool = poolInfo[_pid];
         LockInfo storage lock = lockInfo[_pid][_lid];
         int256 accumulatedAdaSwap = int256(
@@ -402,7 +395,7 @@ contract MasterAdaSwap is Ownable, IMasterAdaSwap {
         uint8 _lid,
         address _to
     ) external {
-        updatePool(_pid, _lid);
+        updatePool(_pid);
         PoolInfo storage pool = poolInfo[_pid];
         LockInfo storage lock = lockInfo[_pid][_lid];
         UserInfo storage user = userInfo[_pid][_lid][msg.sender];

@@ -76,7 +76,6 @@ interface IMasterAdaSwap {
     event LogSetRewarder(uint256 indexed pid, IRewarder indexed rewarder);
     event LogUpdatePool(
         uint256 indexed pid,
-        uint256 indexed lid,
         uint64 lastRewardTime,
         uint256 adaswapPerShare,
         uint256 poolweight
@@ -125,9 +124,7 @@ interface IMasterAdaSwap {
 
     function massUpdatePools(uint256[] calldata pids) external;
 
-    function updatePool(uint256 _pid, uint8 _lid)
-        external
-        returns (PoolInfo memory pool, LockInfo memory lock);
+    function updatePool(uint256 _pid) external returns (PoolInfo memory pool);
 
     function deposit(
         uint256 _pid,

@@ -65,7 +65,7 @@ describe("MasterAdaSwap", function () {
         const log1 = await chef.connect(BOB).deposit(0, 0, getBigNumber(1), BOB.address);
         let timestamp1 = (await ethers.provider.getBlock(log1.blockNumber)).timestamp;
         await advanceIncreaseTime(10);
-        const log2 = await chef.connect(BOB).updatePool(0, 0);
+        const log2 = await chef.connect(BOB).updatePool(0);
         let timestamp2 = (await ethers.provider.getBlock(log2.blockNumber)).timestamp;
 
         pendingAdaSwap = await chef.pendingAdaSwap(0, 0, BOB.address);
@@ -281,13 +281,13 @@ describe("MasterAdaSwap", function () {
     describe('Update Pool', () => {
         it("16. testMasterAdaSwap: Total LP supply is zero", async () => {
             await advanceIncreaseTime(3600 * 24 * 365);
-            const tx = await chef.updatePool(0, 3);
+            const tx = await chef.updatePool(0);
             await tx.wait();
 
             const timestamp = (await ethers.provider.getBlock(tx.blockNumber)).timestamp;
 
             await expect(tx).to.emit(chef, 'LogUpdatePool')
-                .withArgs(0, 3, timestamp, 0, 0);
+                .withArgs(0, timestamp, 0, 0);
         })
 
         it("17. testMasterAdaSwap: Total LP supply is nonzero", async () => {
@@ -297,7 +297,7 @@ describe("MasterAdaSwap", function () {
             await advanceIncreaseTime(3600 * 24 * 7);
             const pool = await chef.poolInfo(0);
 
-            const tx = await chef.updatePool(0, 3);
+            const tx = await chef.updatePool(0);
             await tx.wait();
 
             const timestamp = (await ethers.provider.getBlock(tx.blockNumber)).timestamp;
@@ -307,7 +307,7 @@ describe("MasterAdaSwap", function () {
             const accAdaSwapPerShare = (pool.accAdaSwapPerShare).add((adaReward.mul(1e12)).div(pool.weight));
 
             await expect(tx).to.emit(chef, 'LogUpdatePool')
-                .withArgs(0, 3, timestamp, accAdaSwapPerShare, pool.weight);
+                .withArgs(0, timestamp, accAdaSwapPerShare, pool.weight);
         })
     })
 
