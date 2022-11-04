@@ -10,7 +10,20 @@ const main = async () => {
 
   const { ASW_TOKEN_ADDRESS, TREASURY_ADDRESS } = constants[network.name];
 
+  // const ASW = await deploy("AdaSwapToken");
+  // await ASW.deployed();
+  // ASW_TOKEN_ADDRESS = ASW.address;
+
+  // const Treasury = await deploy("Treasury");
+  // await Treasury.deployed();
+  // TREASURY_ADDRESS = Treasury.address;
+
+  // await ASW.mint(TREASURY_ADDRESS, "10000000000000000000000000000");
+
   const MasterAdaSwap = await deploy("MasterAdaSwap", [ASW_TOKEN_ADDRESS, TREASURY_ADDRESS]);
+  await MasterAdaSwap.deployed();
+
+  // await Treasury.setAllowance(ASW_TOKEN_ADDRESS, "10000000000000000000000000000", MasterAdaSwap.address);
 
   console.log(
     " 💾  Artifacts (address, abi, and args) saved to: ",

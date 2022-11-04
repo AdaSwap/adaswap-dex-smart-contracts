@@ -13,31 +13,48 @@ contract MasterAdaSwap is Ownable, IMasterAdaSwap {
     using Int256 for int256;
     using UInt128 for uint128;
 
-    /// @notice The fixedTimes could be able to use in each pools. first element 0 second also meaning the flexible farming.
-    uint32[] public fixedTimes = [
-        7 days,
-        14 days,
-        30 days,
-        60 days,
-        90 days,
-        365 days
+    /// @notice The lockTimes could be able to use in each pools. first element 0 second also meaning the flexible farming.
+    uint32[] public lockTimes = [
+        0 seconds,
+        7 minutes,
+        14 minutes,
+        30 minutes,
+        60 minutes,
+        90 minutes,
+        365 minutes
     ];
+
+    function nextUnlockedTime(
+        uint256 _pid,
+        uint8 _lid,
+        address _user
+    ) external view returns (uint64 t) {
+        return userInfo[_pid][_lid][_user].lastDepositTime + lockTimes[_lid];
+    }
 
     /// @notice Address of AdaSwapTreasury contract.
     address public immutable AdaSwapTreasury;
     /// @notice Address of ASW contract.
     IERC20 public immutable ASW;
 
+    /// @notice Info of each MCV2 pool.
+    PoolInfo[] public poolInfo;
+    /// @notice Address of the LP token for each MCV2 pool.
+    IERC20[] public lpToken;
+    /// @notice Address of each `IRewarder` contract in MCV2.
+    IRewarder[] public rewarder;
+
+    // lp token -> lockTimeId -> LockInfo
+    mapping(uint256 => mapping(uint8 => LockInfo)) public lockInfo;
+
     /// @notice Info about each user that stakes LP tokens.
-    // user -> lpToken -> fixedOptionId -> UserInfo
-    mapping(address => mapping(address => mapping(uint8 => UserInfo)))
+    // pid  -> lockTimeId -> user address -> UserInfo
+    mapping(uint256 => mapping(uint8 => mapping(address => UserInfo)))
         public userInfo;
-    // lp token -> staking option (locktime) -> poolInfo struct
-    mapping(address => mapping(uint8 => PoolInfo))
-        public poolInfo;
+
     /// @notice Info of each user that stakes LP tokens.
-    mapping(address => uint8[]) public existingPoolOptions;
-    
+    uint8[] public existingPoolBitMasks;
+
     /// @dev Total amount of allocation points. Must be the sum of all allocation points from all pools.
     uint256 public totalAllocPoint = 0;
 
@@ -51,78 +68,89 @@ contract MasterAdaSwap is Ownable, IMasterAdaSwap {
         AdaSwapTreasury = _adaswapTreasury;
     }
 
-    function isAllocatedPool(
-        address _lpToken,
-        uint8 _lockTimeId
-    ) public view returns (bool) {
-        return poolInfo[_lpToken][_lockTimeId].allocPoint != 0; 
+    function poolsLength() public view returns (uint256) {
+        return poolInfo.length;
     }
 
-    function isExistPool(
-        address _lpToken,
-        uint8 _lockTimeId
-    ) public view returns (bool) {
-        return poolInfo[_lpToken][_lockTimeId].lastRewardTime != 0; 
+    function lockTimesLength() public view returns (uint256) {
+        return lockTimes.length;
+    }
+
+    function isExistPool(uint256 _pid, uint8 _lid) public view returns (bool) {
+        return lockInfo[_pid][_lid].allocPoint != 0;
     }
 
     /// @notice Creates a new staking pool with fixed LP token. Can only be called by the owner.
     /// DO NOT add the same LP token more than once. Rewards will be messed up if you do.
-    /// @param _allocPoint AP for new pool which are generated for each fixed time.
+    /// @param _allocPoints AP for new pool which are generated for each fixed time.
     /// @param _lpToken Address of the LP ERC-20 token.
-    /// @param _lockTimeId The lock time when the user will be able to withdraw or harvest his ASW.
     /// @param _rewarder Address of the rewarder delegate.
     function add(
-        uint64 _allocPoint,
+        uint64[] memory _allocPoints,
         address _lpToken,
-        uint8 _lockTimeId,
         address _rewarder
     ) external onlyOwner {
-        totalAllocPoint += _allocPoint;
-        poolInfo[_lpToken][_lockTimeId] = 
+        uint64 poolAllocPoint = 0;
+        uint256 size = lockTimes.length < _allocPoints.length
+            ? lockTimes.length
+            : _allocPoints.length;
+        uint8 poolBitMask = 0;
+        for (uint8 i = 0; i < size; i++) {
+            if (_allocPoints[i] != 0) {
+                poolAllocPoint += _allocPoints[i];
+                poolBitMask |= uint8(1) << i;
+            }
+        }
+        totalAllocPoint = totalAllocPoint + poolAllocPoint;
+        lpToken.push(IERC20(_lpToken));
+        rewarder.push(IRewarder(_rewarder));
+        existingPoolBitMasks.push(poolBitMask);
+
+        poolInfo.push(
             PoolInfo({
-                lpSupply: 0,
-                accAdaSwapPerShare: 0,
-                rewarder: IRewarder(_rewarder),
+                allocPoint: poolAllocPoint,
                 lastRewardTime: block.timestamp.to64(),
-                allocPoint: _allocPoint
-            });
-        existingPoolOptions[_lpToken].push(_lockTimeId);
+                accAdaSwapPerShare: 0,
+                weight: 0
+            })
+        );
+
+        for (uint8 i = 0; i < size; i++) {
+            LockInfo storage lock = lockInfo[lpToken.length - 1][i];
+            lock.allocPoint = _allocPoints[i];
+        }
+
         emit LogPoolAddition(
-            _lockTimeId,
-            _allocPoint,
-            _lpToken,
+            lpToken.length - 1,
+            _allocPoints,
+            IERC20(_lpToken),
             IRewarder(_rewarder)
         );
     }
 
-    /// @notice Updates the given pool's ASW allocation point and `IRewarder` contract. Can only be called by the owner.
-    /// @param _lpToken Address of the LP ERC-20 token.
-    /// @param _lockTimeId The lock time when the user will be able to withdraw or harvest ASW.
+    /// @notice Updates the given pool's ASW allocation point.
+    /// @param _pid indexed of the LP ERC-20 token.
+    /// @param _lid The lock time when the user will be able to withdraw or harvest ASW.
     /// @param _allocPoint New AP of the pool.
-    /// @param _rewarder Address of the rewarder delegate.
-    /// @param overwrite True if _rewarder should be `set`. Otherwise `_rewarder` is ignored.
     function set(
-        address _lpToken,
-        uint8 _lockTimeId,
-        uint256 _allocPoint, 
-        IRewarder _rewarder, 
-        bool overwrite
+        uint256 _pid,
+        uint8 _lid,
+        uint256 _allocPoint
     ) external onlyOwner {
-        totalAllocPoint = 
-            totalAllocPoint 
-            - poolInfo[_lpToken][_lockTimeId].allocPoint 
-            + _allocPoint;
-        poolInfo[_lpToken][_lockTimeId].allocPoint = _allocPoint.to64();
-        if (overwrite) { 
-            poolInfo[_lpToken][_lockTimeId].rewarder = _rewarder; 
-        }
-        emit LogSetPool(
-            _lpToken,
-            _lockTimeId,
-            _allocPoint.to64(),
-            overwrite ? _rewarder : poolInfo[_lpToken][_lockTimeId].rewarder,
-            overwrite
-        );
+        totalAllocPoint =
+            totalAllocPoint -
+            lockInfo[_pid][_lid].allocPoint +
+            _allocPoint;
+        lockInfo[_pid][_lid].allocPoint = _allocPoint.to64();
+        emit LogSetPool(_pid, _lid, _allocPoint.to64());
+    }
+
+    /// @notice Updates the given pool's `IRewarder` contract. Can only be called by the owner.
+    /// @param _pid indexed of the LP ERC-20 token.
+    /// @param _rewarder Address of the rewarder delegate.
+    function setRewarder(uint256 _pid, address _rewarder) external onlyOwner {
+        rewarder[_pid] = IRewarder(_rewarder);
+        emit LogSetRewarder(_pid, IRewarder(_rewarder));
     }
 
     /// @notice Sets the adaswap per second value to be distributed. Can only be called by the owner.
@@ -133,322 +161,261 @@ contract MasterAdaSwap is Ownable, IMasterAdaSwap {
     }
 
     /// @notice Views function to see pending ASW on frontend.
-    /// @param _lpToken Address of the LP ERC-20 token.
+    /// @param _pid indexed of the LP ERC-20 token.
     /// @param _user Address of the user.
-    /// @param _lockTimeId The lock time when the user will be able to withdraw or harvest ASW.
+    /// @param _lid The lock time when the user will be able to withdraw or harvest ASW.
     function pendingAdaSwap(
-        address _lpToken,
-        address _user,
-        uint8 _lockTimeId
+        uint256 _pid,
+        uint8 _lid,
+        address _user
     ) external view returns (uint256 pending) {
-        PoolInfo memory pool = poolInfo[_lpToken][_lockTimeId];
-        UserInfo storage user = userInfo[_user][_lpToken][_lockTimeId];
+        PoolInfo memory pool = poolInfo[_pid];
+        LockInfo memory lock = lockInfo[_pid][_lid];
+        UserInfo storage user = userInfo[_pid][_lid][_user];
         uint256 accAdaSwapPerShare = pool.accAdaSwapPerShare;
-        uint256 lpSupply = pool.lpSupply;
-        if (
-            block.timestamp > pool.lastRewardTime && lpSupply > 0
-        ) {
-            uint256 time = block.timestamp - pool.lastRewardTime;
-            uint256 adaswapReward = 
-                (
-                    time 
-                    * adaswapPerSecond 
-                    * pool.allocPoint
-                ) 
-                / totalAllocPoint;
-            accAdaSwapPerShare = 
-                accAdaSwapPerShare 
-                + (
-                    adaswapReward 
-                    * ACC_ADASWAP_PRECISION 
-                    / lpSupply
-                );
+        if (block.timestamp > pool.lastRewardTime && pool.weight > 0) {
+            uint256 timestamp = block.timestamp - pool.lastRewardTime;
+            uint256 adaswapReward = (timestamp *
+                adaswapPerSecond *
+                pool.allocPoint) / totalAllocPoint;
+            accAdaSwapPerShare =
+                pool.accAdaSwapPerShare +
+                (adaswapReward * ACC_ADASWAP_PRECISION) /
+                pool.weight;
         }
-        pending = (
-            int256(
-                user.amount
-                * accAdaSwapPerShare 
-                / ACC_ADASWAP_PRECISION
-            ) 
-            - user.rewardDebt)
-            .toUInt256();
+        int256 accumulatedAdaSwap = int256(
+            (user.amount * accAdaSwapPerShare) / ACC_ADASWAP_PRECISION
+        );
+        pending =
+            (accumulatedAdaSwap - user.rewardDebt).toUInt256() *
+            lock.allocPoint;
     }
 
-    /// @notice Updates reward variables for all pools. Max length of _lpToken array
-    /// should not exceed 1290. Be careful of gas spending!
-    /// @param _lpToken Array of addresses of the LP ERC-20 token.
-    function massUpdatePools(address[] memory _lpToken) external {
-        uint256 arrLen = _lpToken.length;
-        for (uint256 k = 0; k < arrLen; ++k) {
-            uint256 len = existingPoolOptions[_lpToken[k]].length;
-            for (
-                uint256 i = 0; 
-                i < len; 
-                ++i
-            ) {
-                updatePool(
-                    _lpToken[k],  
-                    existingPoolOptions[_lpToken[k]][i]
-                );
+    /// @notice Updates reward variables for all pools. Be careful of gas spending!
+    /// @param pids Pool IDs of all to be updated. Make sure to update all active pools.
+    function massUpdatePools(uint256[] calldata pids) external {
+        uint256 len = pids.length;
+        for (uint256 k = 0; k < len; ++k) {
+            uint8 pos = 0;
+            while (pos < lockTimes.length) {
+                if (existingPoolBitMasks[pids[k]] & uint8(1 << pos) == 1) {
+                    for (uint256 i = 0; i < len; ++i) {
+                        updatePool(pids[k], pos);
+                    }
+                }
+                pos++;
             }
         }
     }
 
     /// @notice Updates reward variables of the given pool.
-    /// @param _lpToken Address of the LP ERC-20 token.
-    /// @param _lockTimeId The lock time when the user will be able to withdraw or harvest his ASW.
-    function updatePool(
-        address _lpToken,
-        uint8 _lockTimeId
-    ) public returns (PoolInfo memory pool) {
-        pool = poolInfo[_lpToken][_lockTimeId];
+    /// @param _pid indexed of the LP ERC-20 token.
+    /// @param _lid The lock time when the user will be able to withdraw or harvest his ASW.
+    function updatePool(uint256 _pid, uint8 _lid)
+        public
+        returns (PoolInfo memory pool, LockInfo memory lock)
+    {
+        pool = poolInfo[_pid];
+        lock = lockInfo[_pid][_lid];
         if (block.timestamp > pool.lastRewardTime) {
-            uint256 lpSupply = pool.lpSupply;
-            if (lpSupply > 0) {
-                uint256 timestamp = block.timestamp 
-                    - pool.lastRewardTime;
-                uint256 adaReward = 
-                    timestamp 
-                    * adaswapPerSecond 
-                    * pool.allocPoint 
-                    / totalAllocPoint;
-                pool.accAdaSwapPerShare = 
-                    pool.accAdaSwapPerShare 
-                    + (
-                        adaReward 
-                        * ACC_ADASWAP_PRECISION 
-                        / lpSupply
-                    )
-                    .to128();
+            if (pool.weight > 0) {
+                uint256 timestamp = block.timestamp - pool.lastRewardTime;
+                uint256 adaswapReward = (timestamp *
+                    adaswapPerSecond *
+                    pool.allocPoint) / totalAllocPoint;
+                pool.accAdaSwapPerShare =
+                    pool.accAdaSwapPerShare +
+                    (adaswapReward * ACC_ADASWAP_PRECISION) /
+                    pool.weight;
             }
             pool.lastRewardTime = block.timestamp.to64();
-            poolInfo[_lpToken][_lockTimeId] = pool;
+            poolInfo[_pid] = pool;
             emit LogUpdatePool(
-                _lpToken, 
-                _lockTimeId, 
-                pool.lastRewardTime, 
-                lpSupply, 
-                pool.accAdaSwapPerShare
+                _pid,
+                _lid,
+                pool.lastRewardTime,
+                pool.accAdaSwapPerShare,
+                pool.weight
             );
         }
     }
 
     /// @notice Deposits LP tokens to MO for ASW allocation.
-    /// @param _lpToken Address of the LP ERC-20 token.
+    /// @param _pid indexed of the LP ERC-20 token.
+    /// @param _lid The lock time when the user will be able to withdraw or harvest his ASW.
     /// @param _amount LP token amount to deposit.
     /// @param _to The receiver of `amount` deposit benefit.
-    /// @param _lockTimeId The lock time when the user will be able to withdraw or harvest his ASW.
     function deposit(
-        address _lpToken,
-        address _to,
+        uint256 _pid,
+        uint8 _lid,
         uint256 _amount,
-        uint8 _lockTimeId
+        address _to
     ) external {
-        require(
-            isExistPool(_lpToken, _lockTimeId), 
-            'MasterAdaSwap: POOL_DOES_NOT_EXIST'
-        );
-        PoolInfo storage pool = poolInfo[_lpToken][_lockTimeId];
-        UserInfo storage user = userInfo[_to][_lpToken][_lockTimeId];
-        updatePool(_lpToken, _lockTimeId);
+        require(isExistPool(_pid, _lid), "MasterAdaSwap: POOL_DOES_NOT_EXIST");
+        updatePool(_pid, _lid);
+        PoolInfo storage pool = poolInfo[_pid];
+        LockInfo storage lock = lockInfo[_pid][_lid];
+        UserInfo storage user = userInfo[_pid][_lid][_to];
         user.amount = user.amount + _amount;
-        user.rewardDebt = 
-            user.rewardDebt 
-            + int256(
-                _amount 
-                * pool.accAdaSwapPerShare 
-                / ACC_ADASWAP_PRECISION
-            );
+        user.rewardDebt =
+            user.rewardDebt +
+            int256((_amount * pool.accAdaSwapPerShare) / ACC_ADASWAP_PRECISION);
         user.lastDepositTime = block.timestamp.to64();
-        pool.lpSupply = pool.lpSupply + _amount;
-        IRewarder _rewarder = pool.rewarder;
+        lock.supply += _amount;
+        pool.weight += _amount * lock.allocPoint;
+        IRewarder _rewarder = rewarder[_pid];
         if (address(_rewarder) != address(0)) {
-            _rewarder.onAdaSwapReward(
-                _to, 
-                0 
-            );
+            _rewarder.onAdaSwapReward(_pid, _lid, _to, _to, 0, _amount);
         }
-        IERC20(_lpToken).safeTransferFrom(
-            msg.sender, 
-            address(this), 
-            _amount
-        );
-        emit Deposit(msg.sender, _lpToken, _amount, _lockTimeId, _to);
+        lpToken[_pid].safeTransferFrom(msg.sender, address(this), _amount);
+        emit Deposit(msg.sender, _pid, _lid, _amount, _to);
     }
 
     /// @notice Withdraws LP tokens from MO.
-    /// @param _lpToken Address of the LP ERC-20 token.
-    /// @param _to Receiver of the LP tokens.
+    /// @param _pid indexed of the LP ERC-20 token.
+    /// @param _lid The lock time when the user will be able to withdraw or harvest his ASW.
     /// @param _amount LP token amount to withdraw.
-    /// @param _lockTimeId The lock time when the user will be able to withdraw or harvest his ASW.
+    /// @param _to Receiver of the LP tokens.
     function withdraw(
-        address _lpToken,
-        address _to,
+        uint256 _pid,
+        uint8 _lid,
         uint256 _amount,
-        uint8 _lockTimeId
+        address _to
     ) external {
-        PoolInfo storage pool = poolInfo[_lpToken][_lockTimeId];
-        UserInfo storage user = userInfo[msg.sender][_lpToken][_lockTimeId];
-        updatePool(_lpToken, _lockTimeId);
+        UserInfo storage user = userInfo[_pid][_lid][msg.sender];
         require(
-            user.lastDepositTime + fixedTimes[_lockTimeId] 
-            <= 
-            block.timestamp,
-            'MasterAdaSwap: FIXED_LOCK_TIME_IS_NOT_OVER'
+            user.lastDepositTime + lockTimes[_lid] <= block.timestamp,
+            "MasterAdaSwap: FIXED_LOCK_TIME_IS_NOT_OVER"
         );
+        updatePool(_pid, _lid);
+        PoolInfo storage pool = poolInfo[_pid];
+        LockInfo storage lock = lockInfo[_pid][_lid];
         user.amount = user.amount - _amount;
-        user.rewardDebt = 
-            user.rewardDebt 
-            - int256(
-                _amount 
-                * pool.accAdaSwapPerShare 
-                / ACC_ADASWAP_PRECISION
-            );
-        pool.lpSupply -= _amount;
-        IRewarder _rewarder = pool.rewarder;
+        user.rewardDebt =
+            user.rewardDebt -
+            int256((_amount * pool.accAdaSwapPerShare) / ACC_ADASWAP_PRECISION);
+        lock.supply -= _amount;
+        pool.weight -= _amount * lock.allocPoint;
+        IRewarder _rewarder = rewarder[_pid];
         if (address(_rewarder) != address(0)) {
-            _rewarder.onAdaSwapReward(
-                _to, 
-                0 
-            );
+            _rewarder.onAdaSwapReward(_pid, _lid, msg.sender, _to, 0, _amount);
         }
-        IERC20(_lpToken).safeTransfer(_to, _amount);
-        emit Withdraw(
-            msg.sender, 
-            _lpToken, 
-            _amount, 
-            _lockTimeId, 
-            _to
-        );
+        lpToken[_pid].safeTransfer(_to, _amount);
+        emit Withdraw(msg.sender, _pid, _lid, _amount, _to);
     }
 
-    /// @notice Harvests proceeds for transaction sender to `to`.
-    /// @param _lpToken Address of the LP ERC-20 token.
-    /// @param to Receiver of ASW rewards.
-    /// @param _lockTimeId The lock time when the user will be able to withdraw or harvest his ASW.
+    /// @notice Harvests proceeds for transaction sender to `_to`.
+    /// @param _pid indexed of the LP ERC-20 token.
+    /// @param _lid The lock time when the user will be able to withdraw or harvest his ASW.
+    /// @param _to Receiver of ASW rewards.
     function harvest(
-        address _lpToken, 
-        address to,
-        uint8 _lockTimeId
+        uint256 _pid,
+        uint8 _lid,
+        address _to
     ) external {
-        PoolInfo memory pool = updatePool(_lpToken, _lockTimeId);
-        UserInfo storage user = userInfo[msg.sender][_lpToken][_lockTimeId];
+        UserInfo storage user = userInfo[_pid][_lid][msg.sender];
         require(
-            user.lastDepositTime + fixedTimes[_lockTimeId] 
-            <= 
-            block.timestamp,
-            'MasterAdaSwap: FIXED_LOCK_TIME_IS_NOT_OVER'
+            user.lastDepositTime + lockTimes[_lid] <= block.timestamp,
+            "MasterAdaSwap: FIXED_LOCK_TIME_IS_NOT_OVER"
         );
+        (PoolInfo memory pool, LockInfo memory lock) = updatePool(_pid, _lid);
         int256 accumulatedAdaSwap = int256(
-            user.amount 
-            * pool.accAdaSwapPerShare 
-            / ACC_ADASWAP_PRECISION
+            (user.amount * pool.accAdaSwapPerShare) / ACC_ADASWAP_PRECISION
         );
-        uint256 _pendingAdaSwap = (accumulatedAdaSwap - user.rewardDebt)
-            .toUInt256();
+        uint256 _pendingAdaSwap =
+            (accumulatedAdaSwap - user.rewardDebt).toUInt256() *
+            lock.allocPoint;
         user.rewardDebt = accumulatedAdaSwap;
         if (_pendingAdaSwap != 0) {
-            ASW.safeTransferFrom(
-                AdaSwapTreasury, 
-                to, 
-                _pendingAdaSwap
-            );
+            ASW.safeTransferFrom(AdaSwapTreasury, _to, _pendingAdaSwap);
         }
-        IRewarder _rewarder = pool.rewarder;
+        IRewarder _rewarder = rewarder[_pid];
         if (address(_rewarder) != address(0)) {
             _rewarder.onAdaSwapReward(
-                to,
-                _pendingAdaSwap
+                _pid,
+                _lid,
+                msg.sender,
+                _to,
+                _pendingAdaSwap,
+                user.amount
             );
         }
-        emit Harvest(
-            msg.sender, 
-            _lpToken, 
-            _pendingAdaSwap, 
-            _lockTimeId
-        );
+        emit Harvest(msg.sender, _pid, _lid, _pendingAdaSwap);
     }
 
     /// @notice Withdraws LP tokens from MO and harvest proceeds for transaction sender to `to`.
-    /// @param _lpToken Address of the LP ERC-20 token.
+    /// @param _pid indexed of the LP ERC-20 token.
+    /// @param _lid The lock time when the user will be able to withdraw or harvest his ASW.
     /// @param _amount LP token amount to withdraw.
     /// @param _to Receiver of the LP tokens and ASW rewards.
-    /// @param _lockTimeId The lock time when the user will be able to withdraw or harvest his ASW.
     function withdrawAndHarvest(
-        address _lpToken, 
+        uint256 _pid,
+        uint8 _lid,
         uint256 _amount,
-        address _to,
-        uint8 _lockTimeId
+        address _to
     ) external {
-        PoolInfo storage pool = poolInfo[_lpToken][_lockTimeId];
-        UserInfo storage user = userInfo[msg.sender][_lpToken][_lockTimeId];
-        updatePool(_lpToken, _lockTimeId);
+        UserInfo storage user = userInfo[_pid][_lid][msg.sender];
         require(
-            user.lastDepositTime + fixedTimes[_lockTimeId] 
-            <= 
-            block.timestamp,
-            'MasterAdaSwap: FIXED_LOCK_TIME_IS_NOT_OVER'
+            user.lastDepositTime + lockTimes[_lid] <= block.timestamp,
+            "MasterAdaSwap: FIXED_LOCK_TIME_IS_NOT_OVER"
         );
+        updatePool(_pid, _lid);
+        PoolInfo storage pool = poolInfo[_pid];
+        LockInfo storage lock = lockInfo[_pid][_lid];
         int256 accumulatedAdaSwap = int256(
-            user.amount 
-            * pool.accAdaSwapPerShare 
-            / ACC_ADASWAP_PRECISION
+            (user.amount * pool.accAdaSwapPerShare) / ACC_ADASWAP_PRECISION
         );
-        uint256 _pendingAdaSwap = uint256(
-            accumulatedAdaSwap - user.rewardDebt
-        );
+        uint256 _pendingAdaSwap = (accumulatedAdaSwap - user.rewardDebt)
+            .toUInt256() * lock.allocPoint;
         user.rewardDebt =
-            accumulatedAdaSwap 
-            - int256(_amount * pool.accAdaSwapPerShare);
+            accumulatedAdaSwap -
+            int256(_amount * pool.accAdaSwapPerShare / ACC_ADASWAP_PRECISION);
         user.amount -= _amount;
-        pool.lpSupply -= _amount;
-        ASW.safeTransferFrom(
-            AdaSwapTreasury, 
-            _to, 
-            _pendingAdaSwap
-        );
-        IRewarder _rewarder = pool.rewarder;
+        lock.supply -= _amount;
+        pool.weight -= _amount * lock.allocPoint;
+
+        if (_pendingAdaSwap != 0) {
+            ASW.safeTransferFrom(AdaSwapTreasury, _to, _pendingAdaSwap);
+        }
+        IRewarder _rewarder = rewarder[_pid];
         if (address(_rewarder) != address(0)) {
             _rewarder.onAdaSwapReward(
+                _pid,
+                _lid,
+                msg.sender,
                 _to,
-                _pendingAdaSwap
+                _pendingAdaSwap,
+                user.amount
             );
         }
-        IERC20(_lpToken).safeTransfer(_to, _amount);
-        emit Withdraw(msg.sender, _lpToken, _amount,_lockTimeId , _to);
-        emit Harvest(msg.sender, _lpToken, _pendingAdaSwap, _lockTimeId);
+        lpToken[_pid].safeTransfer(_to, _amount);
+        emit Withdraw(msg.sender, _pid, _lid, _amount, _to);
+        emit Harvest(msg.sender, _pid, _lid, _pendingAdaSwap);
     }
 
     /// @notice Withdraws without caring about rewards. EMERGENCY ONLY.
-    /// @param _lpToken Address of the LP ERC-20 token.
+    /// @param _pid indexed of the LP ERC-20 token.
     /// @param _to Receiver of the LP tokens.
-    /// @param _lockTimeId The lock time when the user will be able to withdraw or harvest his ASW.
+    /// @param _lid The lock time when the user will be able to withdraw or harvest his ASW.
     function emergencyWithdraw(
-        address _lpToken, 
-        address _to,        
-        uint8 _lockTimeId
+        uint256 _pid,
+        uint8 _lid,
+        address _to
     ) external {
-        PoolInfo storage pool = poolInfo[_lpToken][_lockTimeId];
-        UserInfo storage user = userInfo[msg.sender][_lpToken][_lockTimeId];
-        updatePool(_lpToken, _lockTimeId);
+        updatePool(_pid, _lid);
+        PoolInfo storage pool = poolInfo[_pid];
+        LockInfo storage lock = lockInfo[_pid][_lid];
+        UserInfo storage user = userInfo[_pid][_lid][msg.sender];
         uint256 amount = user.amount;
         user.amount = 0;
         user.rewardDebt = 0;
-        pool.lpSupply -= amount;
-        IRewarder _rewarder =  poolInfo[_lpToken][_lockTimeId].rewarder;
+        lock.supply -= amount;
+        pool.weight -= amount * lock.allocPoint;
+        IRewarder _rewarder = rewarder[_pid];
         if (address(_rewarder) != address(0)) {
-            _rewarder.onAdaSwapReward(
-                _to, 
-                0 
-            );
+            _rewarder.onAdaSwapReward(_pid, _lid, msg.sender, _to, 0, 0);
         }
-        IERC20(_lpToken).safeTransfer(_to, amount);
-        emit EmergencyWithdraw(
-            msg.sender, 
-            _lpToken, 
-            amount, 
-            _lockTimeId, 
-            _to
-        );
+        lpToken[_pid].safeTransfer(_to, amount);
+        emit EmergencyWithdraw(msg.sender, _pid, _lid, amount, _to);
     }
 }
