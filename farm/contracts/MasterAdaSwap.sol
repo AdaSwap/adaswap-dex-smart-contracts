@@ -52,9 +52,6 @@ contract MasterAdaSwap is Ownable, IMasterAdaSwap {
     mapping(uint256 => mapping(uint8 => mapping(address => UserInfo)))
         public userInfo;
 
-    /// @notice Info of each user that stakes LP tokens.
-    uint8[] public existingPoolBitMasks;
-
     /// @dev Total amount of allocation points. Must be the sum of all allocation points from all pools.
     uint256 public totalAllocPoint = 0;
 
@@ -68,12 +65,18 @@ contract MasterAdaSwap is Ownable, IMasterAdaSwap {
         AdaSwapTreasury = _adaswapTreasury;
     }
 
-    function poolsLength() public view returns (uint256) {
+    function poolsLength() external view returns (uint256) {
         return poolInfo.length;
     }
 
-    function lockTimesLength() public view returns (uint256) {
+    function lockTimesLength() external view returns (uint256) {
         return lockTimes.length;
+    }
+
+    function lockBitMasked(uint256 _pid) external view returns (uint8 mask) {
+        for (uint8 pos = 0; pos < lockTimes.length; pos++) {
+            mask = lockInfo[_pid][pos].allocPoint == 0 ? mask : (mask | (uint8(1) << pos));
+        }
     }
 
     function isExistPool(uint256 _pid, uint8 _lid) public view returns (bool) {
@@ -94,17 +97,14 @@ contract MasterAdaSwap is Ownable, IMasterAdaSwap {
         uint256 size = lockTimes.length < _allocPoints.length
             ? lockTimes.length
             : _allocPoints.length;
-        uint8 poolBitMask = 0;
         for (uint8 i = 0; i < size; i++) {
             if (_allocPoints[i] != 0) {
                 poolAllocPoint += _allocPoints[i];
-                poolBitMask |= uint8(1) << i;
             }
         }
         totalAllocPoint = totalAllocPoint + poolAllocPoint;
         lpToken.push(IERC20(_lpToken));
         rewarder.push(IRewarder(_rewarder));
-        existingPoolBitMasks.push(poolBitMask);
 
         poolInfo.push(
             PoolInfo({

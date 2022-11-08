@@ -82,6 +82,8 @@ interface IMasterAdaSwap {
     );
     event LogAdaSwapPerSecond(uint256 adaswapPerSecond);
 
+    function poolsLength() external view returns (uint256);
+
     function lockTimes(uint256) external view returns (uint32);
 
     function lockTimesLength() external view returns (uint256);
@@ -93,6 +95,8 @@ interface IMasterAdaSwap {
     function adaswapPerSecond() external view returns (uint256);
 
     function isExistPool(uint256 _pid, uint8 _lid) external view returns (bool);
+
+    function lockBitMasked(uint256 _pid) external view returns (uint8);
 
     function nextUnlockedTime(
         uint256 _pid,
