@@ -16,12 +16,13 @@ contract MasterAdaSwap is Ownable, IMasterAdaSwap {
     /// @notice The lockTimes could be able to use in each pools. first element 0 second also meaning the flexible farming.
     uint32[] public lockTimes = [
         0 seconds,
-        7 minutes,
-        14 minutes,
-        30 minutes,
-        60 minutes,
-        90 minutes,
-        365 minutes
+        7 days,
+        14 days,
+        30 days,
+        60 days,
+        90 days,
+        180 days,
+        365 days
     ];
 
     function nextUnlockedTime(
@@ -75,7 +76,7 @@ contract MasterAdaSwap is Ownable, IMasterAdaSwap {
 
     function lockBitMasked(uint256 _pid) external view returns (uint8 mask) {
         for (uint8 pos = 0; pos < lockTimes.length; pos++) {
-            mask = lockInfo[_pid][pos].allocPoint == 0 ? mask : (mask | (uint8(1) << pos));
+            mask = !isExistPool(_pid, pos) ? mask : (mask | (uint8(1) << pos));
         }
     }
 
@@ -129,7 +130,7 @@ contract MasterAdaSwap is Ownable, IMasterAdaSwap {
     }
 
     /// @notice Updates the given pool's ASW allocation point.
-    /// @param _pid indexed of the LP ERC-20 token.
+    /// @param _pid indexed of pool from poolInfo list.
     /// @param _lid The lock time when the user will be able to withdraw or harvest ASW.
     /// @param _allocPoint New AP of the pool.
     function set(
@@ -149,7 +150,7 @@ contract MasterAdaSwap is Ownable, IMasterAdaSwap {
     }
 
     /// @notice Updates the given pool's `IRewarder` contract. Can only be called by the owner.
-    /// @param _pid indexed of the LP ERC-20 token.
+    /// @param _pid indexed of pool from poolInfo list.
     /// @param _rewarder Address of the rewarder delegate.
     function setRewarder(uint256 _pid, address _rewarder) external onlyOwner {
         rewarder[_pid] = IRewarder(_rewarder);
@@ -164,7 +165,7 @@ contract MasterAdaSwap is Ownable, IMasterAdaSwap {
     }
 
     /// @notice Views function to see pending ASW on frontend.
-    /// @param _pid indexed of the LP ERC-20 token.
+    /// @param _pid indexed of pool from poolInfo list.
     /// @param _user Address of the user.
     /// @param _lid The lock time when the user will be able to withdraw or harvest ASW.
     function pendingAdaSwap(
@@ -204,7 +205,7 @@ contract MasterAdaSwap is Ownable, IMasterAdaSwap {
     }
 
     /// @notice Updates reward variables of the given pool.
-    /// @param _pid indexed of the LP ERC-20 token.
+    /// @param _pid indexed of pool from poolInfo list.
     function updatePool(uint256 _pid)
         public
         returns (PoolInfo memory pool)
@@ -233,7 +234,7 @@ contract MasterAdaSwap is Ownable, IMasterAdaSwap {
     }
 
     /// @notice Deposits LP tokens to MO for ASW allocation.
-    /// @param _pid indexed of the LP ERC-20 token.
+    /// @param _pid indexed of pool from poolInfo list.
     /// @param _lid The lock time when the user will be able to withdraw or harvest his ASW.
     /// @param _amount LP token amount to deposit.
     /// @param _to The receiver of `amount` deposit benefit.
@@ -264,7 +265,7 @@ contract MasterAdaSwap is Ownable, IMasterAdaSwap {
     }
 
     /// @notice Withdraws LP tokens from MO.
-    /// @param _pid indexed of the LP ERC-20 token.
+    /// @param _pid indexed of pool from poolInfo list.
     /// @param _lid The lock time when the user will be able to withdraw or harvest his ASW.
     /// @param _amount LP token amount to withdraw.
     /// @param _to Receiver of the LP tokens.
@@ -297,7 +298,7 @@ contract MasterAdaSwap is Ownable, IMasterAdaSwap {
     }
 
     /// @notice Harvests proceeds for transaction sender to `_to`.
-    /// @param _pid indexed of the LP ERC-20 token.
+    /// @param _pid indexed of pool from poolInfo list.
     /// @param _lid The lock time when the user will be able to withdraw or harvest his ASW.
     /// @param _to Receiver of ASW rewards.
     function harvest(
@@ -337,7 +338,7 @@ contract MasterAdaSwap is Ownable, IMasterAdaSwap {
     }
 
     /// @notice Withdraws LP tokens from MO and harvest proceeds for transaction sender to `to`.
-    /// @param _pid indexed of the LP ERC-20 token.
+    /// @param _pid indexed of pool from poolInfo list.
     /// @param _lid The lock time when the user will be able to withdraw or harvest his ASW.
     /// @param _amount LP token amount to withdraw.
     /// @param _to Receiver of the LP tokens and ASW rewards.
@@ -387,9 +388,9 @@ contract MasterAdaSwap is Ownable, IMasterAdaSwap {
     }
 
     /// @notice Withdraws without caring about rewards. EMERGENCY ONLY.
-    /// @param _pid indexed of the LP ERC-20 token.
+    /// @param _pid indexed of pool from poolInfo list.
+    /// @param _lid indexed of lock time from lockInfo list.
     /// @param _to Receiver of the LP tokens.
-    /// @param _lid The lock time when the user will be able to withdraw or harvest his ASW.
     function emergencyWithdraw(
         uint256 _pid,
         uint8 _lid,

@@ -23,7 +23,7 @@ const main = async () => {
   const MasterAdaSwap = await deploy("MasterAdaSwap", [ASW_TOKEN_ADDRESS, TREASURY_ADDRESS]);
   await MasterAdaSwap.deployed();
 
-  // await Treasury.setAllowance(ASW_TOKEN_ADDRESS, "10000000000000000000000000000", MasterAdaSwap.address);
+  // await Treasury.setAllowance(ASW_TOKEN_ADDRESS, "1000000000000000000000000000000", MasterAdaSwap.address);
 
   console.log(
     " 💾  Artifacts (address, abi, and args) saved to: ",
