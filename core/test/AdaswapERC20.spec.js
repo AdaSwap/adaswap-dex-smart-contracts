@@ -61,6 +61,40 @@ describe('AdaswapERC20', () => {
     expect(allowance.toString()).to.eq(TEST_AMOUNT.toString())
   })
 
+  it('increaseAllowance', async () => {
+    const approveAmount = expandTo18Decimals('5')
+    const increasingAmount = TEST_AMOUNT
+    const expectedAllowance = expandTo18Decimals('15')
+    await instance.approve(accounts[1].address, approveAmount)
+    await expect(
+        await instance.increaseAllowance(accounts[1].address, increasingAmount)
+    ).to.emit(instance, 'Approval').withArgs(
+        accounts[0].address, 
+        accounts[1].address, 
+        expectedAllowance
+    )
+
+    let allowance = await instance.allowance(accounts[0].address, accounts[1].address)
+    expect(allowance.toString()).to.eq(expectedAllowance.toString())
+  })
+
+  it('decreaseAllowance', async () => {
+    const approveAmount = expandTo18Decimals('15')
+    const decreasingAmount = TEST_AMOUNT
+    const expectedAllowance = expandTo18Decimals('5')
+    await instance.approve(accounts[1].address, approveAmount)
+    await expect(
+        await instance.decreaseAllowance(accounts[1].address, decreasingAmount)
+    ).to.emit(instance, 'Approval').withArgs(
+        accounts[0].address, 
+        accounts[1].address, 
+        expectedAllowance
+    )
+
+    let allowance = await instance.allowance(accounts[0].address, accounts[1].address)
+    expect(allowance.toString()).to.eq(expectedAllowance.toString())
+  })
+
   it('transfer', async () => {
     expect(
         await instance.transfer(accounts[1].address, TEST_AMOUNT)

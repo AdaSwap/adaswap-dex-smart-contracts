@@ -2,4 +2,7 @@ node_modules/
 
 .contract.address
 .secret
+.DS_Store
 .env
+.secret
+.contract.address

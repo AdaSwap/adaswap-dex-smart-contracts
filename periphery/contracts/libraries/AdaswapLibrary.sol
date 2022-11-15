@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity =0.8.13;
 
-import '@adaswap-testnet/core/contracts/interfaces/IAdaswapPair.sol';
+import '@adaswap/core/contracts/interfaces/IAdaswapPair.sol';
 
 library AdaswapLibrary {
 
@@ -19,7 +19,7 @@ library AdaswapLibrary {
                 hex'ff',
                 factory,
                 keccak256(abi.encodePacked(token0, token1)),
-                hex'd27b57c5cec4f69c31b257335a89e83543b6aaf2f85c3c4b1946fe5d3f9558dc' // init code hash
+                hex'da83fe29e2166f27198116fed6d80db58af433b2543a0040e0672ed25a6cbbc1' // init code hash
             )))));
     }
 

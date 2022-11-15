@@ -8,27 +8,23 @@ contract AdaswapERC20 is IAdaswapERC20 {
     string public constant name = 'Adaswap LP Token';
     string public constant symbol = 'ALP';
     uint8 public constant decimals = 18;
-    uint  public override totalSupply;
-    mapping(address => uint) public override balanceOf;
-    mapping(address => mapping(address => uint)) public override allowance;
+    uint  public totalSupply;
+    mapping(address => uint) public balanceOf;
+    mapping(address => mapping(address => uint)) public allowance;
 
-    bytes32 public override DOMAIN_SEPARATOR;
+    bytes32 public DOMAIN_SEPARATOR;
     // keccak256("Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)");
-    bytes32 public constant override PERMIT_TYPEHASH = 
+    bytes32 public constant PERMIT_TYPEHASH = 
         0x6e71edae12b1b97f4d1f60370fef10105fa2faae0126114a169c64845d6126c9;
-    mapping(address => uint) public override nonces;
+    mapping(address => uint) public nonces;
 
     constructor() {
-        uint chainId;
-        assembly {
-            chainId := chainid()
-        }
         DOMAIN_SEPARATOR = keccak256(
             abi.encode(
                 keccak256('EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)'),
                 keccak256(bytes(name)),
                 keccak256(bytes('1')),
-                chainId,
+                block.chainid,
                 address(this)
             )
         );
@@ -47,6 +43,9 @@ contract AdaswapERC20 is IAdaswapERC20 {
     }
 
     function _approve(address owner, address spender, uint value) private {
+        require(owner != address(0), "Adaswap: approve from the zero address");
+        require(spender != address(0), "Adaswap: approve to the zero address");
+
         allowance[owner][spender] = value;
         emit Approval(owner, spender, value);
     }
@@ -57,17 +56,32 @@ contract AdaswapERC20 is IAdaswapERC20 {
         emit Transfer(from, to, value);
     }
 
-    function approve(address spender, uint value) external override returns (bool) {
+    function approve(address spender, uint value) external returns (bool) {
         _approve(msg.sender, spender, value);
         return true;
     }
 
-    function transfer(address to, uint value) external override returns (bool) {
+    function increaseAllowance(address spender, uint256 addedValue) external returns (bool) {
+        _approve(msg.sender, spender, allowance[msg.sender][spender] + addedValue);
+        return true;
+    }
+
+    function decreaseAllowance(address spender, uint256 subtractedValue) external returns (bool) {
+        uint256 currentAllowance = allowance[msg.sender][spender];
+        require(currentAllowance >= subtractedValue, "Adaswap: decreased allowance below zero");
+        unchecked {
+            _approve(msg.sender, spender, currentAllowance - subtractedValue);
+        }
+
+        return true;
+    }
+
+    function transfer(address to, uint value) external returns (bool) {
         _transfer(msg.sender, to, value);
         return true;
     }
 
-    function transferFrom(address from, address to, uint value) external override returns (bool) {
+    function transferFrom(address from, address to, uint value) external returns (bool) {
         if (allowance[from][msg.sender] != type(uint).max) {
             allowance[from][msg.sender] = allowance[from][msg.sender] - value;
         }
@@ -75,7 +89,7 @@ contract AdaswapERC20 is IAdaswapERC20 {
         return true;
     }
 
-    function permit(address owner, address spender, uint value, uint deadline, uint8 v, bytes32 r, bytes32 s) external override {
+    function permit(address owner, address spender, uint value, uint deadline, uint8 v, bytes32 r, bytes32 s) external {
         require(deadline >= block.timestamp, 'Adaswap: EXPIRED');
         bytes32 digest = keccak256(
             abi.encodePacked(
