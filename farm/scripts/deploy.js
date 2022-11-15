@@ -3,35 +3,27 @@ const fs = require("fs");
 const chalk = require("chalk");
 const { config, ethers, tenderly, run, network } = require("hardhat");
 const { utils } = require("ethers");
+const constants = require('../../constants');
 
 const main = async () => {
   console.log("\n\n 📡 Deploying...\n");
 
-  // get signer from network config
-  let [ deployer ] = await ethers.getSigners();
+  const { ASW_TOKEN_ADDRESS, TREASURY_ADDRESS } = constants[network.name];
 
-  const AdaSwapToken = await deploy("AdaSwapToken");
-  await AdaSwapToken.deployed();
-  const MasterAdaSwap = await deploy("MasterAdaSwap", [AdaSwapToken.address]);
+  // const ASW = await deploy("AdaSwapToken");
+  // await ASW.deployed();
+  // ASW_TOKEN_ADDRESS = ASW.address;
+
+  // const Treasury = await deploy("Treasury");
+  // await Treasury.deployed();
+  // TREASURY_ADDRESS = Treasury.address;
+
+  // await ASW.mint(TREASURY_ADDRESS, "10000000000000000000000000000");
+
+  const MasterAdaSwap = await deploy("MasterAdaSwap", [ASW_TOKEN_ADDRESS, TREASURY_ADDRESS]);
   await MasterAdaSwap.deployed();
-  const EmptyRewarder = await deploy("EmptyRewarder");
-  await EmptyRewarder.deployed();
 
-  // premint 10B AdaSwap tokens to deployer address
-  await AdaSwapToken.mint(deployer.address, "10000000000000000");
-  console.log(` 💰 Minting 10B AdaSwap tokens to ${deployer.address}`);
-
-  // const AdaSwapTokenFactory = await ethers.getContractFactory("MasterAdaSwap");
-  // const AdaSwapToken = await AdaSwapTokenFactory.attach("0x214207859701D6d6890544eeaC3a5141b5e94F86")
-  // const EmptyRewarderFactory = await ethers.getContractFactory("EmptyRewarder");
-  // const EmptyRewarder = await EmptyRewarderFactory.attach("0x77b2f61ED424DEce5c3d2CF03a9a70c08E1529b2")
-  // const MasterAdaSwap = {address: "0xBaEBD335725E396853B57cFacAfE2b1CDCe5D85f"}
-
-  // transfer ownership to the MasterAdaSwap contract
-  await AdaSwapToken.transferOwnership(MasterAdaSwap.address);
-  console.log(` 💰 Transferring ownership to ${MasterAdaSwap.address}`);
-  await EmptyRewarder.transferOwnership(MasterAdaSwap.address);
-  console.log(` 💰 Transferring ownership to ${MasterAdaSwap.address}`);
+  // await Treasury.setAllowance(ASW_TOKEN_ADDRESS, "1000000000000000000000000000000", MasterAdaSwap.address);
 
   console.log(
     " 💾  Artifacts (address, abi, and args) saved to: ",

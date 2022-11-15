@@ -1,7 +1,7 @@
 require("@nomiclabs/hardhat-waffle");
 require("@nomiclabs/hardhat-waffle");
 const fs = require("fs");
-require('dotenv').config({path:'.env'});
+require('dotenv').config({path:'../.env'});
 require('hardhat-contract-sizer');
 
 // This is a sample Hardhat task. To learn how to create your own go to
@@ -16,7 +16,7 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
 
 function mnemonic() {
   try {
-    return fs.readFileSync(".secret").toString().trim();
+    return fs.readFileSync("./mnemonic.txt").toString().trim();
   } catch (e) {
     if (defaultNetwork !== "localhost") {
       console.log(
@@ -46,22 +46,30 @@ module.exports = {
   networks: {
     hardhat: {
       forking: {
-        url: process.env.PROVIDER,
-        blockNumber: 11797060
-      },
-      accounts: {
-        mnemonic: 'prevent evidence skate leader couple kitchen orient grace mean shove ceiling goddess'
+        url: process.env.MILKOMEDA_MAINNET_PROVIDER,
+        blockNumber: 4000000
       }
+      // accounts: {
+      //   mnemonic: 'height school space unique renew cable one stumble ring cube artefact plunge'
+      // }
     },
     localhost: {
       url: "http://localhost:8545",
-      accounts: {
-        mnemonic: 'prevent evidence skate leader couple kitchen orient grace mean shove ceiling goddess'
-      }
+      /*      
+        notice no mnemonic here? it will just use account 0 of the hardhat node to deploy
+        (you can put in a mnemonic here to set the deployer locally)
+      
+      */
     },
+
     milkomedaTestnet: {
-      url: `${process.env.MIKOMEDA_TESTNET_PROVIDER}`,
+      url: `${process.env.MILKOMEDA_TESTNET_PROVIDER}`,
       accounts: [`${process.env.MILKOMEDA_TESTNET_DEPLOYER_PRIV_KEY}`],
+    },
+
+    milkomedaMainnet: {
+      url: `${process.env.MILKOMEDA_MAINNET_PROVIDER}`,
+      accounts: [`${process.env.MILKOMEDA_MAINNET_DEPLOYER_PRIV_KEY}`],
     },
   },
 
