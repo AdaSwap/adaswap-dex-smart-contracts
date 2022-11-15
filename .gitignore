@@ -1,5 +1,9 @@
 node_modules/
 
+.vscode/
 .contract.address
 .secret
+.DS_Store
 .env
+.secret
+.contract.address

@@ -29,7 +29,7 @@ const router = new Contract(
 );
 const factory = new Contract(
     FACTORY_ADDRESS, 
-    require('@adaswap-testnet/core/artifacts/contracts/AdaswapFactory.sol/AdaswapFactory.json').abi, 
+    require('@adaswap/core/artifacts/contracts/AdaswapFactory.sol/AdaswapFactory.json').abi, 
     provider
 );
 
@@ -59,7 +59,7 @@ async function getPairContract(tokenA, tokenB) {
 function getTokenContract(tokenAddress) {
     return new Contract(
         tokenAddress, 
-        require('@adaswap-testnet/core/artifacts/contracts/AdaswapPair.sol/AdaswapPair.json').abi, 
+        require('@adaswap/core/artifacts/contracts/AdaswapPair.sol/AdaswapPair.json').abi, 
         provider
     );
 }

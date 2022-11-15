@@ -1,8 +1,8 @@
 const { solidity } = require("ethereum-waffle");
 // const AdaswapFactoryJson = require('../../core/artifacts/contracts/AdaswapFactory.sol/AdaswapFactory.json')
 // const AdaswapPairJson = require('../../core/artifacts/contracts/AdaswapPair.sol/AdaswapPair.json')
-const AdaswapFactoryJson = require('@adaswap-testnet/core/artifacts/contracts/AdaswapFactory.sol/AdaswapFactory.json')
-const AdaswapPairJson = require('@adaswap-testnet/core/artifacts/contracts/AdaswapPair.sol/AdaswapPair.json')
+const AdaswapFactoryJson = require('@adaswap/core/artifacts/contracts/AdaswapFactory.sol/AdaswapFactory.json')
+const AdaswapPairJson = require('@adaswap/core/artifacts/contracts/AdaswapPair.sol/AdaswapPair.json')
 const { use, expect } = require('chai')
 const {
   ecsign
