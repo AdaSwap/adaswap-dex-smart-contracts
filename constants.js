@@ -17,8 +17,8 @@ module.exports = {
         FACTORY_ADDRESS: '0xAa293D2262cFE5bBCE618f26E582e8E338237c8c',
         WETH_ADDRESS: '0x65a51E52eCD17B641f8F0D1d56a6c9738951FDC9',
         // for farms
-        ASW_TOKEN_ADDRESS: '',
-        TREASURY_ADDRESS: '',
+        ASW_TOKEN_ADDRESS: '0x84a0b87eb42eed5a0a9185d510910ad9deee4470',
+        TREASURY_ADDRESS: '0x201D42B69Fb883c1Fe0b7946e842cA4832F63223',
     },
     milkomedaMainnet: {
         // for core
