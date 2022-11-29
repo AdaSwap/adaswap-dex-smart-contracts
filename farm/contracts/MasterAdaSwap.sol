@@ -136,7 +136,7 @@ contract MasterAdaSwap is Ownable, IMasterAdaSwap {
     function set(
         uint256 _pid,
         uint8 _lid,
-        uint256 _allocPoint
+        uint64 _allocPoint
     ) external onlyOwner {
         LockInfo storage lock = lockInfo[_pid][_lid];
         PoolInfo memory pool = updatePool(_pid);
@@ -145,8 +145,8 @@ contract MasterAdaSwap is Ownable, IMasterAdaSwap {
             lock.allocPoint +
             _allocPoint;
         poolInfo[_pid].weight = pool.weight - lock.allocPoint*lock.supply + _allocPoint * lock.supply;
-        lock.allocPoint = _allocPoint.to64();
-        emit LogSetPool(_pid, _lid, _allocPoint.to64());
+        lock.allocPoint = _allocPoint;
+        emit LogSetPool(_pid, _lid, _allocPoint);
     }
 
     /// @notice Updates the given pool's `IRewarder` contract. Can only be called by the owner.

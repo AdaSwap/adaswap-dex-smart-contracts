@@ -29,7 +29,7 @@ interface IMasterAdaSwap {
     /// @notice Info of each MA lock pool.
     struct LockInfo {
         uint256 supply;
-        uint256 allocPoint;
+        uint64 allocPoint;
     }
 
     /**
@@ -113,7 +113,7 @@ interface IMasterAdaSwap {
     function set(
         uint256 _pid,
         uint8 _lid,
-        uint256 _allocPoint
+        uint64 _allocPoint
     ) external;
 
     function setRewarder(uint256 pid, address rewarder) external;
