@@ -104,7 +104,7 @@ describe("MasterAdaSwap", function () {
     });
 
     describe('Check rewards', async () => {
-        it('19. testMasterAdaSwap: Stop Reward counting', async () => {
+        it('20. testMasterAdaSwap: Stop Reward counting', async () => {
 
             let tomm = await chef.userInfo(1, 0, TOM.address);
             await chef.connect(TOM)
@@ -184,19 +184,19 @@ describe("MasterAdaSwap", function () {
     });
 
     describe('Fake operations',async()=>{
-        it("20. testMasterAdaSwap: Should revert if not Onlyowner", async()=>{
+        it("21. testMasterAdaSwap: Should revert if not Onlyowner", async()=>{
             await expect( chef.connect(ALICE).add(allocPoints, lpToken.address, rewarder.address))
             .to.be.revertedWith("Ownable: caller is not the owner");
 
         })
 
-        it("21. testMasterAdaSwap: Should revert if 0 Address", async()=>{
+        it("22. testMasterAdaSwap: Should revert if 0 Address", async()=>{
             await expect( chef.connect('0x0').add(allocPoints, lpToken.address, rewarder.address))
             .to.be.reverted;
 
         })
 
-        it("22. testMasterAdaSwap: Should revert if fake account", async()=>{
+        it("23. testMasterAdaSwap: Should revert if fake account", async()=>{
             advanceIncreaseTime(3600 * 24 * 14); // to unlock lock time
 
             await expect( chef.connect(TOM)

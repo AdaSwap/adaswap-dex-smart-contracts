@@ -49,7 +49,7 @@ describe("MasterAdaSwap Use Cases", () => {
         await chef.add(allocPoints, lpToken.address, rewarder.address);
     })
 
-    it('23. testMasterAdaSwap: One staker already in pool, 2 entered and then exit positions', async () => {
+    it('24. testMasterAdaSwap: One staker already in pool, 2 entered and then exit positions', async () => {
         // One staker entered the pool
         const tx1 = await chef.connect(ALICE).deposit(0, 1, getBigNumber(2), ALICE.address);
         let timestamp1 = (await ethers.provider.getBlock(tx1.blockNumber)).timestamp;
@@ -93,7 +93,7 @@ describe("MasterAdaSwap Use Cases", () => {
         expect(infoAfter.rewardDebt).to.eq(accumulatedAdaSwap);
     })
 
-    it('24. testMasterAdaSwap: Two stakers already in pool, 1 entered and then first two exit positions', async () => {
+    it('25. testMasterAdaSwap: Two stakers already in pool, 1 entered and then first two exit positions', async () => {
         // Two stakers entered the pool
         await chef.connect(BOB).deposit(0, 1, getBigNumber(11), BOB.address);
         await chef.connect(ALICE).deposit(0, 1, getBigNumber(7), ALICE.address);
@@ -154,7 +154,7 @@ describe("MasterAdaSwap Use Cases", () => {
         expect(infoAfterSTEAVE.rewardDebt).to.eq(accAdaSwapSTEAVE);
     })
 
-    it('25. testMasterAdaSwap: Two users are already staking and harvesting in different periods of time', async () => {
+    it('26. testMasterAdaSwap: Two users are already staking and harvesting in different periods of time', async () => {
         // Two stakers entered the pool
         await chef.connect(BOB).deposit(0, 3, getBigNumber(11), BOB.address);
         await chef.connect(ALICE).deposit(0, 3, getBigNumber(27), ALICE.address);
@@ -208,7 +208,7 @@ describe("MasterAdaSwap Use Cases", () => {
         expect(infoAfterALICE.rewardDebt).to.eq(accumulatedAdaSwapALICE);
     });
 
-    it('26. testMasterAdaSwap: Two users are staking, then other two users start staking. After that first two increase their staking amount', async () => {
+    it('27. testMasterAdaSwap: Two users are staking, then other two users start staking. After that first two increase their staking amount', async () => {
         // Two stakers entered the pool
         await chef.connect(BOB).deposit(0, 4, getBigNumber(11), BOB.address);
         await chef.connect(ALICE).deposit(0, 4, getBigNumber(27), ALICE.address);

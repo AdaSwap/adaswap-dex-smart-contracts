@@ -90,7 +90,7 @@ describe("MasterAdaSwap", function () {
     })
 
     describe('Creating pools with different time lock', async () => {
-        it('27. testMasterAdaSwap: Pool with time lock - 14 days', async () => {
+        it('28. testMasterAdaSwap: Pool with time lock - 14 days', async () => {
             // first pool
             // lock time - 14 days
             await lpToken0.connect(BOB).approve(chef.address, getBigNumber(15));
@@ -126,7 +126,7 @@ describe("MasterAdaSwap", function () {
             expect(infoAfterSTEAVE.rewardDebt).to.eq(accumulatedAdaSwapSTEAVE);
         });
 
-        it('28. testMasterAdaSwap: Pool with time lock - 60 days', async () => {
+        it('29. testMasterAdaSwap: Pool with time lock - 60 days', async () => {
             await lpToken1.connect(TOM).approve(chef.address, getBigNumber(15));
             await lpToken1.connect(GOR).approve(chef.address, getBigNumber(15));
             await lpToken1.connect(TOR).approve(chef.address, getBigNumber(15));
@@ -170,7 +170,7 @@ describe("MasterAdaSwap", function () {
             expect(infoAfterYOR.rewardDebt).to.eq(accumulatedAdaSwapYOR);
         })
 
-        it('29. testMasterAdaSwap: Pool with time lock - 365 days ', async () => {
+        it('30. testMasterAdaSwap: Pool with time lock - 365 days ', async () => {
 
             await lpToken2.connect(J).approve(chef.address, getBigNumber(150000));
             await lpToken2.connect(K).approve(chef.address, getBigNumber(150000));
@@ -207,7 +207,7 @@ describe("MasterAdaSwap", function () {
             expect(infoAfterSTEAVE_.rewardDebt).to.eq(accumulatedAdaSwapSTEAVE_);
         })
 
-        it('30. testMasterAdaSwap: Pool with diffrent time lock in same pool', async () => {
+        it('31. testMasterAdaSwap: Pool with diffrent time lock in same pool', async () => {
 
             await lpToken0.connect(BOB).approve(chef.address, getBigNumber(150000));
             await lpToken0.connect(ALICE).approve(chef.address, getBigNumber(150000));

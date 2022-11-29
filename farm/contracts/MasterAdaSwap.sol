@@ -144,6 +144,7 @@ contract MasterAdaSwap is Ownable, IMasterAdaSwap {
             totalAllocPoint -
             lock.allocPoint +
             _allocPoint;
+        poolInfo[_pid].allocPoint = poolInfo[_pid].allocPoint - lock.allocPoint + _allocPoint;
         poolInfo[_pid].weight = pool.weight - lock.allocPoint*lock.supply + _allocPoint * lock.supply;
         lock.allocPoint = _allocPoint;
         emit LogSetPool(_pid, _lid, _allocPoint);
