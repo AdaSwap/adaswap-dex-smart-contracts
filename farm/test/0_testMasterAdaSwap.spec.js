@@ -1,7 +1,7 @@
 const { ethers } = require("hardhat");
 const { use, expect } = require("chai");
 const { solidity } = require("ethereum-waffle");
-const { getBigNumber } = require("./shared/utils");
+const { getBigNumber, ADDRESS_ZERO } = require("./shared/utils");
 const { BigNumber } = require("ethers");
 
 use(solidity);
@@ -313,7 +313,7 @@ describe("MasterAdaSwap", function () {
 
     describe('Add', () => {
         it(`18. testMasterAdaSwap: Should add pool with corresponding allocation points`, async () => {
-            const tx = await chef.connect(ADMIN).add(allocPoints, lpToken.address, rewarder.address);
+            const tx = await chef.connect(ADMIN).add(allocPoints, "0x15285DE40eA330eA141A73C99778598B4A5aD163", rewarder.address);
             await tx.wait();
 
             const pool = await chef.poolInfo(1)
@@ -327,6 +327,14 @@ describe("MasterAdaSwap", function () {
             await expect(
                 chef.connect(ALICE).add(allocPoints, lpToken.address, rewarder.address)
             ).to.be.revertedWith('Ownable: caller is not the owner')
+
+            await expect(
+                chef.connect(ADMIN).add(allocPoints, ADDRESS_ZERO, rewarder.address)
+            ).to.be.revertedWith('MasterAdaSwap: ZERO_ADDRESS');
+
+            await expect(
+                chef.connect(ADMIN).add(allocPoints, lpToken.address, rewarder.address)
+            ).to.be.revertedWith('MasterAdaSwap: POOL_EXISTS');
         })
     })
 })
