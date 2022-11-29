@@ -11,7 +11,6 @@ contract MasterAdaSwap is Ownable, IMasterAdaSwap {
     using SafeERC20 for IERC20;
     using UInt256 for uint256;
     using Int256 for int256;
-    using UInt128 for uint128;
 
     /// @notice The lockTimes could be able to use in each pools. first element 0 second also meaning the flexible farming.
     uint32[] public lockTimes = [
