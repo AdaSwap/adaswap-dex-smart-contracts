@@ -16,7 +16,7 @@ describe("MasterAdaSwap", function () {
     let allocPoints = [10, 20, 40, 10, 10, 10, 0];
 
     before((done) => {
-        setTimeout(done, 2000);
+        setTimeout(done, 4000);
     });
 
     beforeEach(async () => {
@@ -72,7 +72,6 @@ describe("MasterAdaSwap", function () {
         const expectedAdaSwap = getBigNumber(10).mul(timestamp2 - timestamp1);
         expect(pendingAdaSwap).to.be.equal(expectedAdaSwap);
     })
-
 
     describe('Deposit', () => {
         it(`2. testMasterAdaSwap:  Deposit 1 lptoken`, async () => {
@@ -327,6 +326,26 @@ describe("MasterAdaSwap", function () {
             await expect(
                 chef.connect(ALICE).add(allocPoints, lpToken.address, rewarder.address)
             ).to.be.revertedWith('Ownable: caller is not the owner')
+        })
+    })
+
+    describe('Set', () => {
+        it(`19. testMasterAdaSwap: Should add pool with corresponding allocation points and weight`, async () => {
+            await chef.connect(BOB).deposit(0, 0, getBigNumber(1), BOB.address);
+            await chef.connect(ALICE).deposit(0, 1, getBigNumber(2), ALICE.address);
+
+            const lock0Before = await chef.lockInfo(0, 0);
+            const poolInfoBeforeSet = await chef.poolInfo(0); // w = BN(1) * 10 + BN(2) * 20 = BN(50)
+            const tx = await chef.connect(ADMIN).set(0, 0, 100);
+            await tx.wait();
+            const lock0After = await chef.lockInfo(0, 0);
+            const poolInfoAfterSet = await chef.poolInfo(0); // w = w - BN(1) * 10 + BN(1) * 100 = BN(140)
+
+            expect(poolInfoAfterSet.allocPoint).to.eq(poolInfoBeforeSet.allocPoint.sub(allocPoints[0]).add(100)); // 100 - 10 + 100
+            expect(poolInfoAfterSet.allocPoint).to.eq(190)
+
+            expect(poolInfoAfterSet.weight).to.eq(poolInfoBeforeSet.weight.sub(lock0Before.allocPoint.mul(lock0Before.supply)).add(lock0After.allocPoint.mul(lock0After.supply)));
+            expect(poolInfoAfterSet.weight).to.eq(getBigNumber(140));
         })
     })
 })
