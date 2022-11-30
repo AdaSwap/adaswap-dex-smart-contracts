@@ -45,13 +45,16 @@ contract MasterAdaSwap is Ownable, IMasterAdaSwap {
     /// @notice Address of each `IRewarder` contract in MCV2.
     IRewarder[] public rewarder;
 
-    // lp token -> lockTimeId -> LockInfo
+    // pid -> lockTimeId -> LockInfo
     mapping(uint256 => mapping(uint8 => LockInfo)) public lockInfo;
 
     /// @notice Info about each user that stakes LP tokens.
     // pid  -> lockTimeId -> user address -> UserInfo
     mapping(uint256 => mapping(uint8 => mapping(address => UserInfo)))
         public userInfo;
+
+    // lpToken -> existed?
+    mapping(address => bool) lpTokenExisted;
 
     /// @dev Total amount of allocation points. Must be the sum of all allocation points from all pools.
     uint256 public totalAllocPoint = 0;
@@ -62,6 +65,7 @@ contract MasterAdaSwap is Ownable, IMasterAdaSwap {
 
     /// @param _adaswapTreasury The contract address.
     constructor(address _adaswapToken, address _adaswapTreasury) {
+        require((_adaswapToken != address(0)) && (_adaswapTreasury != address(0)), 'MasterAdaSwap: ZERO_ADDRESS');
         ASW = IERC20(_adaswapToken);
         AdaSwapTreasury = _adaswapTreasury;
     }
@@ -94,6 +98,8 @@ contract MasterAdaSwap is Ownable, IMasterAdaSwap {
         address _lpToken,
         address _rewarder
     ) external onlyOwner {
+        require(_lpToken != address(0), 'MasterAdaSwap: ZERO_ADDRESS');
+        require(!lpTokenExisted[_lpToken], 'MasterAdaSwap: POOL_EXISTS');
         uint64 poolAllocPoint = 0;
         uint256 size = lockTimes.length < _allocPoints.length
             ? lockTimes.length
@@ -115,6 +121,7 @@ contract MasterAdaSwap is Ownable, IMasterAdaSwap {
                 weight: 0
             })
         );
+        lpTokenExisted[_lpToken] = true;
 
         for (uint8 i = 0; i < size; i++) {
             LockInfo storage lock = lockInfo[lpToken.length - 1][i];
