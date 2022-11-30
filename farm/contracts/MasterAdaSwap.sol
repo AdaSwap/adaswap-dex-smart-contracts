@@ -100,17 +100,20 @@ contract MasterAdaSwap is Ownable, IMasterAdaSwap {
         require(_lpToken != address(0), 'MasterAdaSwap: ZERO_ADDRESS');
         require(!lpTokenExisted[_lpToken], 'MasterAdaSwap: POOL_EXISTS');
         uint64 poolAllocPoint = 0;
+
+        lpToken.push(IERC20(_lpToken));
+        rewarder.push(IRewarder(_rewarder));
+
         uint256 size = lockTimes.length < _allocPoints.length
             ? lockTimes.length
             : _allocPoints.length;
         for (uint8 i = 0; i < size; i++) {
             if (_allocPoints[i] != 0) {
                 poolAllocPoint += _allocPoints[i];
+                lockInfo[lpToken.length - 1][i].allocPoint = _allocPoints[i];
             }
         }
         totalAllocPoint = totalAllocPoint + poolAllocPoint;
-        lpToken.push(IERC20(_lpToken));
-        rewarder.push(IRewarder(_rewarder));
 
         poolInfo.push(
             PoolInfo({
@@ -121,11 +124,6 @@ contract MasterAdaSwap is Ownable, IMasterAdaSwap {
             })
         );
         lpTokenExisted[_lpToken] = true;
-
-        for (uint8 i = 0; i < size; i++) {
-            LockInfo storage lock = lockInfo[lpToken.length - 1][i];
-            lock.allocPoint = _allocPoints[i];
-        }
 
         emit LogPoolAddition(
             lpToken.length - 1,
